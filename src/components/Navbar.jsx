@@ -1,0 +1,15 @@
+import { Link } from "react-router-dom"
+
+function Navbar() {
+    return (
+        <nav className="flex justify-between bg-gray-900">
+            <span className="text-white text-xl p-4">Psytrance event tracker!~</span>
+            <div className="flex text-purple-400 text-xl justify-between transition-colors duration-200">
+                <Link to={"/"} className="p-4 hover:text-cyan-400">Home</Link>
+                <Link to={"/events"} className="p-4 hover:text-cyan-400">Events</Link>
+            </div>
+        </nav>
+    )
+}
+
+export default Navbar
