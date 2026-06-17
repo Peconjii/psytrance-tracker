@@ -4,6 +4,9 @@ import fetchEvents from '../api/ticketmaster.js'
 
 
 function Events() {
+
+     const [search, useSearch] = useState("")
+
      const [events, setEvents] = useState([])
   
   useEffect(() => {
