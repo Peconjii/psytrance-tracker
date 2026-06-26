@@ -7,6 +7,7 @@ function Navbar() {
             <div className="flex text-purple-400 text-xl justify-between transition-colors duration-200">
                 <Link to={"/"} className="p-4 hover:text-cyan-400">Home</Link>
                 <Link to={"/events"} className="p-4 hover:text-cyan-400">Events</Link>
+                <Link to={"/favorites"} className="p-4 hover:text-cyan-400">Favorites</Link>
             </div>
         </nav>
     )
