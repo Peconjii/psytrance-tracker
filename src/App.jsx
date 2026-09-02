@@ -5,21 +5,27 @@ import Events from './pages/Events'
 import Navbar from './components/Navbar'
 import { FavoritesProvider } from './context/FavoritesContext'
 import Favorites from './pages/Favorites'
+import { AuthProvider } from './context/AuthContext'
+import Register from './pages/Register'
+import Login from './pages/Login'
+
 
 function App() {
- 
-
   return (
-    <FavoritesProvider>
+    <AuthProvider>
+      <FavoritesProvider>
         <BrowserRouter>
-        <Navbar />
-         <Routes>
+          <Navbar />
+          <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/events' element={<Events />} />
             <Route path='/favorites' element={<Favorites />} />
+            <Route path='/login' element={<Login />} />
+            <Route path='/register' element={<Register />} />
           </Routes>
         </BrowserRouter>
-     </FavoritesProvider>
+      </FavoritesProvider>
+    </AuthProvider>
   )
 }
 

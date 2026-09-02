@@ -8,6 +8,9 @@ function Navbar() {
                 <Link to={"/"} className="p-4 hover:text-cyan-400">Home</Link>
                 <Link to={"/events"} className="p-4 hover:text-cyan-400">Events</Link>
                 <Link to={"/favorites"} className="p-4 hover:text-cyan-400">Favorites</Link>
+                <Link to={"/register"} className="p-4 hover:text-cyan-400">Register</Link>
+                <Link to={"/login"} className="p-4 hover:text-cyan-400">Login</Link>
+
             </div>
         </nav>
     )
