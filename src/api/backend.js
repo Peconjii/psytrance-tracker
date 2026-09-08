@@ -27,7 +27,10 @@ function normalizeEvent(rawEvent) {
         startTime: event.startTime || event.dateStart || 'N/A',
         nameType: event.nameType || 'Party',
         urlImageMedium: event.urlImageMedium || null,
-        urlPartyHtml: event.urlPartyHtml || '#'
+        urlPartyHtml: event.urlPartyHtml || '#',
+        // Proveravamo sve moguće nazive za geografske širine i dužine
+        lat: event.lat || event.lat_party || event.latitude || null,
+        lon: event.lon || event.lon_party || event.longitude || null
     };
 }
 
