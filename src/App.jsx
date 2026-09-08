@@ -8,6 +8,7 @@ import Favorites from './pages/Favorites'
 import { AuthProvider } from './context/AuthContext'
 import Register from './pages/Register'
 import Login from './pages/Login'
+import Profile from './pages/Profile'
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path='/events' element={<Events />} />
             <Route path='/favorites' element={<Favorites />} />
+            <Route path='/profile' element={<Profile />} /> 
             <Route path='/login' element={<Login />} />
             <Route path='/register' element={<Register />} />
           </Routes>

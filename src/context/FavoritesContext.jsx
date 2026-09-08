@@ -4,34 +4,57 @@ import api from "../api/backend"
 
 const FavoritesContext = createContext()
 
-function FavoritesProvider({ children }) {
+export function FavoritesProvider({ children }) {
     const [favorites, setFavorites] = useState([])
-    const { user } = useAuth()
+    const { user, token } = useAuth()
 
     useEffect(() => {
-        if (user) {
-            api.get(`/api/favorites/${user.id}`)
-                .then(response => setFavorites(response.data))
-                .catch(err => console.log(err))
-        } else {
+        if (!user?.id || !token) {
             setFavorites([])
+            return
         }
-    }, [user])
 
-    async function addFavorite(eventId, eventName) {
-        await api.post(`/api/favorites/${user.id}`, null, {
-            params: { eventId, eventName }
-        })
-        const response = await api.get(`/api/favorites/${user.id}`)
-        setFavorites(response.data)
+        async function fetchFavorites() {
+            try {
+                const response = await api.get(`/api/favorites/${user.id}`)
+                setFavorites(response.data)
+            } catch (err) {
+                console.error("Failed to fetch favorites:", err)
+            }
+        }
+
+        fetchFavorites()
+    }, [user?.id, token])
+
+    async function addFavorite(eventId, eventName, userId) {
+        const activeUserId = userId || user?.id
+        if (!activeUserId) return
+
+        try {
+            console.log("Adding favorite for user:", activeUserId)
+            await api.post(`/api/favorites/${activeUserId}`, null, {
+                params: { eventId, eventName }
+            })
+            const response = await api.get(`/api/favorites/${activeUserId}`)
+            setFavorites(response.data)
+        } catch (err) {
+            console.error("Failed to add favorite:", err)
+        }
     }
 
-    async function removeFavorite(eventId) {
-        await api.delete(`/api/favorites/${user.id}`, {
-            params: { eventId }
-        })
-        const response = await api.get(`/api/favorites/${user.id}`)
-        setFavorites(response.data)
+    async function removeFavorite(eventId, userId) {
+        const activeUserId = userId || user?.id
+        if (!activeUserId) return
+
+        try {
+            await api.delete(`/api/favorites/${activeUserId}`, {
+                params: { eventId }
+            })
+            const response = await api.get(`/api/favorites/${activeUserId}`)
+            setFavorites(response.data)
+        } catch (err) {
+            console.error("Failed to remove favorite:", err)
+        }
     }
 
     return (
@@ -41,4 +64,8 @@ function FavoritesProvider({ children }) {
     )
 }
 
-export { FavoritesContext, FavoritesProvider }
+export function useFavorites() {
+    return useContext(FavoritesContext)
+}
+
+export { FavoritesContext }

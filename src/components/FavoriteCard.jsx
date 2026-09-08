@@ -1,23 +1,32 @@
 import { useState, useEffect } from 'react'
-import { useContext } from 'react'
-import { FavoritesContext } from '../context/FavoritesContext'
-import { fetchEventById } from '../api/ticketmaster'
-import EventCard from './EventCard'
+import { fetchGoabaseEventById } from '../api/backend'
+import GoabaseEventCard from './GoabaseEventCard'
 
 function FavoriteCard({ favorite }) {
     const [event, setEvent] = useState(null)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         async function loadEvent() {
-            const data = await fetchEventById(favorite.eventId)
-            setEvent(data)
+            try {
+                const data = await fetchGoabaseEventById(favorite.eventId)
+                setEvent(data)
+            } catch (err) {
+                console.error("Error loading favorite event:", err)
+            } finally {
+                setLoading(false)
+            }
         }
-        loadEvent()
+
+        if (favorite?.eventId) {
+            loadEvent()
+        }
     }, [favorite.eventId])
 
-    if (!event) return <p className="text-white text-center">Loading...</p>
+    if (loading) return <p className="text-white text-center">Loading favorite...</p>
+    if (!event) return null
 
-    return <EventCard events={event} />
+    return <GoabaseEventCard event={event} />
 }
 
 export default FavoriteCard

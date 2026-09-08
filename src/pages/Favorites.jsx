@@ -3,7 +3,7 @@ import { FavoritesContext } from '../context/FavoritesContext'
 import FavoriteCard from '../components/FavoriteCard'
 
 function Favorites() {
-    const { favorites, setFavorites } = useContext(FavoritesContext)
+    const { favorites } = useContext(FavoritesContext)
 
     return(
         favorites.length === 0 ? (
