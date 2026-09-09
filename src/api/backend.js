@@ -4,9 +4,10 @@ const api = axios.create({
     baseURL: 'http://localhost:8080'
 })
 
+// Safely attach token only if it is a valid non-empty string
 api.interceptors.request.use(config => {
     const token = localStorage.getItem('token')
-    if (token && token !== 'undefined' && token !== 'null') {
+    if (token && token !== 'undefined' && token !== 'null' && token.trim() !== '') {
         config.headers.Authorization = `Bearer ${token}`
     } else {
         delete config.headers.Authorization
@@ -14,21 +15,22 @@ api.interceptors.request.use(config => {
     return config
 })
 
+// Safely extract and map event attributes without runtime crashes
 function normalizeEvent(rawEvent) {
     if (!rawEvent) return null;
     const event = rawEvent.party || rawEvent;
+    if (typeof event !== 'object') return null;
 
     return {
         id: String(event.id || ''),
         nameParty: event.nameParty || 'Untitled Event',
         nameTown: event.nameTown || 'Unknown Location',
         nameCountry: event.nameCountry || '',
-        dateStart: event.dateStart ? event.dateStart.split('T')[0] : 'TBA',
+        dateStart: event.dateStart ? String(event.dateStart).split('T')[0] : 'TBA',
         startTime: event.startTime || event.dateStart || 'N/A',
         nameType: event.nameType || 'Party',
         urlImageMedium: event.urlImageMedium || null,
         urlPartyHtml: event.urlPartyHtml || '#',
-        // Obuhvatamo sve varijante naziva koordinata sa Goabase API-ja
         lat: event.lat || event.lat_party || event.latitude || event.geoLat || event.geo_lat || (event.geo && event.geo.lat) || null,
         lon: event.lon || event.lon_party || event.longitude || event.geoLon || event.geo_lon || (event.geo && event.geo.lon) || null
     };

@@ -17,7 +17,7 @@ export function FavoritesProvider({ children }) {
         async function fetchFavorites() {
             try {
                 const response = await api.get(`/api/favorites/${user.id}`)
-                setFavorites(response.data)
+                setFavorites(response.data || [])
             } catch (err) {
                 console.error("Failed to fetch favorites:", err)
             }
@@ -26,39 +26,57 @@ export function FavoritesProvider({ children }) {
         fetchFavorites()
     }, [user?.id, token])
 
-    async function addFavorite(eventId, eventName, userId) {
-        const activeUserId = userId || user?.id
-        if (!activeUserId) return
+    async function addFavorite(event) {
+        const activeUserId = user?.id
+        if (!activeUserId) return alert("Prijavi se da dodaš u omiljene!")
+
+        // Pripremamo ID i ime bez obzira da li je prosleđen ceo objekat ili pojedinačni string
+        const eventId = String(event?.id || event)
+        const eventName = event?.nameParty || event?.name || event?.eventName || 'Untitled Event'
 
         try {
-            console.log("Adding favorite for user:", activeUserId)
-            await api.post(`/api/favorites/${activeUserId}`, null, {
-                params: { eventId, eventName }
+            // Šaljemo čist JSON body ka bekendu
+            const response = await api.post(`/api/favorites/${activeUserId}`, {
+                eventId,
+                eventName
             })
-            const response = await api.get(`/api/favorites/${activeUserId}`)
-            setFavorites(response.data)
+
+            // Ažuriramo stanje sa novim favoritom sa bekenda
+            setFavorites(prev => [...prev, response.data])
         } catch (err) {
             console.error("Failed to add favorite:", err)
         }
     }
 
-    async function removeFavorite(eventId, userId) {
-        const activeUserId = userId || user?.id
+    async function removeFavorite(eventId) {
+        const activeUserId = user?.id
         if (!activeUserId) return
+
+        const idTarget = String(eventId?.id || eventId)
 
         try {
             await api.delete(`/api/favorites/${activeUserId}`, {
-                params: { eventId }
+                params: { eventId: idTarget }
             })
-            const response = await api.get(`/api/favorites/${activeUserId}`)
-            setFavorites(response.data)
+            setFavorites(prev => prev.filter(fav => String(fav.eventId) !== idTarget && String(fav.id) !== idTarget))
         } catch (err) {
             console.error("Failed to remove favorite:", err)
         }
     }
 
+    function toggleFavorite(event) {
+        const targetId = String(event?.id || event)
+        const isFav = favorites.some(fav => String(fav.eventId) === targetId || String(fav.id) === targetId)
+
+        if (isFav) {
+            removeFavorite(targetId)
+        } else {
+            addFavorite(event)
+        }
+    }
+
     return (
-        <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite }}>
+        <FavoritesContext.Provider value={{ favorites, addFavorite, removeFavorite, toggleFavorite }}>
             {children}
         </FavoritesContext.Provider>
     )
