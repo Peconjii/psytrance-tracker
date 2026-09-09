@@ -66,4 +66,23 @@ export async function fetchGoabaseEventById(id) {
     }
 }
 
+export async function fetchEventReviews(eventId) {
+    try {
+        const response = await api.get(`/api/reviews/event/${eventId}`)
+        return response.data || []
+    } catch (err) {
+        console.error("Error fetching reviews:", err)
+        return []
+    }
+}
+
+export async function submitEventReview(eventId, rating, comment) {
+    const response = await api.post('/api/reviews', {
+        eventId,
+        rating,
+        comment
+    })
+    return response.data
+}
+
 export default api

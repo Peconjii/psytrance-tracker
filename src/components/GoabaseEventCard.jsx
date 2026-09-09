@@ -2,11 +2,13 @@ import { useContext, useState } from 'react'
 import { FavoritesContext } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
 import EventMap from './EventMap'
+import ReviewSection from './ReviewSection'
 
 function GoabaseEventCard({ event }) {
     const { favorites, addFavorite, removeFavorite } = useContext(FavoritesContext)
     const { user } = useAuth()
     const [showMap, setShowMap] = useState(false)
+    const [showReviews, setShowReviews] = useState(false)
     
     if (!event) return null;
 
@@ -59,12 +61,25 @@ function GoabaseEventCard({ event }) {
                 </div>
             )}
 
+            {showReviews && (
+                <div className="px-2">
+                    <ReviewSection eventId={String(event.id)} />
+                </div>
+            )}
+
             <div className="flex justify-around items-center p-3 border-t border-gray-600 mt-2">
                 <button 
                     onClick={() => setShowMap(!showMap)} 
                     className="text-sm bg-gray-600 hover:bg-gray-500 text-cyan-300 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
                 >
                     {showMap ? "Hide Map 📍" : "Show Map 📍"}
+                </button>
+
+                <button 
+                    onClick={() => setShowReviews(!showReviews)} 
+                    className="text-sm bg-gray-600 hover:bg-gray-500 text-purple-300 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                >
+                    {showReviews ? "Hide Reviews 💬" : "Reviews 💬"}
                 </button>
 
                 <a 
