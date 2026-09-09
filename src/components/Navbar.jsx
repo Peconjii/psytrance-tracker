@@ -12,6 +12,7 @@ function Navbar() {
             <div className="flex text-purple-400 text-xl items-center gap-2">
                 <Link to="/" className="p-3 hover:text-cyan-400">Home</Link>
                 <Link to="/events" className="p-3 hover:text-cyan-400">Events</Link>
+                <Link to="/map" className="p-3 hover:text-cyan-400">Map</Link>
                 <Link to="/favorites" className="p-3 hover:text-cyan-400">Favorites</Link>
 
                 {user ? (

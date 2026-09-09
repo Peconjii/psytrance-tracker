@@ -9,6 +9,8 @@ import { AuthProvider } from './context/AuthContext'
 import Register from './pages/Register'
 import Login from './pages/Login'
 import Profile from './pages/Profile'
+import GlobalMap from './pages/GlobalMap'
+
 
 
 function App() {
@@ -20,6 +22,7 @@ function App() {
           <Routes>
             <Route path='/' element={<Home />} />
             <Route path='/events' element={<Events />} />
+            <Route path='/map' element={<GlobalMap />} />
             <Route path='/favorites' element={<Favorites />} />
             <Route path='/profile' element={<Profile />} /> 
             <Route path='/login' element={<Login />} />

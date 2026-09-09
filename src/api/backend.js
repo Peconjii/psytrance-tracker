@@ -28,9 +28,9 @@ function normalizeEvent(rawEvent) {
         nameType: event.nameType || 'Party',
         urlImageMedium: event.urlImageMedium || null,
         urlPartyHtml: event.urlPartyHtml || '#',
-        // Proveravamo sve moguće nazive za geografske širine i dužine
-        lat: event.lat || event.lat_party || event.latitude || null,
-        lon: event.lon || event.lon_party || event.longitude || null
+        // Obuhvatamo sve varijante naziva koordinata sa Goabase API-ja
+        lat: event.lat || event.lat_party || event.latitude || event.geoLat || event.geo_lat || (event.geo && event.geo.lat) || null,
+        lon: event.lon || event.lon_party || event.longitude || event.geoLon || event.geo_lon || (event.geo && event.geo.lon) || null
     };
 }
 
