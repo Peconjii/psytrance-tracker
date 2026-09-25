@@ -72,4 +72,15 @@ export async function submitEventReview(eventId, rating, comment) {
     return response.data
 }
 
+// Both throw on failure; the backend's { message } is in err.response.data
+export async function requestPasswordReset(email) {
+    const response = await api.post('/api/auth/forgot-password', { email })
+    return response.data
+}
+
+export async function resetPassword(token, newPassword) {
+    const response = await api.post('/api/auth/reset-password', { token, newPassword })
+    return response.data
+}
+
 export default api

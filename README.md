@@ -19,8 +19,9 @@ This repository is the **React frontend**.
   the map to the first match.
 - **Event cards.** Current weather at the venue (Open-Meteo), a mini-map, reviews with average rating, and
   sharing to WhatsApp or Telegram.
-- **Accounts.** Register and log in (JWT), save favorite events, and see your profile with activity stats and
-  the reviews you've written. Favorites and profile pages are protected routes.
+- **Accounts.** Register and log in (JWT), reset a forgotten password by email, save favorite events, and see
+  your profile with activity stats and the reviews you've written. Favorites and profile pages are protected
+  routes.
 - **Animated background.** A canvas visualizer that cycles through five patterns (flower, spiral, burst,
   wormhole, helix).
 
@@ -59,7 +60,7 @@ src/
 ├── components/   # Event cards, the infinite event feed, maps, reviews, navbar, background
 ├── context/      # AuthContext (user + token), FavoritesContext
 ├── hooks/        # useDebouncedValue
-├── pages/        # Home, Events, GlobalMap, Favorites, Profile, Login, Register
+├── pages/        # Home, Events, GlobalMap, Favorites, Profile, Login, Register, ForgotPassword, ResetPassword
 └── utils/
 ```
 

@@ -50,7 +50,7 @@ function Login() {
                     Don't have an account? <Link to="/register" className="text-cyan-400 hover:text-cyan-300 font-medium">Register</Link>
                 </p>
                 <p className="text-slate-400 text-center text-xs mt-2">
-                    Cant remember password? <Link to="/register" className="text-cyan-400 hover:text-cyan-300 font-medium">click here</Link>
+                    Can't remember your password? <Link to="/forgot-password" className="text-cyan-400 hover:text-cyan-300 font-medium">Reset it</Link>
                 </p>
             </div>
         </div>

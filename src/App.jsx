@@ -8,6 +8,8 @@ import Favorites from './pages/Favorites'
 import { AuthProvider } from './context/AuthContext'
 import Register from './pages/Register'
 import Login from './pages/Login'
+import ForgotPassword from './pages/ForgotPassword'
+import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import GlobalMap from './pages/GlobalMap'
 import CymaticsBackground from './components/CymaticsBackground'
@@ -30,6 +32,8 @@ function App() {
                 <Route path="/map" element={<GlobalMap />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* Zaštićene rute — vidljive samo ulogovanim korisnicima */}
                 <Route 
