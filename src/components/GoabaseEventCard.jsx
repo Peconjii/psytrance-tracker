@@ -1,13 +1,20 @@
 import { useState, useEffect, useContext } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { FavoritesContext } from '../context/FavoritesContext'
+import ReviewSection from './ReviewSection'
+import EventMap from './EventMap'
 
 function GoabaseEventCard({ event }) {
     const { user } = useAuth()
     const favoritesContext = useContext(FavoritesContext)
     const favorites = favoritesContext?.favorites || []
-    
+
     const [weather, setWeather] = useState(null)
+    const [showReviews, setShowReviews] = useState(false)
+    const [showMap, setShowMap] = useState(false)
+
+    const eventLat = event?.parsedLat || event?.lat || event?.geoLat || null
+    const eventLon = event?.parsedLon || event?.lon || event?.geoLon || null
 
     const isFavorite = favorites.some(fav => String(fav.eventId || fav.id) === String(event.id))
 
@@ -181,21 +188,55 @@ function GoabaseEventCard({ event }) {
                     </button>
                 </div>
 
+
+                <div className="flex gap-2 mt-1">
+                    <button
+                        onClick={() => setShowMap(prev => !prev)}
+                        className={`flex-1 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                            showMap
+                                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
+                                : 'border-slate-800 bg-slate-950/50 text-slate-300 hover:text-white hover:border-cyan-500/40'
+                        }`}
+                    >
+                        📍 {showMap ? 'Hide Map' : 'Map'}
+                    </button>
+                    <button
+                        onClick={() => setShowReviews(prev => !prev)}
+                        className={`flex-1 px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                            showReviews
+                                ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/50'
+                                : 'border-slate-800 bg-slate-950/50 text-slate-300 hover:text-white hover:border-cyan-500/40'
+                        }`}
+                    >
+                        💬 {showReviews ? 'Hide Reviews' : 'Reviews'}
+                    </button>
+                </div>
+
+                {showMap && (
+                    <EventMap
+                        lat={eventLat}
+                        lon={eventLon}
+                        partyName={event.nameParty}
+                        locationName={[event.nameTown, event.nameCountry].filter(Boolean).join(', ')}
+                    />
+                )}
+
+                {showReviews && <ReviewSection eventId={event.id} />}
                 <div className="flex items-center justify-between pt-1">
                     <span className="text-[10px] text-slate-500 uppercase font-semibold">Quick Share:</span>
                     <div className="flex gap-2">
-                        <a 
-                            href={`https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}`} 
-                            target="_blank" 
+                        <a
+                            href={`https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}`}
+                            target="_blank"
                             rel="noreferrer"
                             className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 text-xs"
                             title="Share on WhatsApp"
                         >
                             💬 WA
                         </a>
-                        <a 
-                            href={`https://t.me/share/url?url=${shareUrl}&text=${shareText}`} 
-                            target="_blank" 
+                        <a
+                            href={`https://t.me/share/url?url=${shareUrl}&text=${shareText}`}
+                            target="_blank"
                             rel="noreferrer"
                             className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 text-xs"
                             title="Share on Telegram"

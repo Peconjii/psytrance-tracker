@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchGoabaseEventById } from '../api/backend'
+import { fetchEventById } from '../api/backend'
 import GoabaseEventCard from './GoabaseEventCard'
 
 function FavoriteCard({ favorite }) {
@@ -9,7 +9,7 @@ function FavoriteCard({ favorite }) {
     useEffect(() => {
         async function loadEvent() {
             try {
-                const data = await fetchGoabaseEventById(favorite.eventId)
+                const data = await fetchEventById(favorite.eventId)
                 setEvent(data)
             } catch (err) {
                 console.error("Error loading favorite event:", err)

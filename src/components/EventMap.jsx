@@ -64,10 +64,10 @@ function EventMap({ lat, lon, partyName, locationName }) {
                 scrollWheelZoom={false} 
                 className="w-full h-full"
             >
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+<TileLayer
+                            attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>'
+                            url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
+                        />
                 <Marker position={coords} icon={customIcon}>
                     <Popup>
                         <strong className="text-gray-900">{partyName}</strong><br />

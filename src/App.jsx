@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
@@ -12,19 +11,15 @@ import Login from './pages/Login'
 import Profile from './pages/Profile'
 import GlobalMap from './pages/GlobalMap'
 import CymaticsBackground from './components/CymaticsBackground'
-import AudioPlayer from './components/AudioPlayer'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
-  const [analyser, setAnalyser] = useState(null)
-  const [visualMode, setVisualMode] = useState(1)
-
   return (
     <AuthProvider>
       <FavoritesProvider>
         <BrowserRouter>
           <div className="relative min-h-screen bg-slate-950 text-slate-100 overflow-x-hidden">
-            <CymaticsBackground analyser={analyser} mode={visualMode} />
+            <CymaticsBackground />
 
             <Navbar />
 
@@ -55,8 +50,6 @@ function App() {
                 />
               </Routes>
             </main>
-
-            <AudioPlayer onAnalyserCreated={setAnalyser} onModeChange={setVisualMode} currentMode={visualMode} />
           </div>
         </BrowserRouter>
       </FavoritesProvider>

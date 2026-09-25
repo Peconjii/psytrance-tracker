@@ -15,53 +15,38 @@ api.interceptors.request.use(config => {
     return config
 })
 
-// Safely extract and map event attributes without runtime crashes
-function normalizeEvent(rawEvent) {
-    if (!rawEvent) return null;
-    const event = rawEvent.party || rawEvent;
-    if (typeof event !== 'object') return null;
-
-    return {
-        id: String(event.id || ''),
-        nameParty: event.nameParty || 'Untitled Event',
-        nameTown: event.nameTown || 'Unknown Location',
-        nameCountry: event.nameCountry || '',
-        dateStart: event.dateStart ? String(event.dateStart).split('T')[0] : 'TBA',
-        startTime: event.startTime || event.dateStart || 'N/A',
-        nameType: event.nameType || 'Party',
-        urlImageMedium: event.urlImageMedium || null,
-        urlPartyHtml: event.urlPartyHtml || '#',
-        lat: event.lat || event.lat_party || event.latitude || event.geoLat || event.geo_lat || (event.geo && event.geo.lat) || null,
-        lon: event.lon || event.lon_party || event.longitude || event.geoLon || event.geo_lon || (event.geo && event.geo.lon) || null
-    };
+// One page of events, filtered and paged by the backend. Throws on failure so the
+// caller can show an error; pass an AbortSignal to cancel it when filters change.
+export async function fetchEventsPage({ page, size, search, country, genre, timeline }, signal) {
+    const response = await api.get('/api/events', {
+        params: {
+            page,
+            size,
+            search: search || undefined,
+            country: country || undefined,
+            genre: genre && genre !== 'All' ? genre : undefined,
+            timeline
+        },
+        signal
+    })
+    return response.data
 }
 
-export async function fetchGoabaseEvents(limit = 150) {
+// Every event that has coordinates, for the world map
+export async function fetchMapEvents() {
     try {
-        const response = await api.get('/api/goabase/events', { params: { limit } })
-        const list = response.data?.partylist || (Array.isArray(response.data) ? response.data : [])
-        return list.map(normalizeEvent).filter(Boolean)
+        const response = await api.get('/api/events/map')
+        return Array.isArray(response.data) ? response.data : []
     } catch (err) {
-        console.error("Error fetching Goabase events:", err)
+        console.error("Error fetching map events:", err)
         return []
     }
 }
 
-export async function fetchGoabaseEventsByCountry(country, limit = 150) {
+export async function fetchEventById(id) {
     try {
-        const response = await api.get('/api/goabase/events/country', { params: { country, limit } })
-        const list = response.data?.partylist || (Array.isArray(response.data) ? response.data : [])
-        return list.map(normalizeEvent).filter(Boolean)
-    } catch (err) {
-        console.error("Error fetching events by country:", err)
-        return []
-    }
-}
-
-export async function fetchGoabaseEventById(id) {
-    try {
-        const response = await api.get(`/api/goabase/events/${id}`)
-        return normalizeEvent(response.data)
+        const response = await api.get(`/api/events/${id}`)
+        return response.data
     } catch (err) {
         console.error("Error fetching event by id:", err)
         return null

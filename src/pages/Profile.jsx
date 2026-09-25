@@ -9,10 +9,17 @@ function Profile() {
     const [userReviews, setUserReviews] = useState([])
     const [loadingReviews, setLoadingReviews] = useState(true)
 
+    // Clamp na 0-5 da String.repeat ne baci RangeError za neispravne/van-opsega ocene
+    const clampRating = (value) => Math.max(0, Math.min(5, Math.round(Number(value) || 0)))
+
     // Fetch user reviews with fallbacks for existing endpoints
     useEffect(() => {
         async function fetchUserReviews() {
-            if (!user) return;
+            if (!user) {
+                setLoadingReviews(false)
+                return
+            }
+            setLoadingReviews(true)
             try {
                 const response = await api.get('/api/reviews/user')
                 setUserReviews(response.data || [])
@@ -128,7 +135,7 @@ function Profile() {
                                 <div className="space-y-1.5">
                                     <div className="flex items-center gap-3">
                                         <span className="text-amber-400 text-sm font-bold tracking-widest">
-                                            {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                                            {'★'.repeat(clampRating(review.rating))}{'☆'.repeat(5 - clampRating(review.rating))}
                                         </span>
                                         <span className="text-slate-400 text-xs bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-800">
                                             Event ID: #{review.eventId}

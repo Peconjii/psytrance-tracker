@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchGoabaseEvents } from '../api/backend.js'
+import { fetchMapEvents } from '../api/backend.js'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
@@ -50,29 +50,8 @@ function GlobalMap() {
         async function loadAllEvents() {
             setLoading(true)
             try {
-                const rawData = await fetchGoabaseEvents(100)
-                const parsedData = Array.isArray(rawData) ? rawData : []
-
-                const readyEvents = parsedData
-                    .map(event => {
-                        const rawLat = event.lat || event.lat_party || event.latitude || event.geoLat || event.geo_lat;
-                        const rawLon = event.lon || event.lon_party || event.longitude || event.geoLon || event.geo_lon;
-
-                        if (rawLat && rawLon) {
-                            const parsedLat = Number(rawLat);
-                            const parsedLon = Number(rawLon);
-
-                            if (!isNaN(parsedLat) && !isNaN(parsedLon)) {
-                                return {
-                                    ...event,
-                                    parsedLat,
-                                    parsedLon
-                                };
-                            }
-                        }
-                        return null;
-                    })
-                    .filter(Boolean);
+                // Backend only sends events that have coordinates, so no parsing needed here
+                const readyEvents = await fetchMapEvents()
 
                 if (isMounted) {
                     setEvents(readyEvents)
@@ -115,7 +94,7 @@ function GlobalMap() {
                 event.nameTown?.toLowerCase().includes(value.toLowerCase())
             )
             if (firstMatch) {
-                setTargetCoords([firstMatch.parsedLat, firstMatch.parsedLon])
+                setTargetCoords([firstMatch.lat, firstMatch.lon])
             }
         }
     }
@@ -184,7 +163,7 @@ function GlobalMap() {
                                 return (
                                     <Marker 
                                         key={event.id} 
-                                        position={[event.parsedLat, event.parsedLon]}
+                                        position={[event.lat, event.lon]}
                                         icon={highlighted ? highlightIcon : defaultIcon}
                                         opacity={searchTerm.trim() ? (highlighted ? 1.0 : 0.3) : 1.0}
                                     >

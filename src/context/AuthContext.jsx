@@ -9,6 +9,11 @@ export function AuthProvider({ children }) {
         const savedToken = localStorage.getItem('token')
         return savedToken && savedToken !== 'undefined' ? savedToken : null
     })
+    // True dok proveravamo postojeći token na mount-u, da ProtectedRoute ne baci korisnika na /login prerano
+    const [loading, setLoading] = useState(() => {
+        const savedToken = localStorage.getItem('token')
+        return Boolean(savedToken && savedToken !== 'undefined')
+    })
 
     useEffect(() => {
         async function loadUser() {
@@ -23,6 +28,7 @@ export function AuthProvider({ children }) {
                     setUser(null)
                 }
             }
+            setLoading(false)
         }
         loadUser()
     }, [token])
@@ -62,7 +68,7 @@ export function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user, token, login, register, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
             {children}
         </AuthContext.Provider>
     )
