@@ -15,7 +15,7 @@ function Login() {
         try {
             await login(username, password)
             navigate('/events')
-        } catch (err) {
+        } catch {
             setError('Invalid username or password')
         }
     }

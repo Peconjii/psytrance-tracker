@@ -4,19 +4,33 @@ import { FavoritesContext } from '../context/FavoritesContext'
 import ReviewSection from './ReviewSection'
 import EventMap from './EventMap'
 
+// Coordinates rounded to 1 decimal so nearby events share one cached forecast
+function weatherCacheKey(lat, lon) {
+    return `weather_${Number(lat).toFixed(1)}_${Number(lon).toFixed(1)}`
+}
+
+function readCachedWeather(lat, lon) {
+    if (!lat || !lon) return null
+    try {
+        return JSON.parse(sessionStorage.getItem(weatherCacheKey(lat, lon)))
+    } catch {
+        return null
+    }
+}
+
 function GoabaseEventCard({ event }) {
     const { user } = useAuth()
     const favoritesContext = useContext(FavoritesContext)
     const favorites = favoritesContext?.favorites || []
 
-    const [weather, setWeather] = useState(null)
-    const [showReviews, setShowReviews] = useState(false)
-    const [showMap, setShowMap] = useState(false)
-
     const eventLat = event?.parsedLat || event?.lat || event?.geoLat || null
     const eventLon = event?.parsedLon || event?.lon || event?.geoLon || null
 
-    const isFavorite = favorites.some(fav => String(fav.eventId || fav.id) === String(event.id))
+    const [weather, setWeather] = useState(() => readCachedWeather(eventLat, eventLon))
+    const [showReviews, setShowReviews] = useState(false)
+    const [showMap, setShowMap] = useState(false)
+
+    const isFavorite = favorites.some(fav => String(fav.eventId) === String(event.id))
 
     const baseId = Number(event.id) || 100
     const initialGoing = (baseId % 40) + 5
@@ -30,20 +44,10 @@ function GoabaseEventCard({ event }) {
         const lat = event?.parsedLat || event?.lat || event?.geoLat
         const lon = event?.parsedLon || event?.lon || event?.geoLon
 
-        if (!lat || !lon) return
+        // A cached forecast is already in state from the first render, so no request is needed
+        if (!lat || !lon || readCachedWeather(lat, lon)) return
 
-        // Skraćujemo koordinate na 1 decimalu radi grupisanja i smanjenja poziva
-        const cacheKey = `weather_${Number(lat).toFixed(1)}_${Number(lon).toFixed(1)}`
-        const cachedData = sessionStorage.getItem(cacheKey)
-
-        if (cachedData) {
-            try {
-                setWeather(JSON.parse(cachedData))
-                return
-            } catch (e) {
-                sessionStorage.removeItem(cacheKey)
-            }
-        }
+        const cacheKey = weatherCacheKey(lat, lon)
 
         const controller = new AbortController()
         

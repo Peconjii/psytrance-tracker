@@ -17,7 +17,12 @@ function Register() {
             await register(username, email, password)
             navigate('/login')
         } catch (err) {
-            setError("Invalid register credentials")
+            // Backend sends { message } and, for validation errors, { errors: { field: reason } }
+            const data = err.response?.data
+            const fieldErrors = data?.errors
+                ? Object.entries(data.errors).map(([field, reason]) => `${field}: ${reason}`).join(', ')
+                : null
+            setError(fieldErrors || data?.message || 'Registration failed. Please try again.')
         }
     }
 

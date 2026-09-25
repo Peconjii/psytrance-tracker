@@ -1,5 +1,7 @@
 # PsyTrance Event Tracker
 
+[![CI](https://github.com/Peconjii/psytrance-tracker/actions/workflows/ci.yml/badge.svg)](https://github.com/Peconjii/psytrance-tracker/actions/workflows/ci.yml)
+
 A web app for discovering psytrance festivals and parties around the world: browse and filter a few hundred
 upcoming events, explore them on a world map, save favorites and review the ones you went to.
 

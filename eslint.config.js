@@ -17,5 +17,11 @@ export default defineConfig([
       globals: globals.browser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
+    rules: {
+      // Context files export their provider plus a hook/context; that's fine for fast refresh
+      'react-refresh/only-export-components': ['error', {
+        allowExportNames: ['useAuth', 'useFavorites', 'FavoritesContext'],
+      }],
+    },
   },
 ])

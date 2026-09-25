@@ -12,7 +12,6 @@ function Profile() {
     // Clamp na 0-5 da String.repeat ne baci RangeError za neispravne/van-opsega ocene
     const clampRating = (value) => Math.max(0, Math.min(5, Math.round(Number(value) || 0)))
 
-    // Fetch user reviews with fallbacks for existing endpoints
     useEffect(() => {
         async function fetchUserReviews() {
             if (!user) {
@@ -24,18 +23,7 @@ function Profile() {
                 const response = await api.get('/api/reviews/user')
                 setUserReviews(response.data || [])
             } catch (err) {
-                try {
-                    const fallbackResponse = await api.get('/api/reviews')
-                    const allReviews = fallbackResponse.data || []
-                    const filtered = allReviews.filter(r => 
-                        r.username === user.username || 
-                        r.userId === user.id || 
-                        String(r.userId) === String(user.id)
-                    )
-                    setUserReviews(filtered)
-                } catch (fallbackErr) {
-                    console.error("Error fetching user reviews fallback:", fallbackErr)
-                }
+                console.error("Error fetching user reviews:", err)
             } finally {
                 setLoadingReviews(false)
             }

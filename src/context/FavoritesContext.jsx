@@ -5,19 +5,19 @@ import api from "../api/backend"
 const FavoritesContext = createContext()
 
 export function FavoritesProvider({ children }) {
-    const [favorites, setFavorites] = useState([])
     const { user, token } = useAuth()
+    // Remember whose favorites were loaded, so after logout/login another user's list is never shown
+    const [loaded, setLoaded] = useState({ userId: null, items: [] })
+    const favorites = user?.id && token && loaded.userId === user.id ? loaded.items : []
+    const setFavorites = (update) => setLoaded(prev => ({ ...prev, items: update(prev.items) }))
 
     useEffect(() => {
-        if (!user?.id || !token) {
-            setFavorites([])
-            return
-        }
+        if (!user?.id || !token) return
 
         async function fetchFavorites() {
             try {
                 const response = await api.get(`/api/favorites/${user.id}`)
-                setFavorites(response.data || [])
+                setLoaded({ userId: user.id, items: response.data || [] })
             } catch (err) {
                 console.error("Failed to fetch favorites:", err)
             }
@@ -58,7 +58,7 @@ export function FavoritesProvider({ children }) {
             await api.delete(`/api/favorites/${activeUserId}`, {
                 params: { eventId: idTarget }
             })
-            setFavorites(prev => prev.filter(fav => String(fav.eventId) !== idTarget && String(fav.id) !== idTarget))
+            setFavorites(prev => prev.filter(fav => String(fav.eventId) !== idTarget))
         } catch (err) {
             console.error("Failed to remove favorite:", err)
         }
@@ -66,7 +66,8 @@ export function FavoritesProvider({ children }) {
 
     function toggleFavorite(event) {
         const targetId = String(event?.id || event)
-        const isFav = favorites.some(fav => String(fav.eventId) === targetId || String(fav.id) === targetId)
+        // Compare event ids only: fav.id is the database row id and could equal an unrelated event's id
+        const isFav = favorites.some(fav => String(fav.eventId) === targetId)
 
         if (isFav) {
             removeFavorite(targetId)
