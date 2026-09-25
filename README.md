@@ -32,11 +32,17 @@ This repository is the **React frontend**.
 - **Tailwind CSS 4**
 - **Axios**
 - **Leaflet** / **React-Leaflet**
+- **Docker** + **nginx** for the production build
 
 ## Getting started
 
-The frontend needs the [backend](https://github.com/Peconjii/psytrance-tracker-backend) running on
-`http://localhost:8080`. See its README for setup.
+**Easiest: Docker.** The [backend repo](https://github.com/Peconjii/psytrance-tracker-backend) has a Docker
+Compose file that starts the database, backend and this frontend together. Clone both repos next to each other
+and run `docker compose up --build` in the backend folder, then open `http://localhost:5173`.
+In Docker the frontend is built once and served by nginx (see `Dockerfile` and `nginx.conf`).
+
+**For development** with hot reload, run the backend on `http://localhost:8080` (see its README) and start
+the dev server here:
 
 ```bash
 npm install
