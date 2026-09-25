@@ -19,7 +19,7 @@ function EventMap({ lat, lon, partyName, locationName }) {
     const [loading, setLoading] = useState(!coords)
 
     useEffect(() => {
-        // Ako API nije dao koordinate, tražimo ih preko naziva lokacije
+        // Events without coordinates are looked up by town and country instead
         if (!lat || !lon) {
             async function geocodeLocation() {
                 try {

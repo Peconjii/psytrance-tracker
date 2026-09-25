@@ -7,7 +7,6 @@ import L from 'leaflet'
 import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 import markerShadowPng from 'leaflet/dist/images/marker-shadow.png'
 
-// Standardna plava ikonica
 const defaultIcon = new L.Icon({
     iconUrl: markerIconPng,
     shadowUrl: markerShadowPng,
@@ -16,7 +15,7 @@ const defaultIcon = new L.Icon({
     popupAnchor: [1, -34]
 })
 
-// Highlighted narandžasta ikonica za pretražene objekte
+// Orange pin for events that match the search
 const highlightIcon = new L.Icon({
     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
     shadowUrl: markerShadowPng,
@@ -25,7 +24,7 @@ const highlightIcon = new L.Icon({
     popupAnchor: [1, -34]
 })
 
-// Pomoćna komponenta za glatko pomeranje mape na prvu matches lokaciju
+// Leaflet's map object is only reachable from a child of MapContainer, hence this tiny component
 function MapFlyTo({ targetCoords }) {
     const map = useMap()
     useEffect(() => {
@@ -72,7 +71,6 @@ function GlobalMap() {
         }
     }, [])
 
-    // Provera da li event odgovara pretrazi
     const isMatch = (event) => {
         if (!searchTerm.trim()) return false
         const term = searchTerm.toLowerCase()
@@ -83,7 +81,7 @@ function GlobalMap() {
         )
     }
 
-    // Kada korisnik unese pojam za pretragu, nađemo prvu match lokaciju za flyTo
+    // Fly the map to the first town or country that matches the search
     const handleSearchChange = (e) => {
         const value = e.target.value
         setSearchTerm(value)
@@ -104,7 +102,6 @@ function GlobalMap() {
     return (
         <div className="max-w-7xl mx-auto px-4 py-8 flex flex-col items-center">
             
-            {/* Header + Pretraga Bar */}
             <div className="w-full mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div>
                     <h1 className="text-3xl sm:text-5xl font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
@@ -115,7 +112,6 @@ function GlobalMap() {
                     </span>
                 </div>
 
-                {/* Futuriski input za pretragu sa indikatorom poklapanja */}
                 <div className="relative w-full md:w-96">
                     <input
                         type="text"
@@ -132,7 +128,6 @@ function GlobalMap() {
                 </div>
             </div>
 
-            {/* Futuriski stakleni kontejner za mapu */}
             {loading ? (
                 <div className="w-full h-[70vh] bg-slate-900/60 backdrop-blur-md rounded-3xl border border-cyan-500/30 flex items-center justify-center shadow-[0_0_30px_rgba(6,182,212,0.15)]">
                     <p className="text-cyan-400 text-xl animate-pulse tracking-widest">[ LOADING GLOBAL PARTY MARKERS... ]</p>
@@ -155,7 +150,6 @@ function GlobalMap() {
                             url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
                         />
                             
-                            {/* Komponenta koja pomera kameru kada se unese država */}
                             <MapFlyTo targetCoords={targetCoords} />
 
                             {events.map(event => {

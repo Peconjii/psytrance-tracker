@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { FavoritesContext } from '../context/FavoritesContext'
 import ReviewSection from './ReviewSection'
@@ -20,6 +21,7 @@ function readCachedWeather(lat, lon) {
 
 function GoabaseEventCard({ event }) {
     const { user } = useAuth()
+    const navigate = useNavigate()
     const favoritesContext = useContext(FavoritesContext)
     const favorites = favoritesContext?.favorites || []
 
@@ -32,14 +34,7 @@ function GoabaseEventCard({ event }) {
 
     const isFavorite = favorites.some(fav => String(fav.eventId) === String(event.id))
 
-    const baseId = Number(event.id) || 100
-    const initialGoing = (baseId % 40) + 5
-    const initialInterested = (baseId % 85) + 12
-
-    const [attendance, setAttendance] = useState({ going: initialGoing, interested: initialInterested })
-    const [userStatus, setUserStatus] = useState(null)
-
-    // Optimizovan fetch prognoze sa Cache-om u sessionStorage i AbortController-om radi sprečavanja 429 error-a
+    // Current weather at the venue from Open-Meteo, cached per browser session
     useEffect(() => {
         const lat = event?.parsedLat || event?.lat || event?.geoLat
         const lon = event?.parsedLon || event?.lon || event?.geoLon
@@ -51,7 +46,7 @@ function GoabaseEventCard({ event }) {
 
         const controller = new AbortController()
         
-        // Dodajemo mali nasumični timeout da razbijemo istovremene zahteve ka Open-Meteo serveru
+        // Small random delay so 24 new cards don't all hit Open-Meteo at once (it rate-limits with 429)
         const timeoutId = setTimeout(() => {
             fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`, {
                 signal: controller.signal
@@ -66,10 +61,8 @@ function GoabaseEventCard({ event }) {
                         sessionStorage.setItem(cacheKey, JSON.stringify(data.current_weather))
                     }
                 })
-                .catch(err => {
-                    if (err.name !== 'AbortError') {
-                        // Tiho zanemarujemo greške u konzoli da ne opterećujemo log
-                    }
+                .catch(() => {
+                    // Weather is a nice extra: if it fails, the card simply has no weather badge
                 })
         }, Math.random() * 800)
 
@@ -80,41 +73,20 @@ function GoabaseEventCard({ event }) {
     }, [event])
 
     const handleToggleFavorite = () => {
-        if (typeof favoritesContext?.toggleFavorite === 'function') {
-            favoritesContext.toggleFavorite(event)
-        } else if (isFavorite && typeof favoritesContext?.removeFavorite === 'function') {
-            favoritesContext.removeFavorite(event.id)
-        } else if (!isFavorite && typeof favoritesContext?.addFavorite === 'function') {
-            favoritesContext.addFavorite(event)
-        }
+        // Favorites are saved per account, so guests are sent to log in first
+        if (!user) return navigate('/login')
+        favoritesContext.toggleFavorite(event)
     }
 
-    const handleAttendance = (type) => {
-        if (!user) return alert("Prijavi se da označiš dolazak!")
-        
-        if (userStatus === type) {
-            setUserStatus(null)
-            setAttendance(prev => ({ ...prev, [type]: prev[type] - 1 }))
-        } else {
-            if (userStatus) {
-                setAttendance(prev => ({ ...prev, [userStatus]: prev[userStatus] - 1 }))
-            }
-            setUserStatus(type)
-            setAttendance(prev => ({ ...prev, [type]: prev[type] + 1 }))
-        }
-    }
-
-    const shareText = encodeURIComponent(`Hej! Pogledaj ovaj psytrance događaj: ${event.nameParty} u mestu ${event.nameTown}! 🛸`)
+    const shareText = encodeURIComponent(`Check out this psytrance event: ${event.nameParty} in ${event.nameTown}! 🛸`)
     const shareUrl = encodeURIComponent(event.urlPartyHtml || window.location.href)
 
-    // Pouzdaniji fallback url za sliku preko placehold.co
     const fallbackImage = 'https://placehold.co/400x200/0f172a/06b6d4?text=Psytrance+Gathering'
 
     return (
         <div className="bg-slate-900/60 backdrop-blur-md border border-cyan-500/30 rounded-3xl p-4 flex flex-col justify-between shadow-[0_0_20px_rgba(6,182,212,0.1)] hover:border-cyan-400/60 hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] transition-all relative group">
             
             <div>
-                {/* Slika Događaja sa Weather Badge-om i Neonskim Srce Dugmetom */}
                 <div className="relative h-40 w-full rounded-2xl overflow-hidden mb-3 border border-slate-800 bg-slate-950">
                     <img 
                         src={event.urlImageMedium || event.urlImage || fallbackImage} 
@@ -123,7 +95,6 @@ function GoabaseEventCard({ event }) {
                         className="w-full h-full object-cover"
                     />
 
-                    {/* Neonsko Srce Dugme */}
                     <button
                         onClick={handleToggleFavorite}
                         className={`absolute top-2 left-2 p-2 rounded-xl backdrop-blur-md border transition-all duration-300 cursor-pointer z-10 ${
@@ -155,7 +126,6 @@ function GoabaseEventCard({ event }) {
                     )}
                 </div>
 
-                {/* Naslov i Lokacija */}
                 <h3 className="font-bold text-base text-white line-clamp-1 mb-1" title={event.nameParty}>
                     {event.nameParty}
                 </h3>
@@ -167,30 +137,7 @@ function GoabaseEventCard({ event }) {
                 </p>
             </div>
 
-            {/* Bottom Actions: Attendance & Share */}
             <div className="space-y-3 pt-2 border-t border-slate-800/80">
-                <div className="flex items-center justify-between text-xs gap-1">
-                    <button 
-                        onClick={() => handleAttendance('going')}
-                        className={`px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer flex-1 text-center ${
-                            userStatus === 'going' 
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 font-bold' 
-                                : 'bg-slate-950/50 text-slate-400 border-slate-800 hover:text-white'
-                        }`}
-                    >
-                        🚀 Going ({attendance.going})
-                    </button>
-                    <button 
-                        onClick={() => handleAttendance('interested')}
-                        className={`px-2.5 py-1.5 rounded-xl border transition-all cursor-pointer flex-1 text-center ${
-                            userStatus === 'interested' 
-                                ? 'bg-amber-500/20 text-amber-300 border-amber-500/50 font-bold' 
-                                : 'bg-slate-950/50 text-slate-400 border-slate-800 hover:text-white'
-                        }`}
-                    >
-                        ⭐ Interested ({attendance.interested})
-                    </button>
-                </div>
 
 
                 <div className="flex gap-2 mt-1">

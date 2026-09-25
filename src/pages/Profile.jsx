@@ -9,7 +9,7 @@ function Profile() {
     const [userReviews, setUserReviews] = useState([])
     const [loadingReviews, setLoadingReviews] = useState(true)
 
-    // Clamp na 0-5 da String.repeat ne baci RangeError za neispravne/van-opsega ocene
+    // Keep ratings within 0-5, because String.repeat throws a RangeError for negative counts
     const clampRating = (value) => Math.max(0, Math.min(5, Math.round(Number(value) || 0)))
 
     useEffect(() => {

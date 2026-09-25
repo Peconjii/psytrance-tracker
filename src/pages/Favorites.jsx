@@ -16,11 +16,10 @@ function Favorites() {
 
             {favorites.length === 0 ? (
                 <div className="text-center py-16 bg-slate-900/60 backdrop-blur-md rounded-3xl border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.15)] max-w-xl mx-auto">
-                    <p className="text-slate-300 text-lg font-medium">Favorites je prazan!</p>
+                    <p className="text-slate-300 text-lg font-medium">No favorites yet</p>
                     <p className="text-slate-500 text-xs mt-1">Explore events and add them to your favorites list.</p>
                 </div>
             ) : (
-                /* Na telefonima 1 kolona jedna ispod druge, na računarima 3 kolone sa skaliranim slikama */
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {favorites.map(favorite => (
                         <FavoriteCard key={favorite.id} favorite={favorite} />

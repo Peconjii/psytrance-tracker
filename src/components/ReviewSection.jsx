@@ -24,8 +24,6 @@ function ReviewSection({ eventId }) {
 
     async function handleSubmit(e) {
         e.preventDefault()
-        if (!user) return alert('Please login to leave a review!')
-
         setSubmitting(true)
         try {
             const updatedReview = await submitEventReview(eventId, rating, comment)

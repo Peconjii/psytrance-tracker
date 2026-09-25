@@ -27,21 +27,19 @@ export function FavoritesProvider({ children }) {
     }, [user?.id, token])
 
     async function addFavorite(event) {
+        // Guests never get here: the event card sends them to /login first
         const activeUserId = user?.id
-        if (!activeUserId) return alert("Prijavi se da dodaš u omiljene!")
+        if (!activeUserId) return
 
-        // Pripremamo ID i ime bez obzira da li je prosleđen ceo objekat ili pojedinačni string
+        // Accepts a whole event object or just its id
         const eventId = String(event?.id || event)
         const eventName = event?.nameParty || event?.name || event?.eventName || 'Untitled Event'
 
         try {
-            // Šaljemo čist JSON body ka bekendu
             const response = await api.post(`/api/favorites/${activeUserId}`, {
                 eventId,
                 eventName
             })
-
-            // Ažuriramo stanje sa novim favoritom sa bekenda
             setFavorites(prev => [...prev, response.data])
         } catch (err) {
             console.error("Failed to add favorite:", err)

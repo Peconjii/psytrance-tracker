@@ -35,7 +35,7 @@ function App() {
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
 
-                {/* Zaštićene rute — vidljive samo ulogovanim korisnicima */}
+                {/* Only for logged-in users; guests are redirected to /login */}
                 <Route 
                   path="/favorites" 
                   element={

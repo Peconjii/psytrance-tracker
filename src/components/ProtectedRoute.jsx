@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 function ProtectedRoute({ children }) {
     const { user, loading } = useAuth()
 
-    // Dok se provera autentifikacije učitava, prikaži utišanu poruku
+    // Wait for AuthContext to check a saved token before deciding, or a refresh would bounce to /login
     if (loading) {
         return (
             <div className="min-h-[70vh] flex items-center justify-center">
@@ -13,12 +13,10 @@ function ProtectedRoute({ children }) {
         )
     }
 
-    // Ako korisnik nije ulogovan, preusmeri ga na /login
     if (!user) {
         return <Navigate to="/login" replace />
     }
 
-    // Ako je ulogovan, prikaži traženu stranicu
     return children
 }
 

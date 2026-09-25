@@ -68,8 +68,7 @@ src/
 ├── components/   # Event cards, the infinite event feed, maps, reviews, navbar, background
 ├── context/      # AuthContext (user + token), FavoritesContext
 ├── hooks/        # useDebouncedValue
-├── pages/        # Home, Events, GlobalMap, Favorites, Profile, Login, Register, ForgotPassword, ResetPassword
-└── utils/
+└── pages/        # Home, Events, GlobalMap, Favorites, Profile, Login, Register, ForgotPassword, ResetPassword
 ```
 
 ### How the event list works

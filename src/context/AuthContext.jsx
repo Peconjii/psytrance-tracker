@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
         const savedToken = localStorage.getItem('token')
         return savedToken && savedToken !== 'undefined' ? savedToken : null
     })
-    // True dok proveravamo postojeći token na mount-u, da ProtectedRoute ne baci korisnika na /login prerano
+    // True while a saved token is being checked, so ProtectedRoute doesn't send the user to /login too early
     const [loading, setLoading] = useState(() => {
         const savedToken = localStorage.getItem('token')
         return Boolean(savedToken && savedToken !== 'undefined')
@@ -36,8 +36,6 @@ export function AuthProvider({ children }) {
     async function login(username, password) {
         try {
             const response = await api.post('/api/auth/login', { username, password })
-            
-            // Backend vraća {"token": "eyJ..."}
             const receivedToken = response.data?.token
 
             if (!receivedToken) {
