@@ -6,11 +6,9 @@ upcoming events, explore them on a world map, save favorites and review the ones
 This repository is the **React frontend**.
 **Backend (Java / Spring Boot):** [Peconjii/psytrance-tracker-backend](https://github.com/Peconjii/psytrance-tracker-backend)
 
-<!--
-Screenshots: add images to docs/screenshots/ and uncomment.
-![Events page](docs/screenshots/events.png)
-![World map](docs/screenshots/map.png)
--->
+![Events page with filters and infinite scroll](docs/screenshots/events.png)
+
+![World map with every event](docs/screenshots/map.png)
 
 ## Features
 
