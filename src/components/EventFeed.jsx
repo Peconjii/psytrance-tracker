@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { fetchEventsPage } from '../api/backend.js'
+import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import GoabaseEventCard from './GoabaseEventCard.jsx'
 
 const PAGE_SIZE = 24
@@ -13,9 +14,18 @@ function EventFeed({ search, country, genre, timeline }) {
     const [hasMore, setHasMore] = useState(true)
     const [total, setTotal] = useState(0)
     const [error, setError] = useState(null)
+    const [weather, setWeather] = useState({})
     const sentinelRef = useRef(null)
+    const weatherController = useRef(new AbortController())
 
     const loading = pagesLoaded < pagesWanted && !error
+
+    // Cancel any weather request still in flight when the feed goes away (e.g. filters change)
+    useEffect(() => {
+        const controller = new AbortController()
+        weatherController.current = controller
+        return () => controller.abort()
+    }, [])
 
     // Load the next page whenever we want more pages than we have
     useEffect(() => {
@@ -28,6 +38,11 @@ function EventFeed({ search, country, genre, timeline }) {
                 setHasMore(data.hasNext)
                 setTotal(data.totalElements)
                 setPagesLoaded(data.page + 1)
+
+                // Weather for the whole new page in one request; cards render without it until it arrives
+                // (not tied to `controller`: that one is aborted as soon as pagesLoaded changes)
+                fetchWeatherForEvents(data.content, weatherController.current.signal)
+                    .then(found => setWeather(prev => ({ ...prev, ...found })))
             })
             .catch(err => {
                 if (controller.signal.aborted) return
@@ -83,7 +98,7 @@ function EventFeed({ search, country, genre, timeline }) {
                     <p className="text-slate-500 text-xs mb-3">Showing {events.length} of {total} events</p>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
                         {events.map(event => (
-                            <GoabaseEventCard key={event.id} event={event} />
+                            <GoabaseEventCard key={event.id} event={event} weather={weather[weatherKey(event)]} />
                         ))}
                     </div>
                 </>

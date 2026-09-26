@@ -1,25 +1,12 @@
-import { useState, useEffect, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { FavoritesContext } from '../context/FavoritesContext'
 import ReviewSection from './ReviewSection'
 import EventMap from './EventMap'
 
-// Coordinates rounded to 1 decimal so nearby events share one cached forecast
-function weatherCacheKey(lat, lon) {
-    return `weather_${Number(lat).toFixed(1)}_${Number(lon).toFixed(1)}`
-}
-
-function readCachedWeather(lat, lon) {
-    if (!lat || !lon) return null
-    try {
-        return JSON.parse(sessionStorage.getItem(weatherCacheKey(lat, lon)))
-    } catch {
-        return null
-    }
-}
-
-function GoabaseEventCard({ event }) {
+// `weather` is fetched by the parent for all its cards in one request (see api/weather.js)
+function GoabaseEventCard({ event, weather }) {
     const { user } = useAuth()
     const navigate = useNavigate()
     const favoritesContext = useContext(FavoritesContext)
@@ -28,49 +15,10 @@ function GoabaseEventCard({ event }) {
     const eventLat = event?.parsedLat || event?.lat || event?.geoLat || null
     const eventLon = event?.parsedLon || event?.lon || event?.geoLon || null
 
-    const [weather, setWeather] = useState(() => readCachedWeather(eventLat, eventLon))
     const [showReviews, setShowReviews] = useState(false)
     const [showMap, setShowMap] = useState(false)
 
     const isFavorite = favorites.some(fav => String(fav.eventId) === String(event.id))
-
-    // Current weather at the venue from Open-Meteo, cached per browser session
-    useEffect(() => {
-        const lat = event?.parsedLat || event?.lat || event?.geoLat
-        const lon = event?.parsedLon || event?.lon || event?.geoLon
-
-        // A cached forecast is already in state from the first render, so no request is needed
-        if (!lat || !lon || readCachedWeather(lat, lon)) return
-
-        const cacheKey = weatherCacheKey(lat, lon)
-
-        const controller = new AbortController()
-        
-        // Small random delay so 24 new cards don't all hit Open-Meteo at once (it rate-limits with 429)
-        const timeoutId = setTimeout(() => {
-            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`, {
-                signal: controller.signal
-            })
-                .then(res => {
-                    if (!res.ok) throw new Error(`HTTP status ${res.status}`)
-                    return res.json()
-                })
-                .then(data => {
-                    if (data.current_weather) {
-                        setWeather(data.current_weather)
-                        sessionStorage.setItem(cacheKey, JSON.stringify(data.current_weather))
-                    }
-                })
-                .catch(() => {
-                    // Weather is a nice extra: if it fails, the card simply has no weather badge
-                })
-        }, Math.random() * 800)
-
-        return () => {
-            clearTimeout(timeoutId)
-            controller.abort()
-        }
-    }, [event])
 
     const handleToggleFavorite = () => {
         // Favorites are saved per account, so guests are sent to log in first
@@ -90,7 +38,9 @@ function GoabaseEventCard({ event }) {
                 <div className="relative h-40 w-full rounded-2xl overflow-hidden mb-3 border border-slate-800 bg-slate-950">
                     <img 
                         src={event.urlImageMedium || event.urlImage || fallbackImage} 
-                        alt={event.nameParty} 
+                        alt={event.nameParty}
+                        loading="lazy"
+                        decoding="async"
                         onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage }}
                         className="w-full h-full object-cover"
                     />
