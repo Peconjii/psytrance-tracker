@@ -42,7 +42,7 @@ function Events() {
                         <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Search Event / Town</label>
                         <input
                             type="text"
-                            placeholder="e.g. Boom Festival..."
+                            placeholder="e.g. Ozora Festival..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
                             className="w-full bg-slate-950/80 text-white placeholder-slate-500 px-4 py-3 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-400 text-sm"
