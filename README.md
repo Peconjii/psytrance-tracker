@@ -18,7 +18,8 @@ This repository is the **React frontend**.
 
 ## Features
 
-- **Event browser with infinite scroll.** Events load 24 at a time as you scroll. Search by name or town and
+- **Event browser with infinite scroll.** Events load 24 at a time as you scroll, starting halfway through
+  the list so slow connections don't hit the bottom and wait. Search by name or town and
   filter by country, subgenre and timeline (upcoming, this weekend, past). Filtering and paging happen on the
   backend, and text inputs are debounced so typing doesn't send a request per keystroke.
 - **World map.** Every event with coordinates as a pin (Leaflet). Searching highlights matching pins and flies
@@ -74,7 +75,7 @@ calls `http://localhost:8080`). `vercel.json` sends every path to `index.html` s
 
 ```
 src/
-├── api/          # Axios instance (adds the JWT) and API calls
+├── api/          # Axios instance (adds the JWT), API calls, batched weather lookup
 ├── components/   # Event cards, the infinite event feed, maps, reviews, navbar, background
 ├── context/      # AuthContext (user + token), FavoritesContext
 ├── hooks/        # useDebouncedValue
@@ -84,10 +85,16 @@ src/
 ### How the event list works
 
 `EventFeed` keeps the events loaded so far and asks the backend for the next page when an invisible
-"sentinel" element below the grid comes near the screen (`IntersectionObserver`). Each filter combination
-gets its own React `key`, so changing a filter throws the old list away and starts again from page 0.
-Requests that are still running when filters change are cancelled with an `AbortController`, so late
-responses never end up in the wrong list.
+"sentinel" element comes into view (`IntersectionObserver`). The sentinel sits halfway down the loaded list,
+so on a slow connection the next page is usually ready before the user reaches the end. If someone scrolls
+past it while a page is still loading, the next page is requested as soon as that one arrives.
+Each filter combination gets its own React `key`, so changing a filter throws the old list away and starts
+again from page 0. Requests that are still running when filters change are cancelled with an
+`AbortController`, so late responses never end up in the wrong list.
+
+Weather for a new page is fetched in **one** Open-Meteo request for all 24 venues (the API accepts
+comma-separated coordinates) instead of one request per card, and cached for the browser session
+(`src/api/weather.js`). Card images use `loading="lazy"`, so they download only as they get close to the screen.
 
 ## Data sources
 
