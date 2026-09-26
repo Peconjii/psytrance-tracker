@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: 'http://localhost:8080'
+    // Set VITE_API_URL at build time (e.g. on Vercel); falls back to the local backend
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080'
 })
 
 // Safely attach token only if it is a valid non-empty string
