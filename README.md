@@ -5,6 +5,10 @@
 A web app for discovering psytrance festivals and parties around the world: browse and filter a few hundred
 upcoming events, explore them on a world map, save favorites and review the ones you went to.
 
+**Live demo: [psytrance-tracker.vercel.app](https://psytrance-tracker.vercel.app)**
+
+> Hosted on free tiers (Vercel, Render, Neon). The backend sleeps when nobody uses it, so the first load can take 1–2 minutes.
+
 This repository is the **React frontend**.
 **Backend (Java / Spring Boot):** [Peconjii/psytrance-tracker-backend](https://github.com/Peconjii/psytrance-tracker-backend)
 
@@ -60,6 +64,12 @@ Then open `http://localhost:5173`.
 | `npm run preview` | Serve the production build locally |
 | `npm run lint` | Run ESLint |
 
+### Deployment
+
+The live site is deployed on [Vercel](https://vercel.com), which rebuilds it on every push to `master`.
+The backend address is set at build time through the `VITE_API_URL` environment variable (without it, the app
+calls `http://localhost:8080`). `vercel.json` sends every path to `index.html` so React Router can handle it.
+
 ## Project structure
 
 ```
@@ -83,5 +93,5 @@ responses never end up in the wrong list.
 
 - Events: [Goabase](https://www.goabase.net) (through the backend)
 - Weather: [Open-Meteo](https://open-meteo.com)
-- Maps: [OpenStreetMap](https://www.openstreetmap.org) data, [Stadia Maps](https://stadiamaps.com) tiles,
+- Maps: [OpenStreetMap](https://www.openstreetmap.org) data, [CARTO](https://carto.com/attributions) tiles,
   [Nominatim](https://nominatim.org) geocoding
