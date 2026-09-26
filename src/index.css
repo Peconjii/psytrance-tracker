@@ -1,1 +1,5 @@
 @import "tailwindcss";
+/* Leaflet paints the area beyond the map tiles (above and below the world at low zoom) light gray by default. The doubled class outranks leaflet.css, which loads after this file */
+.leaflet-container.leaflet-container {
+  background: #1e1e1e;
+}

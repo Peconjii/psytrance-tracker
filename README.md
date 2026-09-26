@@ -93,5 +93,5 @@ responses never end up in the wrong list.
 
 - Events: [Goabase](https://www.goabase.net) (through the backend)
 - Weather: [Open-Meteo](https://open-meteo.com)
-- Maps: [OpenStreetMap](https://www.openstreetmap.org) data, [CARTO](https://carto.com/attributions) tiles,
+- Maps: [OpenStreetMap](https://www.openstreetmap.org) data, [Esri](https://www.esri.com) dark gray tiles,
   [Nominatim](https://nominatim.org) geocoding
