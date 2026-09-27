@@ -1,72 +1,37 @@
-import { useState, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { FavoritesContext } from '../context/FavoritesContext'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import ReviewSection from './ReviewSection'
 import EventMap from './EventMap'
+import FavoriteButton from './FavoriteButton'
+import ShareLinks from './ShareLinks'
+
+const FALLBACK_IMAGE = 'https://placehold.co/400x200/0f172a/06b6d4?text=Psytrance+Gathering'
 
 // `weather` is fetched by the parent for all its cards in one request (see api/weather.js)
 function GoabaseEventCard({ event, weather }) {
-    const { user } = useAuth()
-    const navigate = useNavigate()
-    const favoritesContext = useContext(FavoritesContext)
-    const favorites = favoritesContext?.favorites || []
-
     const eventLat = event?.parsedLat || event?.lat || event?.geoLat || null
     const eventLon = event?.parsedLon || event?.lon || event?.geoLon || null
 
     const [showReviews, setShowReviews] = useState(false)
     const [showMap, setShowMap] = useState(false)
 
-    const isFavorite = favorites.some(fav => String(fav.eventId) === String(event.id))
-
-    const handleToggleFavorite = () => {
-        // Favorites are saved per account, so guests are sent to log in first
-        if (!user) return navigate('/login')
-        favoritesContext.toggleFavorite(event)
-    }
-
-    const shareText = encodeURIComponent(`Check out this psytrance event: ${event.nameParty} in ${event.nameTown}! 🛸`)
-    const shareUrl = encodeURIComponent(event.urlPartyHtml || window.location.href)
-
-    const fallbackImage = 'https://placehold.co/400x200/0f172a/06b6d4?text=Psytrance+Gathering'
-
     return (
         <div className="bg-slate-900/60 backdrop-blur-md border border-cyan-500/30 rounded-3xl p-4 flex flex-col justify-between shadow-[0_0_20px_rgba(6,182,212,0.1)] hover:border-cyan-400/60 hover:shadow-[0_0_25px_rgba(6,182,212,0.25)] transition-all relative group">
-            
-            <div>
+
+            {/* Outside the link below: a button can't sit inside an <a> */}
+            <FavoriteButton event={event} className="absolute top-6 left-6 z-10" />
+
+            {/* The card's event is passed along so the event page can show it before its details load */}
+            <Link to={`/events/${event.id}`} state={{ event }} className="block">
                 <div className="relative h-40 w-full rounded-2xl overflow-hidden mb-3 border border-slate-800 bg-slate-950">
-                    <img 
-                        src={event.urlImageMedium || event.urlImage || fallbackImage} 
+                    <img
+                        src={event.urlImageMedium || event.urlImage || FALLBACK_IMAGE}
                         alt={event.nameParty}
                         loading="lazy"
                         decoding="async"
-                        onError={(e) => { e.target.onerror = null; e.target.src = fallbackImage }}
-                        className="w-full h-full object-cover"
+                        onError={(e) => { e.target.onerror = null; e.target.src = FALLBACK_IMAGE }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-
-                    <button
-                        onClick={handleToggleFavorite}
-                        className={`absolute top-2 left-2 p-2 rounded-xl backdrop-blur-md border transition-all duration-300 cursor-pointer z-10 ${
-                            isFavorite
-                                ? 'bg-rose-950/80 border-rose-500 text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.6)] scale-110'
-                                : 'bg-slate-950/70 border-slate-700/80 text-slate-400 hover:border-rose-400 hover:text-rose-400 hover:scale-105'
-                        }`}
-                        title={isFavorite ? "Remove from Favorites" : "Add to Favorites"}
-                    >
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            className="w-5 h-5 transition-colors" 
-                            viewBox="0 0 24 24" 
-                            fill={isFavorite ? "currentColor" : "none"} 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round"
-                        >
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-                        </svg>
-                    </button>
 
                     {/* Weather Badge */}
                     {weather && (
@@ -76,7 +41,7 @@ function GoabaseEventCard({ event, weather }) {
                     )}
                 </div>
 
-                <h3 className="font-bold text-base text-white line-clamp-1 mb-1" title={event.nameParty}>
+                <h3 className="font-bold text-base text-white line-clamp-1 mb-1 group-hover:text-cyan-300 transition-colors" title={event.nameParty}>
                     {event.nameParty}
                 </h3>
                 <p className="text-xs text-slate-400 mb-2">
@@ -85,7 +50,7 @@ function GoabaseEventCard({ event, weather }) {
                 <p className="text-xs text-purple-400 font-semibold mb-3">
                     📅 {event.dateStart?.split('T')[0]}
                 </p>
-            </div>
+            </Link>
 
             <div className="space-y-3 pt-2 border-t border-slate-800/80">
 
@@ -125,26 +90,7 @@ function GoabaseEventCard({ event, weather }) {
                 {showReviews && <ReviewSection eventId={event.id} />}
                 <div className="flex items-center justify-between pt-1">
                     <span className="text-[10px] text-slate-500 uppercase font-semibold">Quick Share:</span>
-                    <div className="flex gap-2">
-                        <a
-                            href={`https://api.whatsapp.com/send?text=${shareText}%20${shareUrl}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 text-xs"
-                            title="Share on WhatsApp"
-                        >
-                            💬 WA
-                        </a>
-                        <a
-                            href={`https://t.me/share/url?url=${shareUrl}&text=${shareText}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 text-xs"
-                            title="Share on Telegram"
-                        >
-                            ✈️ TG
-                        </a>
-                    </div>
+                    <ShareLinks event={event} />
                 </div>
             </div>
         </div>

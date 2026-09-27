@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import Events from './pages/Events'
+import EventDetails from './pages/EventDetails'
 import Navbar from './components/Navbar'
 import { FavoritesProvider } from './context/FavoritesContext'
 import Favorites from './pages/Favorites'
@@ -29,6 +30,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/events" element={<Events />} />
+                <Route path="/events/:id" element={<EventDetails />} />
                 <Route path="/map" element={<GlobalMap />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

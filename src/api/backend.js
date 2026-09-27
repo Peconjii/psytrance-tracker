@@ -54,6 +54,24 @@ export async function fetchEventById(id) {
     }
 }
 
+// Everything for the event page (line-up, times, entry fee...). Throws on failure so the
+// page can tell "no such event" (err.response.status 404) from Goabase being down.
+export async function fetchEventDetails(id, signal) {
+    const response = await api.get(`/api/events/${id}/details`, { signal })
+    return response.data
+}
+
+// { videoId, title } of the festival's aftermovie, or null when there is none (the API answers 204).
+// Never throws: the video is a nice extra, so on any failure the page just shows none.
+export async function fetchAftermovie(id, signal) {
+    try {
+        const response = await api.get(`/api/events/${id}/aftermovie`, { signal })
+        return response.data?.videoId ? response.data : null
+    } catch {
+        return null
+    }
+}
+
 export async function fetchEventReviews(eventId) {
     try {
         const response = await api.get(`/api/reviews/event/${eventId}`)

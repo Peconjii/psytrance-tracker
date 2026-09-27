@@ -25,7 +25,10 @@ This repository is the **React frontend**.
 - **World map.** Every event with coordinates as a pin (Leaflet). Searching highlights matching pins and flies
   the map to the first match.
 - **Event cards.** Current weather at the venue (Open-Meteo), a mini-map, reviews with average rating, and
-  sharing to WhatsApp or Telegram.
+  sharing to WhatsApp or Telegram. Clicking a card or a map pin's "View Details" opens the event page.
+- **Event page.** Start and end times, venue notes, entry fee, description and organizer, the line-up with a
+  SoundCloud link for every artist, and the festival's own YouTube aftermovie when one exists. Plus the
+  map, weather, favorites and reviews. The event from the list shows instantly while the details load.
 - **Accounts.** Register and log in (JWT), reset a forgotten password by email, save favorite events, and see
   your profile with activity stats and the reviews you've written. Favorites and profile pages are protected
   routes.
@@ -79,7 +82,7 @@ src/
 ├── components/   # Event cards, the infinite event feed, maps, reviews, navbar, background
 ├── context/      # AuthContext (user + token), FavoritesContext
 ├── hooks/        # useDebouncedValue
-└── pages/        # Home, Events, GlobalMap, Favorites, Profile, Login, Register, ForgotPassword, ResetPassword
+└── pages/        # Home, Events, EventDetails, GlobalMap, Favorites, Profile, Login, Register, ForgotPassword, ResetPassword
 ```
 
 ### How the event list works

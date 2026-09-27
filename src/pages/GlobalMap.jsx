@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { fetchMapEvents } from '../api/backend.js'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -175,14 +176,13 @@ function GlobalMap() {
                                                 <h3 className="font-bold text-base mb-1 text-slate-900">{event.nameParty}</h3>
                                                 <p className="text-xs text-slate-600 mb-1">{event.nameTown}, <strong className="text-slate-800">{event.nameCountry}</strong></p>
                                                 <p className="text-xs text-purple-700 font-semibold mb-3">{event.dateStart?.split('T')[0]}</p>
-                                                <a 
-                                                    href={event.urlPartyHtml} 
-                                                    target="_blank" 
-                                                    rel="noreferrer" 
+                                                <Link
+                                                    to={`/events/${event.id}`}
+                                                    state={{ event }}
                                                     className="inline-block bg-gradient-to-r from-cyan-500 to-purple-600 text-slate-950 font-bold text-xs px-4 py-2 rounded-xl shadow hover:opacity-90 transition-all"
                                                 >
-                                                    View Details ↗
-                                                </a>
+                                                    View Details →
+                                                </Link>
                                             </div>
                                         </Popup>
                                     </Marker>
