@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useNavigationType } from 'react-router-dom'
 import { fetchEventsPage } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import GoabaseEventCard from './GoabaseEventCard.jsx'
@@ -7,20 +8,47 @@ const PAGE_SIZE = 24
 // Start loading the next page once the user has scrolled through this share of the list
 const PREFETCH_AT = 0.5
 
+// The list the user last left (e.g. by opening an event), so pressing Back shows the same events
+// at the same scroll position instead of starting again from page 1. Kept in memory only.
+let savedFeed = null
+
 // Infinite list of events for one set of filters. The parent gives it a `key` built from
 // the filters, so React throws this component away and starts fresh whenever they change.
 function EventFeed({ search, country, genre, timeline }) {
-    const [events, setEvents] = useState([])
-    const [pagesWanted, setPagesWanted] = useState(1)
-    const [pagesLoaded, setPagesLoaded] = useState(0)
-    const [hasMore, setHasMore] = useState(true)
-    const [total, setTotal] = useState(0)
+    const filtersKey = [search, country, genre, timeline].join('|')
+    const navigationType = useNavigationType()
+    // Only Back/Forward ('POP') restores; clicking "Events" in the navbar should give a fresh list
+    const [restored] = useState(() =>
+        navigationType === 'POP' && savedFeed?.filtersKey === filtersKey ? savedFeed : null
+    )
+
+    const [events, setEvents] = useState(restored?.events ?? [])
+    const [pagesWanted, setPagesWanted] = useState(restored?.pagesLoaded ?? 1)
+    const [pagesLoaded, setPagesLoaded] = useState(restored?.pagesLoaded ?? 0)
+    const [hasMore, setHasMore] = useState(restored?.hasMore ?? true)
+    const [total, setTotal] = useState(restored?.total ?? 0)
     const [error, setError] = useState(null)
-    const [weather, setWeather] = useState({})
+    const [weather, setWeather] = useState(restored?.weather ?? {})
     const sentinelRef = useRef(null)
     const weatherController = useRef(new AbortController())
+    const latest = useRef(null)
 
     const loading = pagesLoaded < pagesWanted && !error
+
+    useEffect(() => {
+        latest.current = { filtersKey, events, pagesLoaded, hasMore, total, weather }
+    })
+
+    // Layout effect: it runs before the browser paints (no flash at the top of the list) and its
+    // cleanup runs while this list is still on the page, so window.scrollY is still the real position
+    useLayoutEffect(() => {
+        if (restored) window.scrollTo(0, restored.scrollY)
+        return () => {
+            if (latest.current?.events.length > 0) {
+                savedFeed = { ...latest.current, scrollY: window.scrollY }
+            }
+        }
+    }, [restored])
 
     // Cancel any weather request still in flight when the feed goes away (e.g. filters change)
     useEffect(() => {

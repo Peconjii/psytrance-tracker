@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 
@@ -11,15 +12,43 @@ const TIMELINES = [
     { value: 'PAST', label: 'Past Events' }
 ]
 
+// Filters live in the URL (?search=boom&genre=Dark...), so going back from an event page, reloading
+// or sharing the link brings back the same list. Defaults are left out to keep the URL short.
+const DEFAULTS = { search: '', country: '', genre: 'All', timeline: 'ALL' }
+
 function Events() {
-    const [search, setSearch] = useState('')
-    const [country, setCountry] = useState('')
-    const [genre, setGenre] = useState('All')
-    const [timeline, setTimeline] = useState('ALL')
+    const [searchParams, setSearchParams] = useSearchParams()
+
+    const genre = GENRES.includes(searchParams.get('genre')) ? searchParams.get('genre') : 'All'
+    const timeline = TIMELINES.some(t => t.value === searchParams.get('timeline')) ? searchParams.get('timeline') : 'ALL'
+
+    // What the user is typing; it goes into the URL once it's debounced
+    const [search, setSearch] = useState(() => searchParams.get('search') || '')
+    const [country, setCountry] = useState(() => searchParams.get('country') || '')
 
     // Text inputs wait until the user stops typing before asking the backend
     const debouncedSearch = useDebouncedValue(search.trim(), 300)
     const debouncedCountry = useDebouncedValue(country.trim(), 300)
+
+    // `replace` so filter tweaks don't pile up in history: Back should leave the page, not undo a filter
+    const updateParams = (changes) => {
+        const next = new URLSearchParams(searchParams)
+        for (const [name, value] of Object.entries(changes)) {
+            if (value && value !== DEFAULTS[name]) next.set(name, value)
+            else next.delete(name)
+        }
+        // Only navigate when something changed, otherwise the new URL would re-run the effect below forever
+        if (next.toString() !== searchParams.toString()) {
+            setSearchParams(next, { replace: true })
+        }
+    }
+
+    const setGenre = (value) => updateParams({ genre: value })
+    const setTimeline = (value) => updateParams({ timeline: value })
+
+    useEffect(() => {
+        updateParams({ search: debouncedSearch, country: debouncedCountry })
+    }, [debouncedSearch, debouncedCountry]) // eslint-disable-line react-hooks/exhaustive-deps
 
     // A new key for every filter combination makes React start a fresh EventFeed from page 0
     const feedKey = [debouncedSearch, debouncedCountry, genre, timeline].join('|')
@@ -108,8 +137,8 @@ function Events() {
                             onClick={() => {
                                 setSearch('')
                                 setCountry('')
-                                setGenre('All')
-                                setTimeline('ALL')
+                                // One update: two in a row would both start from the same old URL
+                                updateParams({ genre: 'All', timeline: 'ALL' })
                             }}
                             className="text-xs text-red-400 hover:text-red-300 font-semibold tracking-wider uppercase underline cursor-pointer transition-colors"
                         >
