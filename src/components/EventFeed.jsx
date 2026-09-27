@@ -76,7 +76,7 @@ function EventFeed({ search, country, genre, timeline }) {
 
     if (events.length === 0 && loading) {
         return (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {[...Array(8)].map((_, i) => (
                     <div key={i} className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-4 h-72 animate-pulse flex flex-col justify-between">
                         <div className="w-full h-36 bg-slate-800/60 rounded-2xl mb-3" />
@@ -103,7 +103,7 @@ function EventFeed({ search, country, genre, timeline }) {
                 <>
                     <p className="text-slate-500 text-xs mb-3">Showing {events.length} of {total} events</p>
                     <div className="relative">
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                             {events.map(event => (
                                 <GoabaseEventCard key={event.id} event={event} weather={weather[weatherKey(event)]} />
                             ))}
