@@ -11,6 +11,7 @@ function Navbar() {
     { path: '/', label: 'Home' },
     { path: '/events', label: 'Events' },
     { path: '/map', label: 'Map' },
+    { path: '/artists', label: 'Artists' },
     ...(user ? [
         { path: '/favorites', label: 'Favorites' },
         { path: '/profile', label: 'Profile' }

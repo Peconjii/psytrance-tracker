@@ -65,8 +65,13 @@ export function AuthProvider({ children }) {
         setUser(null)
     }
 
+    // After a change saved on the backend (e.g. reminder emails on/off), so the page shows it without reloading
+    function updateUser(changes) {
+        setUser(prev => (prev ? { ...prev, ...changes } : prev))
+    }
+
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+        <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     )

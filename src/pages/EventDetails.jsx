@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useParams, useLocation, useNavigate } from 'react-router-dom'
-import { fetchEventDetails, fetchAftermovie } from '../api/backend.js'
+import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
+import { fetchEventDetails, fetchAftermovie, fetchGoing } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
 import FavoriteButton from '../components/FavoriteButton.jsx'
+import GoingButton from '../components/GoingButton.jsx'
 import ShareLinks from '../components/ShareLinks.jsx'
 
 const FALLBACK_IMAGE = 'https://placehold.co/800x400/0f172a/06b6d4?text=Psytrance+Gathering'
@@ -58,6 +59,7 @@ function EventDetails() {
     const [loaded, setLoaded] = useState({ id: null, details: null, error: null })
     const [weather, setWeather] = useState({ id: null, value: null })
     const [aftermovie, setAftermovie] = useState({ id: null, value: null })
+    const [going, setGoing] = useState({ id: null, value: null })
     const [attempt, setAttempt] = useState(0)
 
     const details = loaded.id === id ? loaded.details : null
@@ -65,9 +67,19 @@ function EventDetails() {
     const event = details || preview
     const currentWeather = weather.id === id ? weather.value : null
     const currentAftermovie = aftermovie.id === id ? aftermovie.value : null
+    const currentGoing = going.id === id ? going.value : null
 
     useEffect(() => {
         window.scrollTo(0, 0)
+    }, [id])
+
+    // Doesn't need the details, so it starts right away
+    useEffect(() => {
+        const controller = new AbortController()
+        fetchGoing(id, controller.signal).then(status => {
+            if (!controller.signal.aborted) setGoing({ id, value: status })
+        })
+        return () => controller.abort()
     }, [id])
 
     useEffect(() => {
@@ -192,6 +204,7 @@ function EventDetails() {
 
                     <div className="mt-auto pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
                         <FavoriteButton event={event} />
+                        <GoingButton eventId={id} status={currentGoing} onChange={status => setGoing({ id, value: status })} />
                         {event.urlPartyHtml && (
                             <a
                                 href={event.urlPartyHtml}
@@ -241,13 +254,25 @@ function EventDetails() {
                     )}
                     {details?.lineUp.length > 0 && (
                         <Section title="Line-up">
-                            {/* Every line as the organizer wrote it; the ones the backend recognised as an artist get a SoundCloud link */}
+                            {/* Every line as the organizer wrote it; the ones the backend recognised as an artist
+                                link to the artist's page (their other events) and get a SoundCloud link */}
                             <ul className="text-sm leading-relaxed">
                                 {details.lineUp.map((line, i) => line.text === '' ? (
                                     <li key={i} aria-hidden="true" className="h-3" />
                                 ) : (
                                     <li key={i} className="flex items-center justify-between gap-3 py-0.5 min-w-0">
-                                        <span className={`break-words min-w-0 ${line.artist ? 'text-slate-200' : 'text-slate-400'}`}>{line.text}</span>
+                                        {line.artistSlug ? (
+                                            <Link
+                                                to={`/artists/${encodeURIComponent(line.artistSlug)}`}
+                                                state={{ name: line.artist }}
+                                                title={`Where else does ${line.artist} play?`}
+                                                className="break-words min-w-0 text-slate-200 hover:text-cyan-300 underline decoration-slate-700 hover:decoration-cyan-400 underline-offset-4 transition-colors"
+                                            >
+                                                {line.text}
+                                            </Link>
+                                        ) : (
+                                            <span className={`break-words min-w-0 ${line.artist ? 'text-slate-200' : 'text-slate-400'}`}>{line.text}</span>
+                                        )}
                                         {line.artist && (
                                             <a
                                                 href={soundCloudSearchUrl(line.artist)}

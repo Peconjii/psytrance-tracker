@@ -72,6 +72,59 @@ export async function fetchAftermovie(id, signal) {
     }
 }
 
+// { [eventId]: { count, going } } for a whole page of events in one request. Never throws:
+// the counts are an extra, so on failure the cards just show none.
+export async function fetchGoingForEvents(events, signal) {
+    const ids = events.map(event => event.id).filter(Boolean)
+    if (ids.length === 0) return {}
+    try {
+        const response = await api.get('/api/events/going', { params: { ids: ids.join(',') }, signal })
+        return response.data || {}
+    } catch {
+        return {}
+    }
+}
+
+export async function fetchGoing(eventId, signal) {
+    try {
+        const response = await api.get(`/api/events/${eventId}/going`, { signal })
+        return response.data
+    } catch {
+        return null
+    }
+}
+
+// Marks (going = true) or unmarks the logged-in user; returns the new { count, going }. Throws on failure.
+export async function setGoing(eventId, going) {
+    const response = going
+        ? await api.put(`/api/events/${eventId}/going`)
+        : await api.delete(`/api/events/${eventId}/going`)
+    return response.data
+}
+
+// [{ eventId, eventName, startsOn }] of the events the logged-in user is going to
+export async function fetchMyGoing() {
+    const response = await api.get('/api/me/going')
+    return response.data || []
+}
+
+export async function setEventReminders(enabled) {
+    const response = await api.put('/api/me/reminders', { enabled })
+    return response.data.enabled
+}
+
+// [{ slug, name, upcomingEvents }], busiest first. Throws on failure.
+export async function fetchArtists(search, signal) {
+    const response = await api.get('/api/artists', { params: { search: search || undefined }, signal })
+    return response.data || []
+}
+
+// { slug, name, upcomingEvents: [event, ...] }. Throws on failure (err.response.status 404 for unknown artists).
+export async function fetchArtist(slug, signal) {
+    const response = await api.get(`/api/artists/${encodeURIComponent(slug)}`, { signal })
+    return response.data
+}
+
 export async function fetchEventReviews(eventId) {
     try {
         const response = await api.get(`/api/reviews/event/${eventId}`)

@@ -4,11 +4,13 @@ import ReviewSection from './ReviewSection'
 import EventMap from './EventMap'
 import FavoriteButton from './FavoriteButton'
 import ShareLinks from './ShareLinks'
+import GoingButton from './GoingButton'
 
 const FALLBACK_IMAGE = 'https://placehold.co/400x200/0f172a/06b6d4?text=Psytrance+Gathering'
 
-// `weather` is fetched by the parent for all its cards in one request (see api/weather.js)
-function GoabaseEventCard({ event, weather }) {
+// `weather` and `going` ({ count, going }) are each fetched by the parent for all its cards in one
+// request (see api/weather.js). Without `onGoingChange` the card has no "I'm going" button.
+function GoabaseEventCard({ event, weather, going, onGoingChange }) {
     const eventLat = event?.parsedLat || event?.lat || event?.geoLat || null
     const eventLon = event?.parsedLon || event?.lon || event?.geoLon || null
 
@@ -53,7 +55,9 @@ function GoabaseEventCard({ event, weather }) {
             </Link>
 
             <div className="space-y-3 pt-2 border-t border-slate-800/80">
-
+                {onGoingChange && (
+                    <GoingButton eventId={event.id} status={going} onChange={onGoingChange} className="w-full mt-1" />
+                )}
 
                 <div className="flex gap-2 mt-1">
                     <button

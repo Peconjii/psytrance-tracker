@@ -20,18 +20,24 @@ This repository is the **React frontend**.
 
 - **Event browser with infinite scroll.** Events load 24 at a time as you scroll, starting halfway through
   the list so slow connections don't hit the bottom and wait. Search by name or town and
-  filter by country, subgenre and timeline (upcoming, this weekend, past). Filtering and paging happen on the
+  filter by country, subgenre or just this weekend. Filtering and paging happen on the
   backend, and text inputs are debounced so typing doesn't send a request per keystroke.
 - **World map.** Every event with coordinates as a pin (Leaflet). Searching highlights matching pins and flies
   the map to the first match.
-- **Event cards.** Current weather at the venue (Open-Meteo), a mini-map, reviews with average rating, and
-  sharing to WhatsApp or Telegram. Clicking a card or a map pin's "View Details" opens the event page.
+- **Event cards.** Current weather at the venue (Open-Meteo), an "I'm going" button with how many people are
+  going, a mini-map, reviews with average rating, and sharing to WhatsApp or Telegram. Weather and going
+  counts are each fetched in one request per page of cards. Clicking a card or a map pin's "View Details"
+  opens the event page.
 - **Event page.** Start and end times, venue notes, entry fee, description and organizer, the line-up with a
-  SoundCloud link for every artist, and the festival's own YouTube aftermovie when one exists. Plus the
-  map, weather, favorites and reviews. The event from the list shows instantly while the details load.
+  link to each artist's page and SoundCloud, and the festival's own YouTube aftermovie when one exists. Plus
+  the map, weather, favorites, "I'm going" and reviews. The event from the list shows instantly while the
+  details load.
+- **Artists.** Search artists across the line-ups of all upcoming events (accents and case don't matter) and
+  open an artist's page to see every upcoming event they play.
 - **Accounts.** Register and log in (JWT), reset a forgotten password by email, save favorite events, and see
-  your profile with activity stats and the reviews you've written. Favorites and profile pages are protected
-  routes.
+  your profile with activity stats, the events you're going to and the reviews you've written. Reminder
+  emails arrive 3 days before events you saved or are going to, and can be switched off on the profile.
+  Favorites and profile pages are protected routes.
 - **Animated background.** A canvas visualizer that cycles through five patterns (flower, spiral, burst,
   wormhole, helix).
 
@@ -79,10 +85,10 @@ calls `http://localhost:8080`). `vercel.json` sends every path to `index.html` s
 ```
 src/
 ├── api/          # Axios instance (adds the JWT), API calls, batched weather lookup
-├── components/   # Event cards, the infinite event feed, maps, reviews, navbar, background
+├── components/   # Event cards, the infinite event feed, favorite and "going" buttons, maps, reviews, navbar, background
 ├── context/      # AuthContext (user + token), FavoritesContext
 ├── hooks/        # useDebouncedValue
-└── pages/        # Home, Events, EventDetails, GlobalMap, Favorites, Profile, Login, Register, ForgotPassword, ResetPassword
+└── pages/        # Home, Events, EventDetails, GlobalMap, Artists, Artist, Favorites, Profile, Login, Register, ForgotPassword, ResetPassword
 ```
 
 ### How the event list works

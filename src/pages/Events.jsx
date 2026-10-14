@@ -7,9 +7,7 @@ const GENRES = ['All', 'Psytrance', 'Progressive', 'Full On', 'Dark', 'Forest', 
 // value = what the backend expects (EventTimeline enum), label = what the user sees
 const TIMELINES = [
     { value: 'ALL', label: 'All' },
-    { value: 'UPCOMING', label: 'Upcoming' },
-    { value: 'THIS_WEEKEND', label: 'This Weekend' },
-    { value: 'PAST', label: 'Past Events' }
+    { value: 'THIS_WEEKEND', label: 'This Weekend' }
 ]
 
 // Filters live in the URL (?search=boom&genre=Dark...), so going back from an event page, reloading

@@ -1,20 +1,61 @@
 import { useContext, useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { FavoritesContext } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
-import api from '../api/backend'
+import api, { fetchMyGoing, setEventReminders } from '../api/backend'
+
+// "2026-10-14" in the browser's time zone, to compare with the dates the backend sends
+function todayIso() {
+    const now = new Date()
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
+}
 
 function Profile() {
-    const { user } = useAuth()
+    const { user, updateUser } = useAuth()
     const { favorites } = useContext(FavoritesContext)
     const [userReviews, setUserReviews] = useState([])
     const [loadingReviews, setLoadingReviews] = useState(true)
+    const [going, setGoing] = useState({ userId: null, items: [] })
+    const [savingReminders, setSavingReminders] = useState(false)
+    const [remindersError, setRemindersError] = useState(null)
+
+    const goingLoaded = Boolean(user) && going.userId === user.id
+    const today = todayIso()
+    // Events without a date are kept, since they might still be coming up
+    const upcomingGoing = goingLoaded ? going.items.filter(item => !item.startsOn || item.startsOn >= today) : []
+    const remindersOn = user?.eventReminders !== false
+
+    useEffect(() => {
+        if (!user?.id) return
+        fetchMyGoing()
+            .then(items => setGoing({ userId: user.id, items }))
+            .catch(err => {
+                console.error('Error fetching events you are going to:', err)
+                setGoing({ userId: user.id, items: [] })
+            })
+    }, [user?.id])
+
+    const toggleReminders = async () => {
+        setSavingReminders(true)
+        setRemindersError(null)
+        try {
+            updateUser({ eventReminders: await setEventReminders(!remindersOn) })
+        } catch (err) {
+            console.error('Could not change reminder setting:', err)
+            setRemindersError('Could not save the setting. Please try again.')
+        } finally {
+            setSavingReminders(false)
+        }
+    }
 
     // Keep ratings within 0-5, because String.repeat throws a RangeError for negative counts
     const clampRating = (value) => Math.max(0, Math.min(5, Math.round(Number(value) || 0)))
 
+    // Keyed on the id, not the user object, so changing a setting doesn't reload the reviews
+    const userId = user?.id
     useEffect(() => {
         async function fetchUserReviews() {
-            if (!user) {
+            if (!userId) {
                 setLoadingReviews(false)
                 return
             }
@@ -29,7 +70,7 @@ function Profile() {
             }
         }
         fetchUserReviews()
-    }, [user])
+    }, [userId])
 
     // Calculate top location based on favorites
     const locationCounts = favorites.reduce((acc, fav) => {
@@ -65,8 +106,25 @@ function Profile() {
                     <h2 className="text-2xl sm:text-3xl font-bold text-white">{user?.username || 'Guest User'}</h2>
                     <p className="text-slate-400 text-sm">{user?.email || 'No email associated'}</p>
                 </div>
-                <div className="bg-cyan-500/10 border border-cyan-500/30 px-4 py-2 rounded-xl text-xs font-semibold text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.2)]">
-                    ✦ Active Account
+                <div className="space-y-1">
+                    <label className="flex items-center gap-3 cursor-pointer select-none">
+                        <span className="text-sm text-slate-300">Email reminders</span>
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={remindersOn}
+                            onClick={toggleReminders}
+                            disabled={savingReminders}
+                            className={`relative w-11 h-6 rounded-full border transition-colors cursor-pointer disabled:opacity-60 ${
+                                remindersOn ? 'bg-cyan-500/40 border-cyan-400/60' : 'bg-slate-800 border-slate-700'
+                            }`}
+                        >
+                            <span className={`absolute top-0.5 left-0.5 w-4.5 h-4.5 rounded-full bg-white transition-transform ${remindersOn ? 'translate-x-5' : ''}`} />
+                        </button>
+                    </label>
+                    <p className={`text-xs max-w-xs ${remindersError ? 'text-red-400' : 'text-slate-500'}`}>
+                        {remindersError || 'An email 3 days before events you saved or are going to.'}
+                    </p>
                 </div>
             </div>
 
@@ -98,6 +156,38 @@ function Profile() {
                     </div>
 
                 </div>
+            </div>
+
+            {/* Events the user marked "I'm going" */}
+            <div className="bg-slate-900/60 backdrop-blur-md border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_25px_rgba(16,185,129,0.12)]">
+                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                    ✓ You're Going To ({upcomingGoing.length})
+                </h3>
+
+                {!goingLoaded ? (
+                    <p className="text-cyan-400 text-sm animate-pulse">Loading your events...</p>
+                ) : upcomingGoing.length === 0 ? (
+                    <div className="text-center py-10 bg-slate-950/50 rounded-2xl border border-slate-800">
+                        <p className="text-slate-300 text-sm font-medium">No upcoming events yet.</p>
+                        <p className="text-slate-500 text-xs mt-1">
+                            Press "I'm going" on an <Link to="/events" className="text-cyan-400 hover:text-cyan-300">event</Link> to see it here.
+                        </p>
+                    </div>
+                ) : (
+                    <ul className="space-y-3">
+                        {upcomingGoing.map(item => (
+                            <li key={item.eventId}>
+                                <Link
+                                    to={`/events/${item.eventId}`}
+                                    className="bg-slate-950/80 border border-slate-800/80 p-4 rounded-2xl flex justify-between items-center gap-4 hover:border-emerald-500/40 transition-all group"
+                                >
+                                    <span className="text-slate-200 text-sm font-semibold group-hover:text-emerald-300 truncate">{item.eventName}</span>
+                                    <span className="text-purple-300 text-xs font-semibold whitespace-nowrap">📅 {item.startsOn || 'Date TBA'}</span>
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
             {/* User Submitted Reviews Section */}

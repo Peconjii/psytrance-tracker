@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigationType } from 'react-router-dom'
-import { fetchEventsPage } from '../api/backend.js'
+import { fetchEventsPage, fetchGoingForEvents } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import GoabaseEventCard from './GoabaseEventCard.jsx'
 
@@ -29,6 +29,8 @@ function EventFeed({ search, country, genre, timeline }) {
     const [total, setTotal] = useState(restored?.total ?? 0)
     const [error, setError] = useState(null)
     const [weather, setWeather] = useState(restored?.weather ?? {})
+    // { [eventId]: { count, going } }, loaded per page like the weather
+    const [goingByEvent, setGoingByEvent] = useState(restored?.goingByEvent ?? {})
     const sentinelRef = useRef(null)
     const weatherController = useRef(new AbortController())
     const latest = useRef(null)
@@ -36,7 +38,7 @@ function EventFeed({ search, country, genre, timeline }) {
     const loading = pagesLoaded < pagesWanted && !error
 
     useEffect(() => {
-        latest.current = { filtersKey, events, pagesLoaded, hasMore, total, weather }
+        latest.current = { filtersKey, events, pagesLoaded, hasMore, total, weather, goingByEvent }
     })
 
     // Layout effect: it runs before the browser paints (no flash at the top of the list) and its
@@ -73,6 +75,9 @@ function EventFeed({ search, country, genre, timeline }) {
                 // (not tied to `controller`: that one is aborted as soon as pagesLoaded changes)
                 fetchWeatherForEvents(data.content, weatherController.current.signal)
                     .then(found => setWeather(prev => ({ ...prev, ...found })))
+                // Same for "I'm going": one request for the whole page
+                fetchGoingForEvents(data.content, weatherController.current.signal)
+                    .then(found => setGoingByEvent(prev => ({ ...prev, ...found })))
             })
             .catch(err => {
                 if (controller.signal.aborted) return
@@ -133,7 +138,13 @@ function EventFeed({ search, country, genre, timeline }) {
                     <div className="relative">
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                             {events.map(event => (
-                                <GoabaseEventCard key={event.id} event={event} weather={weather[weatherKey(event)]} />
+                                <GoabaseEventCard
+                                    key={event.id}
+                                    event={event}
+                                    weather={weather[weatherKey(event)]}
+                                    going={goingByEvent[event.id]}
+                                    onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
+                                />
                             ))}
                         </div>
                         {hasMore && !error && (

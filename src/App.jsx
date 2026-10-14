@@ -13,6 +13,8 @@ import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
 import Profile from './pages/Profile'
 import GlobalMap from './pages/GlobalMap'
+import Artists from './pages/Artists'
+import Artist from './pages/Artist'
 import CymaticsBackground from './components/CymaticsBackground'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -32,6 +34,8 @@ function App() {
                 <Route path="/events" element={<Events />} />
                 <Route path="/events/:id" element={<EventDetails />} />
                 <Route path="/map" element={<GlobalMap />} />
+                <Route path="/artists" element={<Artists />} />
+                <Route path="/artists/:slug" element={<Artist />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
