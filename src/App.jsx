@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import Events from './pages/Events'
 import EventDetails from './pages/EventDetails'
 import Navbar from './components/Navbar'
+import Footer from './components/Footer'
 import { FavoritesProvider } from './context/FavoritesContext'
 import Favorites from './pages/Favorites'
 import { AuthProvider } from './context/AuthContext'
@@ -23,12 +24,12 @@ function App() {
     <AuthProvider>
       <FavoritesProvider>
         <BrowserRouter>
-          <div className="relative min-h-screen bg-slate-950 text-slate-100 overflow-x-hidden">
+          <div className="relative min-h-screen flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
             <CymaticsBackground />
 
             <Navbar />
 
-            <main className="relative z-10">
+            <main className="relative z-10 flex-1">
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/events" element={<Events />} />
@@ -60,6 +61,8 @@ function App() {
                 />
               </Routes>
             </main>
+
+            <Footer />
           </div>
         </BrowserRouter>
       </FavoritesProvider>
