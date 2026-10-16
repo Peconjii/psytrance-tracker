@@ -1,8 +1,10 @@
 import { useContext } from 'react'
 import { FavoritesContext } from '../context/FavoritesContext'
 import FavoriteCard from '../components/FavoriteCard'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 function Favorites() {
+    usePageMeta({ title: 'Favorites', path: '/favorites', noindex: true })
     const { favorites } = useContext(FavoritesContext)
 
     return (

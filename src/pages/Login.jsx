@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 function Login() {
+    usePageMeta({ title: 'Login', path: '/login', noindex: true })
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')

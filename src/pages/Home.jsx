@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 function Home() {
+    usePageMeta({ path: '/' })
     return (
         <div className="relative min-h-[90vh] flex flex-col items-center justify-center px-4 overflow-hidden">
             
@@ -12,9 +14,13 @@ function Home() {
                     PSYTRANCE EVENT TRACKER
                 </h1>
 
-                <p className='text-slate-300 text-lg sm:text-2xl font-light leading-relaxed mb-10 max-w-xl mx-auto'>
+                <p className='text-slate-300 text-lg sm:text-2xl font-light leading-relaxed mb-6 max-w-xl mx-auto'>
                     Where bass meets the cosmos. <br />
                     <span className="text-cyan-400 font-medium">Find your tribe and feel the frequency.</span>
+                </p>
+
+                <p className='text-slate-400 text-sm sm:text-base leading-relaxed mb-10 max-w-xl mx-auto'>
+                    Upcoming psytrance festivals and parties around the world, with line-ups, a world map and the artists playing them.
                 </p>
 
                 <div className='flex justify-center'>

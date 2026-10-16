@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { requestPasswordReset } from '../api/backend'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 function ForgotPassword() {
+    usePageMeta({ title: 'Forgot Password', path: '/forgot-password', noindex: true })
     const [email, setEmail] = useState('')
     const [sent, setSent] = useState(false)
     const [submitting, setSubmitting] = useState(false)

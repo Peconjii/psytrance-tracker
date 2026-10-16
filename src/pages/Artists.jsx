@@ -2,10 +2,16 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchArtists } from '../api/backend.js'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 // Artists found in the line-ups of upcoming events, busiest first. The backend reads line-ups
 // from Goabase a few events at a time, so right after a fresh start the list fills up gradually.
 function Artists() {
+    usePageMeta({
+        title: 'Psytrance Artists',
+        description: 'Search psytrance artists and DJs across the line-ups of upcoming festivals and parties, and see where they play next.',
+        path: '/artists',
+    })
     const [search, setSearch] = useState('')
     const debouncedSearch = useDebouncedValue(search.trim(), 300)
     // Tagged with the search it belongs to, so a slow old answer never replaces a newer one

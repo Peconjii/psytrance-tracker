@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { FavoritesContext } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
 import api, { fetchMyGoing, setEventReminders } from '../api/backend'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 // "2026-10-14" in the browser's time zone, to compare with the dates the backend sends
 function todayIso() {
@@ -11,6 +12,7 @@ function todayIso() {
 }
 
 function Profile() {
+    usePageMeta({ title: 'Profile', path: '/profile', noindex: true })
     const { user, updateUser } = useAuth()
     const { favorites } = useContext(FavoritesContext)
     const [userReviews, setUserReviews] = useState([])

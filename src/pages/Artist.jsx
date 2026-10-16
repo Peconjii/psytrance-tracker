@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchArtist, fetchGoingForEvents } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import GoabaseEventCard from '../components/GoabaseEventCard.jsx'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 function soundCloudSearchUrl(artist) {
     return `https://soundcloud.com/search/people?q=${encodeURIComponent(artist)}`
@@ -25,6 +26,12 @@ function Artist() {
     const artist = loaded.slug === slug ? loaded.artist : null
     const error = loaded.slug === slug ? loaded.error : null
     const name = artist?.name || passedName || slug
+
+    usePageMeta({
+        title: `${name} – Upcoming Psytrance Events`,
+        description: `Where does ${name} play next? Upcoming psytrance festivals and parties with ${name} in the line-up.`,
+        path: `/artists/${slug}`,
+    })
 
     useEffect(() => {
         window.scrollTo(0, 0)

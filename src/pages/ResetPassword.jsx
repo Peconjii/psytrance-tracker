@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { resetPassword } from '../api/backend'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 const MIN_PASSWORD_LENGTH = 8 // same rule as the backend's ResetPasswordRequest
 
 // Opened from the emailed link: /reset-password?token=...
 function ResetPassword() {
+    usePageMeta({ title: 'Reset Password', path: '/reset-password', noindex: true })
     const [searchParams] = useSearchParams()
     const token = searchParams.get('token')
 

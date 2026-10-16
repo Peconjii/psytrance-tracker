@@ -7,6 +7,7 @@ import ReviewSection from '../components/ReviewSection.jsx'
 import FavoriteButton from '../components/FavoriteButton.jsx'
 import GoingButton from '../components/GoingButton.jsx'
 import ShareLinks from '../components/ShareLinks.jsx'
+import usePageMeta, { SITE_URL } from '../hooks/usePageMeta.js'
 
 const FALLBACK_IMAGE = 'https://placehold.co/800x400/0f172a/06b6d4?text=Psytrance+Gathering'
 
@@ -45,6 +46,42 @@ function TextPlaceholder() {
     )
 }
 
+// schema.org Event, see https://developers.google.com/search/docs/appearance/structured-data/event
+function eventStructuredData(event, details, id) {
+    const lat = event.parsedLat || event.lat || event.geoLat
+    const lon = event.parsedLon || event.lon || event.geoLon
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'MusicEvent',
+        name: event.nameParty,
+        url: `${SITE_URL}/events/${id}`,
+        startDate: details?.startsAt || event.dateStart,
+        endDate: details?.endsAt || event.dateEnd || undefined,
+        eventStatus: /cancel/i.test(event.nameStatus || '')
+            ? 'https://schema.org/EventCancelled'
+            : 'https://schema.org/EventScheduled',
+        eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+        image: [details?.urlImageLarge || event.urlImageMedium].filter(Boolean),
+        description: details?.info?.slice(0, 500) || undefined,
+        location: {
+            '@type': 'Place',
+            name: event.nameTown || event.nameCountry,
+            address: {
+                '@type': 'PostalAddress',
+                addressLocality: event.nameTown || undefined,
+                addressCountry: event.nameCountry || undefined,
+            },
+            geo: lat && lon ? { '@type': 'GeoCoordinates', latitude: Number(lat), longitude: Number(lon) } : undefined,
+        },
+        organizer: details?.organizer
+            ? { '@type': 'Organization', name: details.organizer, url: details.organizerUrl || undefined }
+            : undefined,
+        performer: details?.lineUp
+            ?.filter(line => line.artist)
+            .map(line => ({ '@type': 'PerformingGroup', name: line.artist })),
+    }
+}
+
 function EventDetails() {
     const { id } = useParams()
     const location = useLocation()
@@ -68,6 +105,15 @@ function EventDetails() {
     const currentWeather = weather.id === id ? weather.value : null
     const currentAftermovie = aftermovie.id === id ? aftermovie.value : null
     const currentGoing = going.id === id ? going.value : null
+
+    const place = event ? [event.nameTown, event.nameCountry].filter(Boolean).join(', ') : ''
+    usePageMeta({
+        title: event ? `${event.nameParty}${place ? ` – ${place}` : ''}` : 'Psytrance Event',
+        description: event
+            ? `${event.nameParty}: psytrance ${(event.nameType || 'event').toLowerCase()}${place ? ` in ${place}` : ''}${event.dateStart ? ` on ${formatWhen(event.dateStart)}` : ''}. Line-up, location, entry fee, weather and reviews.`
+            : undefined,
+        path: `/events/${id}`,
+    })
 
     useEffect(() => {
         window.scrollTo(0, 0)
@@ -155,6 +201,11 @@ function EventDetails() {
 
     return (
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+            {/* Lets Google show the event with its date and place in search results */}
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(eventStructuredData(event, details, id)).replace(/</g, '\\u003c') }}
+            />
             {backButton}
 
             {/* Header: flyer and the key facts */}

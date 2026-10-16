@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /favorites
+Disallow: /profile
+Disallow: /reset-password
+
+Sitemap: https://psytrance-tracker.vercel.app/sitemap.xml

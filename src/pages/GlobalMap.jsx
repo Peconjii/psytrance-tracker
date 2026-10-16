@@ -8,6 +8,7 @@ import { DARK_TILES_URL, DARK_TILES_ATTRIBUTION, DARK_TILES_MAX_ZOOM } from '../
 
 import markerIconPng from 'leaflet/dist/images/marker-icon.png'
 import markerShadowPng from 'leaflet/dist/images/marker-shadow.png'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 const defaultIcon = new L.Icon({
     iconUrl: markerIconPng,
@@ -40,6 +41,11 @@ function MapFlyTo({ targetCoords }) {
 }
 
 function GlobalMap() {
+    usePageMeta({
+        title: 'Psytrance Events Map',
+        description: 'Every upcoming psytrance festival and party on a world map. Find psytrance events near you.',
+        path: '/map',
+    })
     const [events, setEvents] = useState([])
     const [loading, setLoading] = useState(true)
     const [searchTerm, setSearchTerm] = useState('')

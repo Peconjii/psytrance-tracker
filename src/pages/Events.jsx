@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
+import usePageMeta from '../hooks/usePageMeta.js'
 
 const GENRES = ['All', 'Psytrance', 'Progressive', 'Full On', 'Dark', 'Forest', 'Goa', 'Hi-Tech', 'Zenonesque']
 // value = what the backend expects (EventTimeline enum), label = what the user sees
@@ -15,6 +16,11 @@ const TIMELINES = [
 const DEFAULTS = { search: '', country: '', genre: 'All', timeline: 'ALL' }
 
 function Events() {
+    usePageMeta({
+        title: 'Upcoming Psytrance Events, Festivals & Parties',
+        description: 'Browse upcoming psytrance festivals and parties worldwide. Filter psytrance events by country, subgenre (progressive, full on, dark, forest, goa, hi-tech) or this weekend.',
+        path: '/events',
+    })
     const [searchParams, setSearchParams] = useSearchParams()
 
     const genre = GENRES.includes(searchParams.get('genre')) ? searchParams.get('genre') : 'All'
