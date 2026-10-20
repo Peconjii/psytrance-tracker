@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 const AUTHOR_NAME = 'Petar Vlku'
 const GITHUB_PROFILE = 'https://github.com/Peconjii'
 const LINKEDIN_PROFILE = 'https://www.linkedin.com/in/petar-vlku-a6445b294/'
@@ -31,6 +33,7 @@ function Footer() {
                         {' '}· built by <ExternalLink href={LINKEDIN_PROFILE}>{AUTHOR_NAME}</ExternalLink>
                     </p>
                     <p className="m-0">
+                        <Link to="/feedback">✎ Feedback</Link> ·{' '}
                         <ExternalLink href={GITHUB_PROFILE}>GitHub ↗</ExternalLink>
                         {LINKEDIN_PROFILE && <> · <ExternalLink href={LINKEDIN_PROFILE}>LinkedIn ↗</ExternalLink></>}
                     </p>

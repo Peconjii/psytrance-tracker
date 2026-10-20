@@ -1,6 +1,7 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
+import { FixLink } from './FixLink';
 import { HeartButton } from './Playlist';
 import type { PlaylistApi } from '../hooks/usePlaylist';
 import {
@@ -133,6 +134,7 @@ export function Panel({
         )}
         <div className="hud__footer">
           <a className="hud__ext" href={youtube(`${f.name} full set`)} target="_blank" rel="noopener noreferrer">Sets on YouTube ↗</a>
+          <FixLink about="FESTIVAL" name={f.name} />
           <ShareButton />
         </div>
       </HudShell>
@@ -168,6 +170,7 @@ export function Panel({
         ) : null}
         <div className="hud__footer">
           <a className="hud__ext" href={youtube(label)} target="_blank" rel="noopener noreferrer">Search on YouTube ↗</a>
+          <FixLink about="LABEL" name={label} />
           <ShareButton />
         </div>
       </HudShell>
@@ -303,6 +306,7 @@ export function Panel({
 
         <div className="hud__footer">
           <a className="hud__ext" href={youtube(artist)} target="_blank" rel="noopener noreferrer">Search on YouTube ↗</a>
+          <FixLink about="ARTIST" name={artist} />
           <ShareButton />
         </div>
       </HudShell>
@@ -361,7 +365,7 @@ export function Panel({
       {chips(from)}
       <div className="hud__label">Influenced</div>
       {chips(to)}
-      <div className="hud__footer"><ShareButton /></div>
+      <div className="hud__footer"><FixLink about="GENRE" name={g.name} /><ShareButton /></div>
     </HudShell>
   );
 }

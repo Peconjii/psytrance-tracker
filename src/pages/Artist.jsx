@@ -83,9 +83,15 @@ function Artist() {
                         </p>
                     )}
                 </div>
-                <a href={soundCloudSearchUrl(name)} target="_blank" rel="noreferrer" className="btn shrink-0 self-start sm:self-center">
-                    SoundCloud ↗
-                </a>
+                <div className="flex gap-2 shrink-0 self-start sm:self-center">
+                    <Link className="btn btn--ghost" title="Wrong name or not an artist? Tell us"
+                        to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'ARTIST', ref: name, from: `/artists/${slug}` })}`}>
+                        ✎ Report
+                    </Link>
+                    <a href={soundCloudSearchUrl(name)} target="_blank" rel="noreferrer" className="btn">
+                        SoundCloud ↗
+                    </a>
+                </div>
             </div>
 
             {error === 'notFound' ? (

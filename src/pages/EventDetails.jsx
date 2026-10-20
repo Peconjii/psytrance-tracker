@@ -247,6 +247,10 @@ function EventDetails() {
                                 Goabase ↗
                             </a>
                         )}
+                        <Link className="btn btn--ghost" title="Wrong date, place or line-up? Tell us"
+                            to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'EVENT', ref: `${event.nameParty} (#${id})`, from: `/events/${id}` })}`}>
+                            ✎ Report a problem
+                        </Link>
                         <div className="flex items-center gap-2 ml-auto">
                             <span className="field-label m-0">Share</span>
                             <ShareLinks event={event} />

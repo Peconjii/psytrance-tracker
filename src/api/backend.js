@@ -169,3 +169,19 @@ export async function resetPassword(token, newPassword) {
 }
 
 export default api
+// Feedback form. Throws on failure; the backend's { message } (and { errors } for invalid fields) is in err.response.data
+export async function sendFeedback(feedback) {
+    const response = await api.post('/api/feedback', feedback)
+    return response.data
+}
+
+// Admins only: all feedback newest first, or only one status (NEW, IN_PROGRESS, DONE, REJECTED)
+export async function fetchFeedback(status, signal) {
+    const response = await api.get('/api/admin/feedback', { params: status ? { status } : {}, signal })
+    return response.data
+}
+
+export async function setFeedbackStatus(id, status) {
+    const response = await api.patch(`/api/admin/feedback/${id}`, { status })
+    return response.data
+}

@@ -15,7 +15,9 @@ function Navbar() {
         ...(user ? [
             { path: '/favorites', label: 'Favorites' },
             { path: '/profile', label: 'Profile' }
-        ] : [])
+        ] : []),
+        // Only admins read the feedback (the backend checks it again)
+        ...(user?.admin ? [{ path: '/admin/feedback', label: 'Inbox' }] : [])
     ]
 
     // An event or artist page counts as its section, so /events/123 still lights up "Events"

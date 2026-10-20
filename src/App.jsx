@@ -15,6 +15,8 @@ import Profile from './pages/Profile'
 import GlobalMap from './pages/GlobalMap'
 import Artists from './pages/Artists'
 import Artist from './pages/Artist'
+import Feedback from './pages/Feedback'
+import AdminFeedback from './pages/AdminFeedback'
 import ProtectedRoute from './components/ProtectedRoute'
 
 // The home page is the galaxy map, which fills the window under the navbar, so it has no footer
@@ -37,6 +39,7 @@ function Shell() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/feedback" element={<Feedback />} />
 
           {/* Only for logged-in users; guests are redirected to /login */}
           <Route 
@@ -53,7 +56,16 @@ function Shell() {
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
-            } 
+            }
+          />
+          {/* For admins; the page and the backend both check it */}
+          <Route
+            path="/admin/feedback"
+            element={
+              <ProtectedRoute>
+                <AdminFeedback />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </main>

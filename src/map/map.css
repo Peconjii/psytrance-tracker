@@ -474,3 +474,6 @@
 .hud__more:hover, .hud__more:focus-visible { text-decoration: underline; outline: none; }
 /* Long event names shorten with "…" instead of pushing the date out of the panel */
 .hud__list > li { min-width: 0; }
+
+/* "✎ Fix" in the HUD footers opens the feedback form about what is shown */
+.hud__fix { text-decoration: none; }
