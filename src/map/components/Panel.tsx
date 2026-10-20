@@ -26,7 +26,7 @@ interface Props {
 }
 
 /** HUD container; on phones it is a bottom sheet that can be folded down to its header */
-function HudShell({ className, style, children }: { className: string; style?: CSSProperties; children: ReactNode }) {
+export function HudShell({ className, style, children }: { className: string; style?: CSSProperties; children: ReactNode }) {
   const [folded, setFolded] = useState(false);
   return (
     <aside className={folded ? `${className} is-folded` : className} style={style}>

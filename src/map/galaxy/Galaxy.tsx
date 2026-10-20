@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Application, BlurFilter, Container, Graphics, Text } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { data, festivals, genreById, genresOfArtist, labels, WORLD, type Genre } from '../data/types';
+import { shipPosition, type MapEvent } from '../data/events';
 
 interface Props {
   selectedId: string | null;
@@ -17,6 +18,12 @@ interface Props {
   onSelectFestival: (id: string) => void;
   showLabels: boolean;
   onSelectLabel: (name: string) => void;
+  /** Upcoming events shown as ships between the stars of their genres; null hides the event layer */
+  events: MapEvent[] | null;
+  /** Events whose panel is open: lines are drawn from their ship to the stars of their genres */
+  selectedFleet: number[] | null;
+  onSelectFleet: (ids: number[]) => void;
+  onSelectHarbour: () => void;
 }
 
 export interface Focus {
@@ -43,15 +50,42 @@ interface StarNode {
   /** Artist satellites, in their own layer so the star's hit area doesn't swallow their clicks */
   orbit: Container;
   sats: Satellite[];
+  /** Number of upcoming events playing this genre, shown next to the star */
+  count: Text;
+}
+
+/** Ships parked at the same spot travel together as one fleet */
+interface Fleet {
+  events: MapEvent[];
+  x: number;
+  y: number;
+  node: Container;
+  name: Text | null;
 }
 
 const hex = (c: string) => parseInt(c.slice(1), 16);
 /** Zoom level from which every star shows its satellites, not just the selected one */
 const SAT_ZOOM = 1.6;
 const ORBIT_SPEED = 0.05;
+/** Zoom level from which ships are drawn; further out, the stars show how many events they have */
+const SHIP_ZOOM = 0.7;
+/** Ships closer than this to a star are moved out of the star's glow */
+const NEAR_STAR = 60;
+const SHIP_OFFSET = 78;
+/** Ships within one grid cell of each other form a fleet */
+const FLEET_GRID = 34;
+/** Where events of unknown genre wait: an empty corner south of the chill systems */
+const HARBOUR = { x: 420, y: 1720 };
+
+const shortName = (name: string) => (name.length > 26 ? name.slice(0, 25).trimEnd() + '…' : name);
+
+/** A small arrow-shaped ship pointing up */
+function drawShip(g: Graphics, x: number, y: number, color: number) {
+  g.poly([x - 9, y + 7, x, y - 11, x + 9, y + 7, x, y + 3]).fill(color).stroke({ width: 1.5, color: 0xffffff, alpha: 0.7 });
+}
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -61,6 +95,17 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   const focusLineRef = useRef<Graphics | null>(null);
   const stationLayerRef = useRef<Container | null>(null);
   const labelLayerRef = useRef<Container | null>(null);
+  const eventLayerRef = useRef<Container | null>(null);
+  const fleetLinesRef = useRef<Graphics | null>(null);
+  const harbourRef = useRef<{ node: Container; text: Text } | null>(null);
+  const fleetsRef = useRef<Fleet[]>([]);
+  const hoverFleetRef = useRef<MapEvent[] | null>(null);
+  const selectedFleetRef = useRef(selectedFleet);
+  selectedFleetRef.current = selectedFleet;
+  const onSelectFleetRef = useRef(onSelectFleet);
+  onSelectFleetRef.current = onSelectFleet;
+  const onSelectHarbourRef = useRef(onSelectHarbour);
+  onSelectHarbourRef.current = onSelectHarbour;
   const onSelectLabelRef = useRef(onSelectLabel);
   onSelectLabelRef.current = onSelectLabel;
   const onSelectFestivalRef = useRef(onSelectFestival);
@@ -135,6 +180,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       const focusLine = new Graphics();
       routeLayer.addChild(focusLine);
       focusLineRef.current = focusLine;
+      const fleetLines = new Graphics();
+      routeLayer.addChild(fleetLines);
+      fleetLinesRef.current = fleetLines;
 
       // Particles travelling along the routes
       const particles = data.links.map(([a, b]) => {
@@ -148,9 +196,33 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       const satLayer = new Container();
       const stationLayer = new Container();
       const labelLayer = new Container();
-      vp.addChild(starLayer, labelLayer, stationLayer, satLayer);
+      const eventLayer = new Container();
+      vp.addChild(starLayer, labelLayer, stationLayer, satLayer, eventLayer);
       stationLayerRef.current = stationLayer;
       labelLayerRef.current = labelLayer;
+      eventLayerRef.current = eventLayer;
+
+      // The harbour: an anchor where ships of unknown genre wait
+      const harbour = new Container();
+      harbour.position.set(HARBOUR.x, HARBOUR.y);
+      const anchor = new Graphics()
+        .circle(0, -8, 4).stroke({ width: 2, color: 0x9a94b8 })
+        .moveTo(0, -4).lineTo(0, 12).moveTo(-8, 3).lineTo(8, 3).stroke({ width: 2, color: 0x9a94b8 })
+        .arc(0, 4, 11, 0.15 * Math.PI, 0.85 * Math.PI).stroke({ width: 2, color: 0x9a94b8 });
+      const harbourText = new Text({
+        text: '',
+        style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fill: 0xcfcaf2, letterSpacing: 1, align: 'center' },
+      });
+      harbourText.anchor.set(0.5, 0);
+      harbourText.position.set(0, 22);
+      harbour.addChild(anchor, harbourText);
+      harbour.eventMode = 'static';
+      harbour.cursor = 'pointer';
+      harbour.hitArea = { contains: (x: number, y: number) => (Math.abs(x) < 20 && Math.abs(y) < 22) || (Math.abs(x) < harbourText.width / 2 && y > 18 && y < 22 + harbourText.height) };
+      harbour.on('pointertap', () => onSelectHarbourRef.current());
+      harbour.visible = false;
+      eventLayer.addChild(harbour);
+      harbourRef.current = { node: harbour, text: harbourText };
 
       // Record labels: hexagon markers parked near the systems they release
       const labelTexts: Text[] = [];
@@ -214,7 +286,14 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         });
         label.anchor.set(0.5, 0);
         label.position.set(0, 30 * g.size);
-        root.addChild(halo, core, label);
+        const count = new Text({
+          text: '',
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: '600', fill: color, letterSpacing: 1 },
+        });
+        count.anchor.set(0, 1);
+        count.position.set(14 * g.size, -12 * g.size);
+        count.visible = false;
+        root.addChild(halo, core, label, count);
         root.eventMode = 'static';
         root.cursor = 'pointer';
         root.hitArea = { contains: (x: number, y: number) => x * x + y * y < (40 * g.size) ** 2 };
@@ -248,7 +327,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           return { name, node, dot, radius: inner + (i % 2) * 26, phase: (i / g.artists.length) * Math.PI * 2 };
         });
         satLayer.addChild(orbit);
-        starsRef.current[g.id] = { genre: g, root, halo, label, orbit, sats };
+        starsRef.current[g.id] = { genre: g, root, halo, label, orbit, sats, count };
       }
 
       // Animation: pulse on the beat (one pulse per bar), particles, orbiting satellites
@@ -269,6 +348,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           const beat = (time * bpm) / 60 / 4;
           s.halo.scale.set(1 + 0.15 * Math.pow(Math.sin(beat * Math.PI), 8));
           s.label.scale.set(labelScale);
+          s.count.scale.set(labelScale);
 
           const selected = s.genre.id === selectedRef.current;
           s.orbit.visible = s.root.visible && (selected || zoomed);
@@ -280,6 +360,14 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
             sat.dot.scale.set(selected && sat.name === artistRef.current ? 1.6 : 1);
           }
         }
+        // Ships appear once you zoom in; a lone ship shows its event's name only up close
+        const showShips = vp.scale.x >= SHIP_ZOOM;
+        for (const f of fleetsRef.current) {
+          f.node.visible = showShips;
+          f.node.scale.set(Math.max(1, 0.9 / vp.scale.x));
+          if (f.name) f.name.visible = vp.scale.x >= 1.1;
+        }
+        if (harbourRef.current) harbourRef.current.node.scale.set(stationScale);
         for (const q of particles) {
           q.t = (q.t + tk.deltaMS / 4000) % 1;
           q.p.position.set(q.a.x + (q.b.x - q.a.x) * q.t, q.a.y + (q.b.y - q.a.y) * q.t);
@@ -293,6 +381,12 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       destroyed = true;
       setReady(false);
       viewportRef.current = null;
+      // Destroyed with the app; an effect running before the next init must not touch them
+      routesRef.current = [];
+      fleetsRef.current = [];
+      eventLayerRef.current = null;
+      fleetLinesRef.current = null;
+      harbourRef.current = null;
       artistLinksRef.current = null;
       tourLineRef.current = null;
       focusLineRef.current = null;
@@ -370,6 +464,111 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   useEffect(() => {
     if (labelLayerRef.current) labelLayerRef.current.visible = showLabels;
   }, [showLabels, ready]);
+
+  // Lines from a ship to the stars of its genres, thicker for a bigger share: on hover and for the open fleet
+  const drawFleetLines = useRef(() => {});
+  drawFleetLines.current = () => {
+    const lines = fleetLinesRef.current;
+    if (!lines) return;
+    lines.clear();
+    const shown = new Set<number>([...(selectedFleetRef.current ?? []), ...(hoverFleetRef.current ?? []).map((e) => e.id)]);
+    for (const f of fleetsRef.current) {
+      for (const e of f.events) {
+        if (!shown.has(e.id)) continue;
+        for (const g of e.genres) {
+          const star = genreById[g.genreId];
+          lines.moveTo(f.x, f.y).lineTo(star.x, star.y)
+            .stroke({ width: 1 + 3 * g.share, color: hex(data.families[star.family].color), alpha: 0.75 });
+        }
+      }
+    }
+  };
+
+  // Event layer: star counts, ships and fleets, and the harbour for unknown genres
+  useEffect(() => {
+    const layer = eventLayerRef.current;
+    const harbour = harbourRef.current;
+    if (!layer || !harbour) return;
+    for (const f of fleetsRef.current) f.node.destroy({ children: true });
+    fleetsRef.current = [];
+    hoverFleetRef.current = null;
+
+    const counts: Record<string, number> = {};
+    for (const e of events ?? []) for (const g of e.genres) counts[g.genreId] = (counts[g.genreId] ?? 0) + 1;
+    for (const s of Object.values(starsRef.current)) {
+      const n = counts[s.genre.id] ?? 0;
+      s.count.text = n ? `▲${n}` : '';
+      s.count.visible = !!events && n > 0;
+    }
+
+    // Line-ups the backend hasn't read yet aren't known to be unknown, so they wait outside the map
+    const unknown = (events ?? []).filter((e) => e.lineUpRead && !e.genres.length);
+    harbour.node.visible = !!events;
+    harbour.text.text = `HARBOUR\n${unknown.length} of unknown genre`;
+
+    const groups = new Map<string, { events: MapEvent[]; x: number; y: number }>();
+    for (const e of events ?? []) {
+      const p = shipPosition(e);
+      if (!p) continue;
+      // A ship right on a star would hide in its glow: move it out, away from the star
+      const top = genreById[e.genres[0].genreId];
+      const dx = p.x - top.x, dy = p.y - top.y;
+      const d = Math.hypot(dx, dy);
+      if (d < NEAR_STAR) {
+        const [ux, uy] = d > 1 ? [dx / d, dy / d] : [Math.SQRT1_2, -Math.SQRT1_2];
+        p.x = top.x + ux * SHIP_OFFSET;
+        p.y = top.y + uy * SHIP_OFFSET;
+      }
+      const key = `${Math.round(p.x / FLEET_GRID)}:${Math.round(p.y / FLEET_GRID)}`;
+      const group = groups.get(key) ?? { events: [], x: p.x, y: p.y };
+      group.events.push(e);
+      groups.set(key, group);
+    }
+
+    for (const { events: fleetEvents, x, y } of groups.values()) {
+      const node = new Container();
+      node.position.set(x, y);
+      // Color of the genre with the biggest share across the fleet
+      const weight: Record<string, number> = {};
+      for (const e of fleetEvents) for (const g of e.genres) weight[g.genreId] = (weight[g.genreId] ?? 0) + g.share;
+      const main = genreById[Object.entries(weight).sort((a, b) => b[1] - a[1])[0][0]];
+      const color = hex(data.families[main.family].color);
+      const icon = new Graphics();
+      let name: Text | null = null;
+      if (fleetEvents.length === 1) {
+        drawShip(icon, 0, 0, color);
+        name = new Text({
+          text: shortName(fleetEvents[0].nameParty),
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xe9e6ff },
+        });
+        name.anchor.set(0.5, 0);
+        name.position.set(0, 12);
+        node.addChild(icon, name);
+      } else {
+        drawShip(icon, -9, 4, color);
+        drawShip(icon, 9, 4, color);
+        drawShip(icon, 0, -6, color);
+        const n = new Text({
+          text: `×${fleetEvents.length}`,
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: '600', fill: 0xffffff },
+        });
+        n.anchor.set(0, 0.5);
+        n.position.set(20, 0);
+        node.addChild(icon, n);
+      }
+      node.eventMode = 'static';
+      node.cursor = 'pointer';
+      node.hitArea = { contains: (px: number, py: number) => Math.abs(px) < 26 && Math.abs(py) < 18 };
+      node.on('pointerover', () => { hoverFleetRef.current = fleetEvents; drawFleetLines.current(); });
+      node.on('pointerout', () => { hoverFleetRef.current = null; drawFleetLines.current(); });
+      node.on('pointertap', () => onSelectFleetRef.current(fleetEvents.map((e) => e.id)));
+      layer.addChild(node);
+      fleetsRef.current.push({ events: fleetEvents, x, y, node, name });
+    }
+    drawFleetLines.current();
+  }, [events, ready]);
+
+  useEffect(() => drawFleetLines.current(), [selectedFleet, ready]);
 
   // Camera frames the whole focus group
   useEffect(() => {

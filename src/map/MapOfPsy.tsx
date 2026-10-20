@@ -9,6 +9,8 @@ import { Quiz } from './components/Quiz';
 import { Compare } from './components/Compare';
 import { PlaylistMenu } from './components/Playlist';
 import { LabelsMenu } from './components/LabelsMenu';
+import { FleetPanel } from './components/FleetPanel';
+import { fetchMapEvents, type EventPeriod, type MapEvent } from './data/events';
 import { usePlaylist } from './hooks/usePlaylist';
 import {
   data, festivalById, genreById, genresOfArtist, genresOfLabel, labels, randomTrack, stopTrack, type Tour, type Track,
@@ -51,6 +53,21 @@ export default function MapOfPsy() {
   const playlist = usePlaylist();
   const [timeTravel, setTimeTravel] = useState(false);
   const [menu, setMenu] = useState(false);
+  // Upcoming events as ships: which period, the events, and the open fleet or harbour
+  const [period, setPeriod] = useState<EventPeriod | null>('WEEK');
+  const [events, setEvents] = useState<MapEvent[] | null>(null);
+  const [fleet, setFleet] = useState<number[] | null>(null);
+  const [harbour, setHarbour] = useState(false);
+
+  useEffect(() => {
+    if (!period) { setEvents(null); return; }
+    let current = true;
+    fetchMapEvents(period)
+      .then((list) => { if (current) setEvents(list); })
+      // Without the backend the map still works, just without ships
+      .catch((err) => { if (current) { setEvents(null); console.warn('Could not load events for the map', err); } });
+    return () => { current = false; };
+  }, [period]);
 
   // Time machine: plays history forward one year at a time, lighting stars as their genre appears
   useEffect(() => {
@@ -91,6 +108,8 @@ export default function MapOfPsy() {
   }, [selectedId, artist, festival, label]);
 
   const clearFocus = () => {
+    setFleet(null);
+    setHarbour(false);
     setFestival(null);
     setLabel(null);
     setCompare(null);
@@ -117,6 +136,17 @@ export default function MapOfPsy() {
     setYear(MAX_YEAR);
     setLabel(name);
   };
+  const openFleet = (ids: number[]) => {
+    select(null);
+    setFleet(ids);
+  };
+  const openHarbour = () => {
+    select(null);
+    setHarbour(true);
+  };
+  const fleetEvents = harbour
+    ? (events ?? []).filter((e) => e.lineUpRead && !e.genres.length)
+    : fleet ? (events ?? []).filter((e) => fleet.includes(e.id)) : [];
   const openCompare = (a: string, b?: string) => {
     const other = b ?? data.links.find(([x, y]) => x === a || y === a)?.find((id) => id !== a) ?? 'goa';
     setYear(MAX_YEAR);
@@ -175,7 +205,8 @@ export default function MapOfPsy() {
     <div className={tour || quiz || compare ? 'psy-map app is-touring' : 'psy-map app'}>
       <Galaxy selectedId={selectedId} artist={artist} year={year} onSelect={select} onSelectArtist={reveal}
         tourPath={tourPath} focus={focus} showStations={showStations} onSelectFestival={openFestival}
-        showLabels={showLabels} onSelectLabel={openLabel} />
+        showLabels={showLabels} onSelectLabel={openLabel}
+        events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour} />
 
       <header className="topbar">
         <div className="brand">
@@ -196,6 +227,13 @@ export default function MapOfPsy() {
             aria-pressed={showStations} title="Click to show or hide festival stations">◇ Festivals {showStations ? 'on' : 'off'}</button>
           <button className={showLabels ? 'legend__toggle is-on is-label' : 'legend__toggle is-label'} onClick={() => setShowLabels((s) => !s)}
             aria-pressed={showLabels} title="Click to show or hide record labels">⬡ Labels {showLabels ? 'on' : 'off'}</button>
+          <span className="legend__events" role="group" aria-label="Upcoming events on the map">
+            ▲ Events
+            {([['WEEK', 'week'], ['MONTH', 'month'], [null, 'off']] as const).map(([p, text]) => (
+              <button key={text} className={period === p ? 'legend__toggle is-on is-event' : 'legend__toggle is-event'}
+                onClick={() => { setPeriod(p); setFleet(null); setHarbour(false); }} aria-pressed={period === p}>{text}</button>
+            ))}
+          </span>
         </div>
         <div className="topbar__tools">
           <ToursMenu onStart={(t) => goToStop(t, 0)} />
@@ -209,12 +247,17 @@ export default function MapOfPsy() {
         </div>
       </header>
 
+      {fleetEvents.length > 0 ? (
+        <FleetPanel events={fleetEvents} harbour={harbour} onSelect={select}
+          onClose={() => { setFleet(null); setHarbour(false); }} />
+      ) : (
       <Panel genreId={selectedId} artist={artist} festival={festival} label={label}
         playing={hidden ? null : playing} playlist={playlist}
         onPlay={(t, list) => play(t, false, list ?? null)}
         onSelect={select} onSelectArtist={setArtist} onOpenFestival={openFestival} onOpenLabel={openLabel}
         onOpenArtist={(name) => reveal(genresOfArtist(name)[0].id, name)}
         onCompare={openCompare} onClose={() => select(null)} />
+      )}
 
       <Player track={playing} hidden={hidden} playlist={playlist}
         hasPrev={!!queue && !!playing && queue.findIndex((t) => t.youtube === playing.youtube) > 0}

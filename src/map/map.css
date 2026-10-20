@@ -360,3 +360,15 @@
 .seo-intro .seo-lead { color: var(--fg); margin-top: 4px; }
 .seo-intro h2, .seo-intro h3 { font-size: 14px; color: var(--fg); margin: 16px 0 4px; }
 .seo-intro ul { display: flex; flex-wrap: wrap; gap: 0 12px; list-style: none; margin: 0; padding: 0; }
+
+/* Upcoming events: period switch in the legend, and the fleet / harbour HUD */
+.legend__events { display: inline-flex; align-items: baseline; gap: 8px; pointer-events: auto; }
+.legend__toggle.is-event.is-on { color: var(--accent); }
+.fleet { list-style: none; padding: 0; margin: 4px 0 0; display: grid; gap: 14px; }
+.fleet li { padding-top: 12px; border-top: 1px dashed var(--line); display: grid; gap: 8px; }
+.fleet li:first-child { padding-top: 0; border-top: 0; }
+.fleet__name { font-weight: 500; }
+.fleet__meta { display: flex; flex-wrap: wrap; gap: 4px 14px; font: 12px var(--mono); color: var(--muted); }
+.fleet__meta span:first-child { color: var(--fg); }
+.fleet__link { font: 12px var(--mono); color: var(--fam); text-decoration: none; justify-self: start; }
+.fleet__link:hover, .fleet__link:focus-visible { text-decoration: underline; outline: none; }
