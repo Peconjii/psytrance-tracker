@@ -27,7 +27,7 @@ function Footer() {
             <div className="site-footer__inner">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <p className="m-0">
-                        <span className="site-footer__brand">Psytrance Event Tracker</span>
+                        <span className="site-footer__brand">Map of Psy</span>
                         {' '}· built by <ExternalLink href={LINKEDIN_PROFILE}>{AUTHOR_NAME}</ExternalLink>
                     </p>
                     <p className="m-0">

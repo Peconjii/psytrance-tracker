@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 export const SITE_URL = 'https://psytrance-tracker.vercel.app'
-const SITE_NAME = 'PsyTrance Event Tracker'
+const SITE_NAME = 'Map of Psy'
 const DEFAULT_DESCRIPTION =
     'Find upcoming psytrance festivals and parties around the world. Browse psytrance events by country and subgenre, see them on a world map and check who plays where.'
 
