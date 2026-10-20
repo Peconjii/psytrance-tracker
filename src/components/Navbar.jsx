@@ -14,10 +14,9 @@ function Navbar() {
         { path: '/events', label: 'Events' },
         { path: '/map', label: 'World map' },
         { path: '/artists', label: 'Artists' },
-        ...(user ? [
-            { path: '/favorites', label: 'Favorites' },
-            { path: '/profile', label: 'Profile' }
-        ] : []),
+        { path: '/feedback', label: 'Feedback' },
+        // Profile is the username button on the right
+        ...(user ? [{ path: '/favorites', label: 'Favorites' }] : []),
         // Only admins read the feedback (the backend checks it again)
         ...(user?.admin ? [{ path: '/admin/feedback', label: 'Inbox' }] : [])
     ]
