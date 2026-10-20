@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchArtist, fetchGenresForEvents, fetchGoingForEvents } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import EventTicket from '../components/EventTicket.jsx'
-import EventDays from '../components/EventDays.jsx'
 import { TicketSkeletons } from '../components/EventFeed.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -105,9 +104,10 @@ function Artist() {
             ) : !artist ? (
                 <TicketSkeletons count={4} />
             ) : artist.upcomingEvents.length > 0 && (
-                <EventDays
-                    events={artist.upcomingEvents}
-                    renderTicket={event => (
+                // One artist rarely plays twice on a day, so day headings would leave one ticket per row:
+                // the dates are on the tickets, and they fill two columns (one on phones)
+                <div className="tickets">
+                    {artist.upcomingEvents.map(event => (
                         <EventTicket
                             key={event.id}
                             event={event}
@@ -116,8 +116,8 @@ function Artist() {
                             genres={genresByEvent[event.id]}
                             onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
                         />
-                    )}
-                />
+                    ))}
+                </div>
             )}
         </div>
     )
