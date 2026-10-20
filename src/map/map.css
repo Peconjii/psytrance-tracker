@@ -447,3 +447,7 @@
   /* The info sheet sits above the folded ship console */
   .hud { bottom: 112px; max-height: calc(100% - 200px); }
 }
+
+/* The ship clicked on the map, at the top of the departures */
+.cockpit__departures li.is-picked { background: rgba(62, 230, 196, 0.07); box-shadow: inset 2px 0 var(--accent); padding-left: 6px; margin-left: -6px; }
+.cockpit__board.is-aboard { color: var(--fg); border-color: var(--accent); cursor: default; }

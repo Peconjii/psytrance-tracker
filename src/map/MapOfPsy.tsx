@@ -299,7 +299,8 @@ export default function MapOfPsy() {
         onPrev={() => step(-1)} onNext={() => step(1)} onEnded={() => step(1)} onClose={() => play(null)} />
       <Cockpit period={period} events={events} view={view}
         onPeriod={(p) => { setPeriod(p); setFleet(null); setHarbour(false); }}
-        onLook={(x, y) => cameraRef.current?.(x, y)} onBoard={(id) => openFleet([id])} onHarbour={openHarbour} />
+        onLook={(x, y) => cameraRef.current?.(x, y)} onBoard={(id) => openFleet([id])} onHarbour={openHarbour}
+        picked={fleet} />
 
       {compare && (
         <Compare ids={compare} playing={playing} onChange={(a, b) => setCompare([a, b])}

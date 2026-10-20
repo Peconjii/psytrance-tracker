@@ -1,4 +1,4 @@
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useEffect, useMemo, useState, type MouseEvent } from 'react';
 import { data, genreById, WORLD } from '../data/types';
 import { buildFleets, HARBOUR, type EventPeriod, type MapEvent } from '../data/events';
 import type { ViewBounds } from '../galaxy/Galaxy';
@@ -13,6 +13,8 @@ interface Props {
   onLook: (x: number, y: number) => void;
   onBoard: (eventId: number) => void;
   onHarbour: () => void;
+  /** Events of the ship or fleet clicked on the map: they go to the top of the departures */
+  picked: number[] | null;
 }
 
 const PERIODS: [EventPeriod | null, string][] = [['WEEK', 'Week'], ['MONTH', 'Month'], [null, 'Off']];
@@ -40,13 +42,23 @@ function departureLabel(dateStart: string | null): string {
 }
 
 /** The ship's console, bottom left: radar, event period, counts and the next departures to board */
-export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHarbour }: Props) {
+export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHarbour, picked }: Props) {
   // Phones start with the console folded, so it doesn't cover the map
   const [open, setOpen] = useState(() => !window.matchMedia('(max-width: 700px)').matches);
   const fleets = useMemo(() => buildFleets(events ?? []), [events]);
-  const ships = fleets.reduce((n, f) => n + f.events.length, 0);
+  const shipCount = fleets.reduce((n, f) => n + f.events.length, 0);
   const inHarbour = (events ?? []).filter((e) => e.lineUpRead && !e.genres.length).length;
-  const departures = (events ?? []).filter((e) => e.genres.length).slice(0, DEPARTURES);
+  // The clicked ship (or the ships of a clicked fleet) first, then the soonest of the rest
+  const ships = (events ?? []).filter((e) => e.genres.length);
+  const pickedShips = picked ? ships.filter((e) => picked.includes(e.id)) : [];
+  const departures = [...pickedShips, ...ships.filter((e) => !pickedShips.includes(e))].slice(0, Math.max(DEPARTURES, pickedShips.length));
+  const boardedId = picked?.length === 1 ? picked[0] : null;
+
+  // A ship clicked on the map opens the console, so its departure is in view
+  const pickedKey = picked?.join(',') ?? '';
+  useEffect(() => {
+    if (pickedKey) setOpen(true);
+  }, [pickedKey]);
 
   // Click on the radar: fly the camera to that point of the world
   const look = (ev: MouseEvent<SVGSVGElement>) => {
@@ -66,7 +78,7 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
     <section className={open ? 'cockpit' : 'cockpit is-folded'} aria-label="Ship navigation: upcoming events">
       <button className="cockpit__head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <span className="cockpit__tag">// SHIP NAVIGATION · EVENTS</span>
-        {!open && period && events && <span className="cockpit__mini">▲ {ships} · ⚓ {inHarbour}</span>}
+        {!open && period && events && <span className="cockpit__mini">▲ {shipCount} · ⚓ {inHarbour}</span>}
         <span aria-hidden="true">{open ? '▾' : '▴'}</span>
       </button>
 
@@ -103,7 +115,7 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
               </div>
               {period && events ? (
                 <p className="cockpit__counts">
-                  <b>▲ {ships}</b> ships · <b>{fleets.filter((f) => f.events.length > 1).length}</b> fleets<br />
+                  <b>▲ {shipCount}</b> ships · <b>{fleets.filter((f) => f.events.length > 1).length}</b> fleets<br />
                   <button className="cockpit__harbour" onClick={onHarbour}><b>⚓ {inHarbour}</b> in harbour</button>
                 </p>
               ) : (
@@ -120,13 +132,15 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
                   const genre = genreById[e.genres[0].genreId];
                   const label = departureLabel(e.dateStart);
                   return (
-                    <li key={e.id}>
+                    <li key={e.id} className={pickedShips.includes(e) ? 'is-picked' : undefined}>
                       <span className={label === 'TONIGHT' ? 'cockpit__when is-now' : 'cockpit__when'}>{label}</span>
                       <span className="cockpit__event">
                         <b title={e.nameParty}>{e.nameParty}</b>
                         <span>{e.nameTown} · <i style={{ color: data.families[genre.family].color }}>{genre.name}</i></span>
                       </span>
-                      <button className="cockpit__board" onClick={() => onBoard(e.id)}>Board ▸</button>
+                      {e.id === boardedId
+                        ? <span className="cockpit__board is-aboard">Aboard ✓</span>
+                        : <button className="cockpit__board" onClick={() => onBoard(e.id)}>Board ▸</button>}
                     </li>
                   );
                 })}
