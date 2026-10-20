@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { setReducedMotion, useReducedMotion } from '../motion.js';
 import { fetchEventDetails } from '../api/backend.js';
 import './map.css';
 import { Galaxy, type CrewMember, type Focus, type ViewBounds } from './galaxy/Galaxy';
@@ -69,6 +70,7 @@ export default function MapOfPsy() {
   const [boarded, setBoarded] = useState<Boarded | null>(null);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const reducedMotion = useReducedMotion();
   const boardedId = fleet?.length === 1 ? fleet[0] : null;
 
   useEffect(() => {
@@ -247,7 +249,7 @@ export default function MapOfPsy() {
         showLabels={showLabels} onSelectLabel={openLabel}
         events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour}
         crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew}
-        onView={setView} cameraRef={cameraRef} />
+        onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion} />
 
       <header className="topbar">
         <div className="brand">
@@ -270,10 +272,13 @@ export default function MapOfPsy() {
             aria-pressed={showLabels} title="Click to show or hide record labels">⬡ Labels {showLabels ? 'on' : 'off'}</button>
         </div>
         {/* On phones the navbar's own menu is hidden on this page, so the site's pages live here too */}
-        <nav className="topbar__pages" aria-label="Pages" data-closes-menu>
+        <nav className="topbar__pages" aria-label="Pages">
           <Link to="/events">Events</Link>
           <Link to="/map">World map</Link>
           <Link to="/artists">Artists</Link>
+          <button onClick={() => setReducedMotion(!reducedMotion)} aria-pressed={!reducedMotion}>
+            Motion {reducedMotion ? 'off' : 'on'}
+          </button>
           {user ? (
             <>
               <Link to="/favorites">Favorites</Link>

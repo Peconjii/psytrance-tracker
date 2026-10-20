@@ -31,6 +31,8 @@ interface Props {
   onView?: (view: ViewBounds) => void;
   /** Filled with a function that flies the camera to a world point (the radar uses it) */
   cameraRef?: MutableRefObject<((x: number, y: number) => void) | null>;
+  /** Site-wide "reduced motion": everything stands still and the camera jumps instead of flying */
+  reducedMotion?: boolean;
 }
 
 /** The visible part of the world, in world coordinates */
@@ -115,7 +117,7 @@ const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -138,6 +140,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   onSelectHarbourRef.current = onSelectHarbour;
   const onSelectCrewRef = useRef(onSelectCrew);
   onSelectCrewRef.current = onSelectCrew;
+  const reducedMotionRef = useRef(reducedMotion);
+  reducedMotionRef.current = reducedMotion;
+  // Camera moves take this long, or no time at all with reduced motion
+  const flight = (ms: number) => (reducedMotionRef.current ? 1 : ms);
   const onViewRef = useRef(onView);
   onViewRef.current = onView;
   const cameraRefRef = useRef(cameraRef);
@@ -198,7 +204,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       reportView();
       if (cameraRefRef.current) {
         cameraRefRef.current.current = (x: number, y: number) =>
-          vp.animate({ position: { x, y }, time: 600, ease: 'easeInOutSine' });
+          vp.animate({ position: { x, y }, time: flight(600), ease: 'easeInOutSine' });
       }
 
       // Background stars
@@ -388,7 +394,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       // Animation: pulse on the beat (one pulse per bar), particles, orbiting satellites
       let time = 0;
       app.ticker.add((tk) => {
-        time += tk.deltaMS / 1000;
+        // With reduced motion the clock stops, so pulses, orbits, rotations and bobbing all hold still
+        const still = reducedMotionRef.current;
+        if (!still) time += tk.deltaMS / 1000;
         for (const icon of stations) icon.rotation = Math.PI / 4 + time * 0.3;
         const stationScale = Math.max(1, 0.9 / vp.scale.x);
         const showStationNames = vp.scale.x >= STATION_NAME_ZOOM;
@@ -418,7 +426,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         }
         // Ships appear once you zoom in; a lone ship shows its event's name only up close
         const showShips = vp.scale.x >= SHIP_ZOOM;
-        const dt = tk.deltaMS / 1000;
+        const dt = still ? 0 : tk.deltaMS / 1000;
         for (const f of fleetsRef.current) {
           f.node.visible = showShips;
           f.node.scale.set(Math.max(1, 0.9 / vp.scale.x));
@@ -426,6 +434,11 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           if (!showShips) continue;
           // Ships float gently, each on its own beat
           f.body.y = Math.sin(time * 1.6 + f.phase) * 2.5;
+          if (still) {
+            f.particles = [];
+            f.trail.clear();
+            continue;
+          }
           // Engine exhaust: particles leave the nozzles backwards, drift and fade
           const cos = Math.cos(f.body.rotation), sin = Math.sin(f.body.rotation);
           f.spawn += dt;
@@ -461,9 +474,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         }
         if (harbourRef.current) harbourRef.current.node.scale.set(stationScale);
         for (const q of particles) {
-          q.t = (q.t + tk.deltaMS / 4000) % 1;
+          q.t = (q.t + dt / 4) % 1;
           q.p.position.set(q.a.x + (q.b.x - q.a.x) * q.t, q.a.y + (q.b.y - q.a.y) * q.t);
-          q.p.visible = starsRef.current[q.a.id].root.visible && starsRef.current[q.b.id].root.visible;
+          q.p.visible = !still && starsRef.current[q.a.id].root.visible && starsRef.current[q.b.id].root.visible;
         }
       });
       setReady(true);
@@ -668,7 +681,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     const fleet = selectedFleet && fleetsRef.current.find((f) => f.events.some((e) => e.id === selectedFleet[0]));
     if (!vp || !fleet) return;
     const scale = Math.max(vp.scale.x, 1.3);
-    vp.animate({ position: { x: fleet.x + 180 / scale, y: fleet.y }, scale, time: 700, ease: 'easeInOutSine' });
+    vp.animate({ position: { x: fleet.x + 180 / scale, y: fleet.y }, scale, time: flight(700), ease: 'easeInOutSine' });
   }, [selectedFleet, events, ready]);
 
   // Crew of the boarded ship: its line-up as satellites on alternating orbits around it
@@ -714,7 +727,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     // Leave room on the right for the HUD
     const card = focus.bottomCard ? 500 : 0;
     const scale = Math.max(0.35, Math.min(1.3, (vp.screenWidth - 420) / (x1 - x0 + 500), (vp.screenHeight - card) / (y1 - y0 + 400)));
-    vp.animate({ position: { x: (x0 + x1) / 2 + 180 / scale, y: (y0 + y1) / 2 + card / 2 / scale }, scale, time: 800, ease: 'easeInOutSine' });
+    vp.animate({ position: { x: (x0 + x1) / 2 + 180 / scale, y: (y0 + y1) / 2 + card / 2 / scale }, scale, time: flight(800), ease: 'easeInOutSine' });
   }, [focus, ready]);
 
   // Tour path: travelled legs solid, the road ahead as faint dots
@@ -741,7 +754,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     const vp = viewportRef.current;
     if (vp && selectedId) {
       const g = genreById[selectedId];
-      vp.animate({ position: { x: g.x, y: g.y }, scale: Math.max(vp.scale.x, 1.3), time: 700, ease: 'easeInOutSine' });
+      vp.animate({ position: { x: g.x, y: g.y }, scale: Math.max(vp.scale.x, 1.3), time: flight(700), ease: 'easeInOutSine' });
     }
   }, [selectedId, ready]);
 

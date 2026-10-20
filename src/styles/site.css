@@ -256,3 +256,11 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
   .skeleton { animation: none; }
   .switch::after { transition: none; }
 }
+
+/* Reduced motion, switched in the navbar (see motion.js): CSS animations and transitions stop everywhere */
+[data-motion='reduced'] *, [data-motion='reduced'] *::before, [data-motion='reduced'] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}

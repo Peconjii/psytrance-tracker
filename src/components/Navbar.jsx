@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { setReducedMotion, useReducedMotion } from '../motion.js'
 
 function Navbar() {
     const { user, logout } = useAuth()
     const [isOpen, setIsOpen] = useState(false)
     const location = useLocation()
+    const reducedMotion = useReducedMotion()
 
     const navLinks = [
         { path: '/', label: 'Galaxy' },
@@ -23,6 +25,14 @@ function Navbar() {
     // An event or artist page counts as its section, so /events/123 still lights up "Events"
     const isActive = (path) => path === '/' ? location.pathname === '/' : location.pathname.startsWith(path)
     const linkClass = (path) => `site-nav__link${isActive(path) ? ' is-active' : ''}`
+
+    // Site-wide reduced motion; starts from the system setting
+    const motionButton = (
+        <button className="btn btn--ghost" onClick={() => setReducedMotion(!reducedMotion)} aria-pressed={!reducedMotion}
+            title={reducedMotion ? 'Turn animations back on' : 'Stop the animations (stars, ships, camera flights)'}>
+            Motion {reducedMotion ? 'off' : 'on'}
+        </button>
+    )
 
     const authLinks = user ? (
         <>
@@ -55,7 +65,7 @@ function Navbar() {
                     ))}
                 </div>
 
-                <div className="site-nav__auth">{authLinks}</div>
+                <div className="site-nav__auth">{motionButton}{authLinks}</div>
 
                 <button
                     onClick={() => setIsOpen(open => !open)}
@@ -74,7 +84,7 @@ function Navbar() {
                             {link.label}
                         </Link>
                     ))}
-                    <div className="flex gap-2 pt-3">{authLinks}</div>
+                    <div className="flex flex-wrap gap-2 pt-3">{motionButton}{authLinks}</div>
                 </div>
             )}
         </nav>
