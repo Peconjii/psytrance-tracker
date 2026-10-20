@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { fetchEventById, fetchGoing } from '../api/backend'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather'
-import GoabaseEventCard from './GoabaseEventCard'
+import EventRow from './EventRow'
 
 function FavoriteCard({ favorite }) {
     const [event, setEvent] = useState(null)
@@ -29,10 +29,10 @@ function FavoriteCard({ favorite }) {
         }
     }, [favorite.eventId])
 
-    if (loading) return <p className="text-white text-center">Loading favorite...</p>
+    if (loading) return <div className="board__row"><div className="skeleton h-10 col-span-4" /></div>
     if (!event) return null
 
-    return <GoabaseEventCard event={event} weather={weather} going={going} onGoingChange={setGoing} />
+    return <EventRow event={event} weather={weather} going={going} onGoingChange={setGoing} />
 }
 
 export default FavoriteCard

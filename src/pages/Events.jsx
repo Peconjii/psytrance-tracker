@@ -7,8 +7,8 @@ import usePageMeta from '../hooks/usePageMeta.js'
 const GENRES = ['All', 'Psytrance', 'Progressive', 'Full On', 'Dark', 'Forest', 'Goa', 'Hi-Tech', 'Zenonesque']
 // value = what the backend expects (EventTimeline enum), label = what the user sees
 const TIMELINES = [
-    { value: 'ALL', label: 'All' },
-    { value: 'THIS_WEEKEND', label: 'This Weekend' }
+    { value: 'ALL', label: 'Any time' },
+    { value: 'THIS_WEEKEND', label: 'This weekend' }
 ]
 
 // Filters live in the URL (?search=boom&genre=Dark...), so going back from an event page, reloading
@@ -57,55 +57,51 @@ function Events() {
     // A new key for every filter combination makes React start a fresh EventFeed from page 0
     const feedKey = [debouncedSearch, debouncedCountry, genre, timeline].join('|')
 
-    return (
-        <div className="max-w-[1700px] mx-auto px-3 sm:px-6 py-8">
-            
-            {/* Page Header */}
-            <div className="text-center mb-8">
-                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-wider bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
-                    Psytrance Events Hub
-                </h1>
-                <p className="text-slate-400 text-sm mt-1">Discover, filter and track underground gatherings worldwide</p>
-            </div>
+    const filtered = search || country || (genre && genre !== 'All') || timeline !== 'ALL'
 
-            {/* Filter Panel */}
-            <div className="bg-slate-900/60 backdrop-blur-md p-4 sm:p-8 rounded-3xl shadow-[0_0_30px_rgba(6,182,212,0.15)] mb-8 border border-cyan-500/30">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    return (
+        <div className="page page--wide">
+            <header className="page-head">
+                <div className="page-head__tag">// Departures · Goabase</div>
+                <h1 className="page-title">Upcoming events</h1>
+                <p className="page-head__sub">Psytrance festivals and parties worldwide, soonest first.</p>
+            </header>
+
+            <section className="panel mb-6" aria-label="Filters">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
                     <div>
-                        <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Search Event / Town</label>
+                        <label htmlFor="event-search" className="field-label">Event or town</label>
                         <input
+                            id="event-search"
                             type="text"
-                            placeholder="e.g. Ozora Festival..."
+                            placeholder="Ozora, Lisbon..."
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
-                            className="w-full bg-slate-950/80 text-white placeholder-slate-500 px-4 py-3 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-400 text-sm"
+                            className="field"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Filter by Country</label>
+                        <label htmlFor="event-country" className="field-label">Country</label>
                         <input
+                            id="event-country"
                             type="text"
-                            placeholder="e.g. Serbia..."
+                            placeholder="Serbia..."
                             value={country}
                             onChange={(e) => setCountry(e.target.value)}
-                            className="w-full bg-slate-950/80 text-white placeholder-slate-500 px-4 py-3 rounded-xl border border-slate-800 focus:outline-none focus:border-cyan-400 text-sm"
+                            className="field"
                         />
                     </div>
 
-                    {/* Quick Status Selector Pills */}
                     <div>
-                        <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Event Timeline</label>
-                        <div className="flex flex-wrap gap-1.5">
+                        <span className="field-label">When</span>
+                        <div className="flex flex-wrap gap-2">
                             {TIMELINES.map(t => (
                                 <button
                                     key={t.value}
                                     onClick={() => setTimeline(t.value)}
-                                    className={`px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
-                                        timeline === t.value
-                                            ? "bg-purple-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]"
-                                            : "bg-slate-950/60 text-slate-400 hover:text-white border border-slate-800"
-                                    }`}
+                                    className={`chip${timeline === t.value ? ' is-on' : ''}`}
+                                    aria-pressed={timeline === t.value}
                                 >
                                     {t.label}
                                 </button>
@@ -114,29 +110,22 @@ function Events() {
                     </div>
                 </div>
 
-                {/* Genre Selector Pills */}
-                <div>
-                    <label className="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Subgenre</label>
-                    <div className="flex flex-wrap gap-2">
-                        {GENRES.map(g => (
-                            <button
-                                key={g}
-                                onClick={() => setGenre(g)}
-                                className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all cursor-pointer ${
-                                    genre === g
-                                        ? "bg-cyan-500 text-slate-950 font-bold shadow-[0_0_15px_rgba(6,182,212,0.4)] scale-105"
-                                        : "bg-slate-950/60 text-slate-300 hover:bg-slate-800 border border-slate-800"
-                                }`}
-                            >
-                                {g}
-                            </button>
-                        ))}
-                    </div>
+                <span className="field-label">Subgenre</span>
+                <div className="flex flex-wrap gap-2">
+                    {GENRES.map(g => (
+                        <button
+                            key={g}
+                            onClick={() => setGenre(g)}
+                            className={`chip${genre === g ? ' is-on' : ''}`}
+                            aria-pressed={genre === g}
+                        >
+                            {g}
+                        </button>
+                    ))}
                 </div>
 
-                {/* Reset Filters Button */}
-                {(search || country || (genre && genre !== 'All') || timeline !== 'ALL') && (
-                    <div className="mt-6 text-right border-t border-slate-800/80 pt-4">
+                {filtered && (
+                    <div className="mt-5 pt-4 border-t border-dashed border-[var(--line)] text-right">
                         <button
                             onClick={() => {
                                 setSearch('')
@@ -144,13 +133,13 @@ function Events() {
                                 // One update: two in a row would both start from the same old URL
                                 updateParams({ genre: 'All', timeline: 'ALL' })
                             }}
-                            className="text-xs text-red-400 hover:text-red-300 font-semibold tracking-wider uppercase underline cursor-pointer transition-colors"
+                            className="btn btn--ghost btn--danger"
                         >
-                            Reset All Filters
+                            Reset filters
                         </button>
                     </div>
                 )}
-            </div>
+            </section>
 
             <EventFeed
                 key={feedKey}

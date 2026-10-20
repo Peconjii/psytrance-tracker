@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigationType } from 'react-router-dom'
 import { fetchEventsPage, fetchGoingForEvents } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
-import GoabaseEventCard from './GoabaseEventCard.jsx'
+import EventRow, { BoardHead } from './EventRow.jsx'
 
 const PAGE_SIZE = 24
 // Start loading the next page once the user has scrolled through this share of the list
@@ -109,13 +109,17 @@ function EventFeed({ search, country, genre, timeline }) {
 
     if (events.length === 0 && loading) {
         return (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="board" aria-busy="true">
+                <BoardHead />
                 {[...Array(8)].map((_, i) => (
-                    <div key={i} className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-4 h-72 animate-pulse flex flex-col justify-between">
-                        <div className="w-full h-36 bg-slate-800/60 rounded-2xl mb-3" />
-                        <div className="h-4 bg-slate-800/60 rounded-lg w-3/4 mb-2" />
-                        <div className="h-3 bg-slate-800/40 rounded-lg w-1/2 mb-4" />
-                        <div className="h-8 bg-slate-800/40 rounded-xl w-full" />
+                    <div key={i} className="board__row">
+                        <div className="skeleton h-10" />
+                        <div className="skeleton h-16 w-16 board__thumb-link" />
+                        <div className="grid gap-2">
+                            <div className="skeleton h-4 w-2/3" />
+                            <div className="skeleton h-3 w-1/3" />
+                        </div>
+                        <span />
                     </div>
                 ))}
             </div>
@@ -124,8 +128,9 @@ function EventFeed({ search, country, genre, timeline }) {
 
     if (events.length === 0 && !error) {
         return (
-            <div className="text-center py-16 bg-slate-900/40 rounded-3xl border border-slate-800 backdrop-blur-md">
-                <p className="text-slate-300 text-lg font-medium">No events found matching your filter criteria.</p>
+            <div className="empty">
+                <p><strong>No events match these filters.</strong></p>
+                <p>Try another town, country or subgenre.</p>
             </div>
         )
     }
@@ -134,19 +139,18 @@ function EventFeed({ search, country, genre, timeline }) {
         <>
             {events.length > 0 && (
                 <>
-                    <p className="text-slate-500 text-xs mb-3">Showing {events.length} of {total} events</p>
-                    <div className="relative">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-                            {events.map(event => (
-                                <GoabaseEventCard
-                                    key={event.id}
-                                    event={event}
-                                    weather={weather[weatherKey(event)]}
-                                    going={goingByEvent[event.id]}
-                                    onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
-                                />
-                            ))}
-                        </div>
+                    <p className="mono text-xs muted mb-3">Showing {events.length} of {total} events</p>
+                    <div className="relative board">
+                        <BoardHead />
+                        {events.map(event => (
+                            <EventRow
+                                key={event.id}
+                                event={event}
+                                weather={weather[weatherKey(event)]}
+                                going={goingByEvent[event.id]}
+                                onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
+                            />
+                        ))}
                         {hasMore && !error && (
                             <div
                                 ref={sentinelRef}
@@ -160,23 +164,16 @@ function EventFeed({ search, country, genre, timeline }) {
             )}
 
             {error ? (
-                <div className="text-center py-10">
-                    <p className="text-red-400 text-sm mb-3">{error}</p>
-                    <button
-                        onClick={() => setError(null)}
-                        className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-950/60 text-slate-300 hover:text-white border border-slate-800 cursor-pointer"
-                    >
-                        Try again
-                    </button>
+                <div className="py-8 grid justify-items-center gap-3">
+                    <p className="notice m-0">{error}</p>
+                    <button onClick={() => setError(null)} className="btn">Try again</button>
                 </div>
             ) : hasMore ? (
-                <div className="text-center py-8 text-slate-500 text-sm">
+                <p className="text-center py-8 mono text-xs muted">
                     {loading && 'Loading more events...'}
-                </div>
+                </p>
             ) : (
-                <div className="text-center py-12 text-slate-500 text-sm font-medium tracking-wide">
-                    ✦ You've reached the end of the events list. ✦
-                </div>
+                <p className="text-center py-10 mono text-xs muted tracking-widest">END OF THE BOARD</p>
             )}
         </>
     )

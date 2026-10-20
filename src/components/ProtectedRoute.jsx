@@ -7,8 +7,8 @@ function ProtectedRoute({ children }) {
     // Wait for AuthContext to check a saved token before deciding, or a refresh would bounce to /login
     if (loading) {
         return (
-            <div className="min-h-[70vh] flex items-center justify-center">
-                <p className="text-cyan-400 text-lg animate-pulse tracking-widest">[ CHECKING AUTHENTICATION... ]</p>
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <p className="mono text-xs muted tracking-widest">CHECKING YOUR ACCOUNT...</p>
             </div>
         )
     }

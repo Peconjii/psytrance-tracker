@@ -43,37 +43,37 @@ function EventMap({ lat, lon, partyName, locationName }) {
 
     if (loading) {
         return (
-            <div className="w-full h-64 bg-gray-800 flex items-center justify-center rounded-xl text-cyan-400">
-                Finding location on map...
+            <div className="map-frame w-full h-64 flex items-center justify-center mono text-xs muted">
+                Finding the venue on the map...
             </div>
         )
     }
 
     if (!coords) {
         return (
-            <div className="w-full h-64 bg-gray-800 flex items-center justify-center rounded-xl text-gray-400">
-                Location map unavailable
+            <div className="map-frame w-full h-64 flex items-center justify-center mono text-xs muted">
+                Venue map unavailable
             </div>
         )
     }
 
     return (
-        <div className="w-full h-64 rounded-xl overflow-hidden shadow-lg my-2">
-            <MapContainer 
-                center={coords} 
-                zoom={10} 
-                scrollWheelZoom={false} 
+        <div className="map-frame w-full h-64 overflow-hidden">
+            <MapContainer
+                center={coords}
+                zoom={10}
+                scrollWheelZoom={false}
                 className="w-full h-full"
             >
-<TileLayer
-                            attribution={DARK_TILES_ATTRIBUTION}
-                            url={DARK_TILES_URL}
-                            maxZoom={DARK_TILES_MAX_ZOOM}
-                        />
+                <TileLayer
+                    attribution={DARK_TILES_ATTRIBUTION}
+                    url={DARK_TILES_URL}
+                    maxZoom={DARK_TILES_MAX_ZOOM}
+                />
                 <Marker position={coords} icon={customIcon}>
                     <Popup>
-                        <strong className="text-gray-900">{partyName}</strong><br />
-                        <span className="text-gray-600">{locationName}</span>
+                        <strong>{partyName}</strong><br />
+                        <span className="muted">{locationName}</span>
                     </Popup>
                 </Marker>
             </MapContainer>

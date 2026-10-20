@@ -34,20 +34,10 @@ function GoingButton({ eventId, status, onChange, className = '' }) {
             onClick={toggle}
             disabled={saving}
             title={failed ? 'Could not save, try again' : going ? "You're going. Click to undo" : 'Let others know you are going'}
-            className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all cursor-pointer disabled:opacity-60 disabled:cursor-wait flex items-center justify-center gap-1.5 ${
-                going
-                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
-                    : failed
-                        ? 'bg-slate-950/50 text-red-300 border-red-500/40'
-                        : 'bg-slate-950/50 text-slate-300 border-slate-800 hover:text-white hover:border-emerald-500/40'
-            } ${className}`}
+            className={`btn${going ? ' is-on' : ''}${failed ? ' btn--danger' : ''} ${className}`}
         >
             <span>{going ? "✓ I'm going" : "I'm going"}</span>
-            {count > 0 && (
-                <span className={`px-1.5 rounded-md ${going ? 'bg-emerald-500/20' : 'bg-slate-800/80 text-slate-400'}`}>
-                    {count}
-                </span>
-            )}
+            {count > 0 && <span className="btn__count">{count}</span>}
         </button>
     )
 }

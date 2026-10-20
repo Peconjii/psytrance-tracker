@@ -9,7 +9,7 @@ import GoingButton from '../components/GoingButton.jsx'
 import ShareLinks from '../components/ShareLinks.jsx'
 import usePageMeta, { SITE_URL } from '../hooks/usePageMeta.js'
 
-const FALLBACK_IMAGE = 'https://placehold.co/800x400/0f172a/06b6d4?text=Psytrance+Gathering'
+const FALLBACK_IMAGE = 'https://placehold.co/800x400/05040d/8f88c4?text=No+flyer'
 
 const DATE_FORMAT = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 
@@ -25,8 +25,8 @@ function formatWhen(value) {
 
 function Section({ title, children }) {
     return (
-        <section className="bg-slate-900/60 backdrop-blur-md border border-cyan-500/30 rounded-3xl p-5 sm:p-6 shadow-[0_0_20px_rgba(6,182,212,0.1)]">
-            <h2 className="text-slate-400 text-xs font-semibold uppercase tracking-wider mb-3">{title}</h2>
+        <section className="panel">
+            <h2 className="panel__label">{title}</h2>
             {children}
         </section>
     )
@@ -38,10 +38,10 @@ function soundCloudSearchUrl(artist) {
 
 function TextPlaceholder() {
     return (
-        <div className="space-y-2 animate-pulse">
-            <div className="h-3 bg-slate-800/60 rounded-lg w-3/4" />
-            <div className="h-3 bg-slate-800/60 rounded-lg w-1/2" />
-            <div className="h-3 bg-slate-800/40 rounded-lg w-2/3" />
+        <div className="grid gap-2" aria-busy="true">
+            <div className="skeleton h-3 w-3/4" />
+            <div className="skeleton h-3 w-1/2" />
+            <div className="skeleton h-3 w-2/3" />
         </div>
     )
 }
@@ -158,35 +158,25 @@ function EventDetails() {
     const goBack = () => (location.key !== 'default' ? navigate(-1) : navigate('/events'))
 
     const backButton = (
-        <button
-            onClick={goBack}
-            className="mb-6 text-xs text-slate-400 hover:text-cyan-300 font-semibold uppercase tracking-wider cursor-pointer transition-colors"
-        >
-            ← Back
-        </button>
+        <button onClick={goBack} className="back-link">← Back</button>
     )
 
     if (!event) {
         return (
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+            <div className="page">
                 {backButton}
                 {error ? (
-                    <div className="text-center py-16 bg-slate-900/40 rounded-3xl border border-slate-800 backdrop-blur-md">
-                        <p className="text-red-400 text-sm mb-4">{error}</p>
-                        <button
-                            onClick={retry}
-                            className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-950/60 text-slate-300 hover:text-white border border-slate-800 cursor-pointer"
-                        >
-                            Try again
-                        </button>
+                    <div className="empty grid justify-items-center gap-3">
+                        <p className="notice m-0">{error}</p>
+                        <button onClick={retry} className="btn">Try again</button>
                     </div>
                 ) : (
-                    <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 animate-pulse grid lg:grid-cols-5 gap-6">
-                        <div className="lg:col-span-2 h-72 bg-slate-800/60 rounded-2xl" />
-                        <div className="lg:col-span-3 space-y-3">
-                            <div className="h-8 bg-slate-800/60 rounded-lg w-3/4" />
-                            <div className="h-4 bg-slate-800/40 rounded-lg w-1/2" />
-                            <div className="h-4 bg-slate-800/40 rounded-lg w-1/3" />
+                    <div className="panel grid lg:grid-cols-5 gap-6" aria-busy="true">
+                        <div className="lg:col-span-2 h-72 skeleton" />
+                        <div className="lg:col-span-3 grid gap-3 content-start">
+                            <div className="skeleton h-8 w-3/4" />
+                            <div className="skeleton h-4 w-1/2" />
+                            <div className="skeleton h-4 w-1/3" />
                         </div>
                     </div>
                 )}
@@ -200,7 +190,7 @@ function EventDetails() {
     const hasStory = details && (details.lineUp.length > 0 || details.info)
 
     return (
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+        <div className="page">
             {/* Lets Google show the event with its date and place in search results */}
             <script
                 type="application/ld+json"
@@ -209,8 +199,8 @@ function EventDetails() {
             {backButton}
 
             {/* Header: flyer and the key facts */}
-            <div className="bg-slate-900/60 backdrop-blur-md border border-cyan-500/30 rounded-3xl p-4 sm:p-6 shadow-[0_0_30px_rgba(6,182,212,0.15)] grid lg:grid-cols-5 gap-6">
-                <div className="lg:col-span-2 rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center">
+            <div className="panel grid lg:grid-cols-5 gap-6">
+                <div className="lg:col-span-2 map-frame flex items-center justify-center">
                     <img
                         src={details?.urlImageLarge || event.urlImageMedium || FALLBACK_IMAGE}
                         alt={event.nameParty}
@@ -220,54 +210,45 @@ function EventDetails() {
                 </div>
 
                 <div className="lg:col-span-3 flex flex-col gap-4 min-w-0">
+                    <div className="page-head__tag">// Ship · Event</div>
                     <div className="flex flex-wrap gap-2">
-                        <span className="px-3 py-1 rounded-xl text-xs font-semibold bg-purple-500/15 text-purple-300 border border-purple-500/30">
-                            {event.nameType}
-                        </span>
+                        {event.nameType && <span className="badge">{event.nameType}</span>}
                         {event.nameStatus && (
-                            <span className={`px-3 py-1 rounded-xl text-xs font-semibold border ${
-                                isCancelled
-                                    ? 'bg-red-500/15 text-red-300 border-red-500/40'
-                                    : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30'
-                            }`}>
-                                {event.nameStatus}
-                            </span>
+                            <span className={`badge${isCancelled ? ' badge--danger' : ''}`}>{event.nameStatus}</span>
                         )}
                     </div>
 
-                    <h1 className="text-2xl sm:text-4xl font-extrabold tracking-wide text-white break-words">
-                        {event.nameParty}
-                    </h1>
+                    <h1 className="page-title m-0">{event.nameParty}</h1>
 
-                    <div className="space-y-1.5 text-sm">
-                        <p className="text-slate-300">
-                            📍 {event.nameTown}{event.nameCountry && <>, <strong className="text-cyan-400">{event.nameCountry}</strong></>}
-                        </p>
+                    <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 m-0 text-sm">
+                        <dt className="field-label m-0 pt-0.5">Where</dt>
+                        <dd className="m-0 soft">{[event.nameTown, event.nameCountry].filter(Boolean).join(', ')}</dd>
                         {startsAt && (
-                            <p className="text-purple-300 font-semibold">
-                                📅 {startsAt}{endsAt && endsAt !== startsAt && <span className="text-slate-400 font-normal"> → {endsAt}</span>}
-                            </p>
+                            <>
+                                <dt className="field-label m-0 pt-0.5">When</dt>
+                                <dd className="m-0 soft">
+                                    {startsAt}{endsAt && endsAt !== startsAt && <span className="muted"> → {endsAt}</span>}
+                                </dd>
+                            </>
                         )}
                         {currentWeather && (
-                            <p className="text-cyan-300">🌡️ {Math.round(currentWeather.temperature)}°C at the venue right now</p>
+                            <>
+                                <dt className="field-label m-0 pt-0.5">Weather</dt>
+                                <dd className="m-0 soft">{Math.round(currentWeather.temperature)}°C at the venue right now</dd>
+                            </>
                         )}
-                    </div>
+                    </dl>
 
-                    <div className="mt-auto pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-3">
+                    <div className="mt-auto pt-4 border-t border-dashed border-[var(--line)] flex flex-wrap items-center gap-3">
                         <FavoriteButton event={event} />
                         <GoingButton eventId={id} status={currentGoing} onChange={status => setGoing({ id, value: status })} />
                         {event.urlPartyHtml && (
-                            <a
-                                href={event.urlPartyHtml}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-800 bg-slate-950/50 text-slate-300 hover:text-white hover:border-cyan-500/40 transition-all"
-                            >
-                                View on Goabase ↗
+                            <a href={event.urlPartyHtml} target="_blank" rel="noreferrer" className="btn">
+                                Goabase ↗
                             </a>
                         )}
                         <div className="flex items-center gap-2 ml-auto">
-                            <span className="text-[10px] text-slate-500 uppercase font-semibold">Share:</span>
+                            <span className="field-label m-0">Share</span>
                             <ShareLinks event={event} />
                         </div>
                     </div>
@@ -275,14 +256,14 @@ function EventDetails() {
             </div>
 
             {error && (
-                <p className="text-red-400 text-sm text-center mt-6">
+                <p className="notice mt-6">
                     {error}{' '}
-                    <button onClick={retry} className="underline cursor-pointer hover:text-red-300">Try again</button>
+                    <button onClick={retry} className="link bg-transparent border-0 p-0 cursor-pointer">Try again</button>
                 </p>
             )}
 
             <div className="grid lg:grid-cols-3 gap-6 mt-6">
-                <div className="lg:col-span-2 space-y-6 min-w-0">
+                <div className="lg:col-span-2 grid gap-6 content-start min-w-0">
                     {!details && !error && (
                         <Section title="Line-up">
                             <TextPlaceholder />
@@ -290,7 +271,7 @@ function EventDetails() {
                     )}
                     {currentAftermovie && (
                         <Section title="Aftermovie">
-                            <div className="aspect-video rounded-2xl overflow-hidden border border-slate-800 bg-slate-950">
+                            <div className="aspect-video map-frame overflow-hidden">
                                 {/* youtube-nocookie: YouTube sets no tracking cookies until the video is played */}
                                 <iframe
                                     src={`https://www.youtube-nocookie.com/embed/${currentAftermovie.videoId}`}
@@ -304,10 +285,10 @@ function EventDetails() {
                         </Section>
                     )}
                     {details?.lineUp.length > 0 && (
-                        <Section title="Line-up">
+                        <Section title="Line-up · crew">
                             {/* Every line as the organizer wrote it; the ones the backend recognised as an artist
                                 link to the artist's page (their other events) and get a SoundCloud link */}
-                            <ul className="text-sm leading-relaxed">
+                            <ul className="text-sm leading-relaxed list-none p-0 m-0">
                                 {details.lineUp.map((line, i) => line.text === '' ? (
                                     <li key={i} aria-hidden="true" className="h-3" />
                                 ) : (
@@ -317,12 +298,12 @@ function EventDetails() {
                                                 to={`/artists/${encodeURIComponent(line.artistSlug)}`}
                                                 state={{ name: line.artist }}
                                                 title={`Where else does ${line.artist} play?`}
-                                                className="break-words min-w-0 text-slate-200 hover:text-cyan-300 underline decoration-slate-700 hover:decoration-cyan-400 underline-offset-4 transition-colors"
+                                                className="break-words min-w-0 text-[var(--fg)] underline decoration-[var(--line)] underline-offset-4 hover:text-[var(--accent)] hover:decoration-[var(--accent)]"
                                             >
                                                 {line.text}
                                             </Link>
                                         ) : (
-                                            <span className={`break-words min-w-0 ${line.artist ? 'text-slate-200' : 'text-slate-400'}`}>{line.text}</span>
+                                            <span className={`break-words min-w-0 ${line.artist ? 'text-[var(--fg)]' : 'muted'}`}>{line.text}</span>
                                         )}
                                         {line.artist && (
                                             <a
@@ -330,9 +311,9 @@ function EventDetails() {
                                                 target="_blank"
                                                 rel="noreferrer"
                                                 title={`Find ${line.artist} on SoundCloud`}
-                                                className="shrink-0 px-2 py-0.5 rounded-lg text-[11px] font-semibold bg-orange-500/10 text-orange-400 border border-orange-500/25 hover:bg-orange-500/20 transition-colors"
+                                                className="shrink-0 mono text-[11px] text-[var(--goa)] no-underline hover:underline"
                                             >
-                                                ☁ SoundCloud
+                                                SoundCloud ↗
                                             </a>
                                         )}
                                     </li>
@@ -342,22 +323,22 @@ function EventDetails() {
                     )}
                     {details?.info && (
                         <Section title="About">
-                            <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line break-words">{details.info}</p>
+                            <p className="soft text-sm leading-relaxed whitespace-pre-line break-words m-0">{details.info}</p>
                         </Section>
                     )}
                     {details && !hasStory && (
                         <Section title="About">
-                            <p className="text-slate-500 text-sm">The organizers haven't published a line-up or description yet.</p>
+                            <p className="muted text-sm m-0">The organizers haven't published a line-up or description yet.</p>
                         </Section>
                     )}
 
                     <ReviewSection eventId={id} />
                 </div>
 
-                <div className="space-y-6 min-w-0">
+                <div className="grid gap-6 content-start min-w-0">
                     <Section title="Venue">
                         {details?.location && (
-                            <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line break-words mb-3">{details.location}</p>
+                            <p className="soft text-sm leading-relaxed whitespace-pre-line break-words mt-0 mb-3">{details.location}</p>
                         )}
                         <EventMap
                             key={id}
@@ -369,21 +350,16 @@ function EventDetails() {
                     </Section>
 
                     {details?.entryFee && (
-                        <Section title="Entry Fee">
-                            <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line break-words">{details.entryFee}</p>
+                        <Section title="Entry fee">
+                            <p className="soft text-sm leading-relaxed whitespace-pre-line break-words m-0">{details.entryFee}</p>
                         </Section>
                     )}
 
                     {(details?.organizer || details?.organizerUrl) && (
-                        <Section title="Organizer">
-                            {details.organizer && <p className="text-slate-200 text-sm font-semibold">{details.organizer}</p>}
+                        <Section title="Organizer · captain">
+                            {details.organizer && <p className="text-sm font-medium mt-0 mb-1">{details.organizer}</p>}
                             {details.organizerUrl && (
-                                <a
-                                    href={details.organizerUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className="text-cyan-400 hover:text-cyan-300 text-sm break-all"
-                                >
+                                <a href={details.organizerUrl} target="_blank" rel="noreferrer" className="link text-sm break-all">
                                     {details.organizerUrl.replace(/^https?:\/\//, '')} ↗
                                 </a>
                             )}

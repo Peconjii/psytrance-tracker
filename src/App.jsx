@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import './App.css'
 import MapOfPsy from './map/MapOfPsy'
 import Events from './pages/Events'
 import EventDetails from './pages/EventDetails'
@@ -16,18 +15,14 @@ import Profile from './pages/Profile'
 import GlobalMap from './pages/GlobalMap'
 import Artists from './pages/Artists'
 import Artist from './pages/Artist'
-import CymaticsBackground from './components/CymaticsBackground'
 import ProtectedRoute from './components/ProtectedRoute'
 
-// The home page is the galaxy map, which fills the window under the navbar on its own
-// background, so it gets neither the animated background nor the footer
+// The home page is the galaxy map, which fills the window under the navbar, so it has no footer
 function Shell() {
   const isHome = useLocation().pathname === '/'
   return (
     // On the home page the layout is exactly one window tall and the map takes what the navbar leaves
-    <div className={`relative flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden ${isHome ? 'h-dvh overflow-hidden' : 'min-h-screen'}`}>
-      {!isHome && <CymaticsBackground />}
-
+    <div className={`relative flex flex-col overflow-x-hidden ${isHome ? 'h-dvh overflow-hidden' : 'min-h-screen'}`}>
       <Navbar />
 
       <main className={`relative z-10 flex-1 ${isHome ? 'min-h-0' : ''}`}>

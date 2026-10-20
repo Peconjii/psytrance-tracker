@@ -44,71 +44,64 @@ function ReviewSection({ eventId }) {
         : null
 
     return (
-        <div className="bg-gray-800 p-4 rounded-xl mt-3 text-white text-left">
-            <div className="flex justify-between items-center mb-3 border-b border-gray-700 pb-2">
-                <h3 className="font-bold text-lg">User Reviews</h3>
+        <section className="panel">
+            <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+                <h2 className="panel__label m-0">Reviews</h2>
                 {averageRating && (
-                    <span className="bg-purple-900 text-purple-200 text-sm px-2.5 py-1 rounded-full font-semibold">
-                        ★ {averageRating} / 5 ({reviews.length})
-                    </span>
+                    <span className="mono text-xs soft">★ {averageRating} / 5 · {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}</span>
                 )}
             </div>
 
             {user ? (
-                <form onSubmit={handleSubmit} className="mb-4 flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                        <label className="text-sm text-gray-300">Rating:</label>
+                <form onSubmit={handleSubmit} className="mb-4 grid gap-2">
+                    <div className="flex items-center gap-3">
+                        <label htmlFor={`rating-${eventId}`} className="field-label m-0">Rating</label>
                         <select
+                            id={`rating-${eventId}`}
                             value={rating}
                             onChange={(e) => setRating(Number(e.target.value))}
-                            className="bg-gray-700 text-white rounded px-2 py-1 focus:outline-none"
+                            className="field w-auto py-1"
                         >
-                            <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
-                            <option value={4}>⭐⭐⭐⭐ (4)</option>
-                            <option value={3}>⭐⭐⭐ (3)</option>
-                            <option value={2}>⭐⭐ (2)</option>
-                            <option value={1}>⭐ (1)</option>
+                            {[5, 4, 3, 2, 1].map(n => (
+                                <option key={n} value={n}>{'★'.repeat(n)}{'☆'.repeat(5 - n)} ({n})</option>
+                            ))}
                         </select>
                     </div>
 
                     <textarea
-                        placeholder="Write a comment..."
+                        placeholder="How was it?"
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         rows={2}
-                        className="w-full bg-gray-700 text-white p-2 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:border-cyan-400 border border-transparent"
+                        className="field"
                     />
 
-                    <button
-                        type="submit"
-                        disabled={submitting}
-                        className="self-end bg-cyan-600 hover:bg-cyan-500 text-white text-xs px-4 py-2 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                        {submitting ? 'Submitting...' : 'Post Review'}
+                    <button type="submit" disabled={submitting} className="btn btn--primary justify-self-end">
+                        {submitting ? 'Posting...' : 'Post review'}
                     </button>
                 </form>
             ) : (
-                <p className="text-xs text-gray-400 italic mb-3">Login to leave a review.</p>
+                <p className="muted text-sm mb-3">Log in to leave a review.</p>
             )}
 
             {loading ? (
-                <p className="text-xs text-gray-400">Loading reviews...</p>
+                <p className="muted text-sm">Loading reviews...</p>
             ) : reviews.length === 0 ? (
-                <p className="text-xs text-gray-400">No reviews yet. Be the first!</p>
+                <p className="muted text-sm">No reviews yet.</p>
             ) : (
-                <div className="flex flex-col gap-2 max-h-40 overflow-y-auto pr-1">
+                <ul className="rows max-h-64 overflow-y-auto">
                     {reviews.map(rev => (
-                        <div key={rev.id} className="bg-gray-700 p-2 rounded-lg text-xs">
-                            <div className="flex justify-between text-gray-300 mb-1">
-                                <span className="font-semibold text-cyan-300">{rev.username}</span>
-                                <span>{'★'.repeat(rev.rating)}</span>
+                        <li key={rev.id} className="rows__item flex-col items-stretch gap-1">
+                            <div className="flex justify-between gap-3">
+                                <span className="mono text-xs text-[var(--accent)]">{rev.username}</span>
+                                <span className="mono text-xs soft">{'★'.repeat(rev.rating)}{'☆'.repeat(5 - rev.rating)}</span>
                             </div>
-                            {rev.comment && <p className="text-gray-200">{rev.comment}</p>}
-                        </div>
+                            {rev.comment && <p className="soft text-sm m-0">{rev.comment}</p>}
+                        </li>
                     ))}
-                </div>
+                </ul>
             )}
-        </div>
+        </section>
     )
 }
 
