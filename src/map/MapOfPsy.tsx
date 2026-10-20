@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { fetchEventDetails } from '../api/backend.js';
 import './map.css';
-import { Galaxy, type Focus } from './galaxy/Galaxy';
+import { Galaxy, type CrewMember, type Focus } from './galaxy/Galaxy';
 import { Panel } from './components/Panel';
 import { Player } from './components/Player';
 import { Search } from './components/Search';
@@ -10,7 +12,7 @@ import { Compare } from './components/Compare';
 import { PlaylistMenu } from './components/Playlist';
 import { LabelsMenu } from './components/LabelsMenu';
 import { FleetPanel } from './components/FleetPanel';
-import { fetchMapEvents, type EventPeriod, type MapEvent } from './data/events';
+import { fetchMapEvents, mapArtistBySlug, type Boarded, type EventPeriod, type MapEvent } from './data/events';
 import { usePlaylist } from './hooks/usePlaylist';
 import {
   data, festivalById, genreById, genresOfArtist, genresOfLabel, labels, randomTrack, stopTrack, type Tour, type Track,
@@ -58,6 +60,37 @@ export default function MapOfPsy() {
   const [events, setEvents] = useState<MapEvent[] | null>(null);
   const [fleet, setFleet] = useState<number[] | null>(null);
   const [harbour, setHarbour] = useState(false);
+  // The ship the user boarded (a fleet of one): its captain and crew, loaded from the event's details
+  const [boarded, setBoarded] = useState<Boarded | null>(null);
+  const navigate = useNavigate();
+  const boardedId = fleet?.length === 1 ? fleet[0] : null;
+
+  useEffect(() => {
+    if (boardedId === null) return;
+    const controller = new AbortController();
+    fetchEventDetails(boardedId, controller.signal)
+      .then((details: { organizer?: string; organizerUrl?: string; lineUp: { artist: string | null; artistSlug: string | null }[] }) => {
+        const seen = new Set<string>();
+        const crew: CrewMember[] = [];
+        for (const line of details.lineUp) {
+          if (!line.artist || !line.artistSlug || seen.has(line.artistSlug)) continue;
+          seen.add(line.artistSlug);
+          const onMap = mapArtistBySlug(line.artistSlug);
+          crew.push({ name: line.artist, slug: line.artistSlug, color: onMap ? data.families[genreById[onMap.genreId].family].color : null });
+        }
+        setBoarded({ id: boardedId, captain: details.organizer ?? null, captainUrl: details.organizerUrl ?? null, crew });
+      })
+      .catch(() => { if (!controller.signal.aborted) setBoarded({ id: boardedId, captain: null, captainUrl: null, crew: [] }); });
+    return () => controller.abort();
+  }, [boardedId]);
+  const currentBoarded = boarded && boarded.id === boardedId ? boarded : null;
+
+  // A crew member who is on the map opens their satellite; anyone else, their page with upcoming events
+  const selectCrew = (member: CrewMember) => {
+    const onMap = member.slug ? mapArtistBySlug(member.slug) : null;
+    if (onMap) reveal(onMap.genreId, onMap.name);
+    else if (member.slug) navigate(`/artists/${encodeURIComponent(member.slug)}`, { state: { name: member.name } });
+  };
 
   useEffect(() => {
     if (!period) { setEvents(null); return; }
@@ -206,7 +239,8 @@ export default function MapOfPsy() {
       <Galaxy selectedId={selectedId} artist={artist} year={year} onSelect={select} onSelectArtist={reveal}
         tourPath={tourPath} focus={focus} showStations={showStations} onSelectFestival={openFestival}
         showLabels={showLabels} onSelectLabel={openLabel}
-        events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour} />
+        events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour}
+        crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew} />
 
       <header className="topbar">
         <div className="brand">
@@ -249,6 +283,8 @@ export default function MapOfPsy() {
 
       {fleetEvents.length > 0 ? (
         <FleetPanel events={fleetEvents} harbour={harbour} onSelect={select}
+          boarded={currentBoarded} loadingCrew={boardedId !== null && !currentBoarded}
+          onBoard={(id) => openFleet([id])} onSelectCrew={selectCrew}
           onClose={() => { setFleet(null); setHarbour(false); }} />
       ) : (
       <Panel genreId={selectedId} artist={artist} festival={festival} label={label}

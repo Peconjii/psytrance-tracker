@@ -375,3 +375,11 @@
 /* The navigation legend in the idle HUD: symbol on the left, what it is on the right */
 .hud__legend { margin-top: 14px; gap: 9px 12px; }
 .hud__legend dt { color: var(--accent); white-space: nowrap; }
+
+/* Boarding a ship: captain and crew in the fleet HUD */
+.fleet__board { justify-self: start; font: 12px var(--mono); color: var(--fg); background: none; border: 1px solid var(--line); padding: 4px 10px; cursor: pointer; }
+.fleet__board:hover, .fleet__board:focus-visible { border-color: var(--fam); color: var(--fam); outline: none; }
+.fleet__captain { margin: 0; }
+.fleet__captain a { color: var(--fam); text-decoration: none; }
+.fleet__captain a:hover { text-decoration: underline; }
+.fleet__hint { font-size: 12px; margin-top: 10px; }

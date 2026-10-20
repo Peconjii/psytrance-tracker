@@ -1,5 +1,5 @@
 import api from '../../api/backend.js';
-import { genreById } from './types';
+import { data, genreById } from './types';
 
 /** How far ahead the map shows events, as the backend names it */
 export type EventPeriod = 'WEEK' | 'MONTH';
@@ -50,4 +50,26 @@ export function eventDates(e: MapEvent): string {
     { weekday: 'short', day: 'numeric', ...(month ? { month: 'short' } : {}) });
   if (!e.dateEnd || e.dateEnd === e.dateStart) return fmt(e.dateStart, true);
   return `${fmt(e.dateStart, false)} – ${fmt(e.dateEnd, true)}`;
+}
+
+/** A boarded ship: the event's organizer (its captain) and its line-up (its crew) */
+export interface Boarded {
+  id: number;
+  captain: string | null;
+  captainUrl: string | null;
+  crew: { name: string; slug: string | null; color: string | null }[];
+}
+
+/** The same slug the backend gives line-up artists: "Ace Ventura" -> "ace-ventura", "Ëlement" -> "element" */
+export function artistSlug(name: string): string {
+  return name.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+}
+
+// Map artists by slug, so a line-up name finds its satellite however the organizer wrote it
+const bySlug = new Map<string, { name: string; genreId: string }>();
+for (const g of data.genres) for (const name of g.artists) if (!bySlug.has(artistSlug(name))) bySlug.set(artistSlug(name), { name, genreId: g.id });
+
+/** The map artist with this slug and the first genre they are placed in, or null when they aren't on the map */
+export function mapArtistBySlug(slug: string): { name: string; genreId: string } | null {
+  return bySlug.get(slug) ?? null;
 }

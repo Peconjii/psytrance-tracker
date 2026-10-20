@@ -24,6 +24,16 @@ interface Props {
   selectedFleet: number[] | null;
   onSelectFleet: (ids: number[]) => void;
   onSelectHarbour: () => void;
+  /** Line-up of the boarded ship (one event selected): drawn as satellites orbiting it */
+  crew: CrewMember[] | null;
+  onSelectCrew: (member: CrewMember) => void;
+}
+
+/** An artist in a ship's line-up; color is their genre's scene color when they are on the map */
+export interface CrewMember {
+  name: string;
+  slug: string | null;
+  color: string | null;
 }
 
 export interface Focus {
@@ -61,6 +71,16 @@ interface Fleet {
   y: number;
   node: Container;
   name: Text | null;
+  /** The ship arrows, turned towards the star of the fleet's main genre */
+  body: Container;
+  /** Engine exhaust in the main genre's color, redrawn every frame */
+  trail: Graphics;
+  color: number;
+  /** Engine nozzles in body coordinates */
+  engines: { x: number; y: number }[];
+  particles: { x: number; y: number; vx: number; vy: number; age: number }[];
+  spawn: number;
+  phase: number;
 }
 
 const hex = (c: string) => parseInt(c.slice(1), 16);
@@ -81,13 +101,16 @@ const HARBOUR = { x: 546, y: 2030 };
 
 const shortName = (name: string) => (name.length > 26 ? name.slice(0, 25).trimEnd() + '…' : name);
 
-/** A small arrow-shaped ship pointing up */
+/** A small arrow-shaped ship pointing right, in the color of its main genre */
 function drawShip(g: Graphics, x: number, y: number, color: number) {
-  g.poly([x - 9, y + 7, x, y - 11, x + 9, y + 7, x, y + 3]).fill(color).stroke({ width: 1.5, color: 0xffffff, alpha: 0.7 });
+  g.poly([x - 7, y - 9, x + 11, y, x - 7, y + 9, x - 3, y]).fill(color).stroke({ width: 1.5, color: 0xffffff, alpha: 0.7 });
 }
 
+const TRAIL_LIFE = 0.8;
+const TRAIL_EVERY = 0.05;
+
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -108,6 +131,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   onSelectFleetRef.current = onSelectFleet;
   const onSelectHarbourRef = useRef(onSelectHarbour);
   onSelectHarbourRef.current = onSelectHarbour;
+  const onSelectCrewRef = useRef(onSelectCrew);
+  onSelectCrewRef.current = onSelectCrew;
+  const crewRef = useRef<{ orbit: Container; sats: { node: Container; radius: number; phase: number }[] } | null>(null);
   const onSelectLabelRef = useRef(onSelectLabel);
   onSelectLabelRef.current = onSelectLabel;
   const onSelectFestivalRef = useRef(onSelectFestival);
@@ -365,10 +391,46 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         }
         // Ships appear once you zoom in; a lone ship shows its event's name only up close
         const showShips = vp.scale.x >= SHIP_ZOOM;
+        const dt = tk.deltaMS / 1000;
         for (const f of fleetsRef.current) {
           f.node.visible = showShips;
           f.node.scale.set(Math.max(1, 0.9 / vp.scale.x));
           if (f.name) f.name.visible = vp.scale.x >= 1.1;
+          if (!showShips) continue;
+          // Ships float gently, each on its own beat
+          f.body.y = Math.sin(time * 1.6 + f.phase) * 2.5;
+          // Engine exhaust: particles leave the nozzles backwards, drift and fade
+          const cos = Math.cos(f.body.rotation), sin = Math.sin(f.body.rotation);
+          f.spawn += dt;
+          while (f.spawn > TRAIL_EVERY) {
+            f.spawn -= TRAIL_EVERY;
+            for (const e of f.engines) {
+              const ly = e.y * f.body.scale.y;
+              const spread = (Math.random() - 0.5) * 16;
+              f.particles.push({
+                x: e.x * cos - ly * sin,
+                y: e.x * sin + ly * cos + f.body.y,
+                vx: -cos * 40 - sin * spread,
+                vy: -sin * 40 + cos * spread,
+                age: 0,
+              });
+            }
+          }
+          f.trail.clear();
+          f.particles = f.particles.filter((p) => (p.age += dt / TRAIL_LIFE) < 1);
+          for (const p of f.particles) {
+            p.x += p.vx * dt;
+            p.y += p.vy * dt;
+            f.trail.circle(p.x, p.y, 3.4 * (1 - p.age) + 0.6).fill({ color: f.color, alpha: 0.75 * (1 - p.age) });
+          }
+        }
+        // The boarded ship's crew orbits it like artists orbit a star
+        if (crewRef.current) {
+          crewRef.current.orbit.scale.set(Math.max(1, 0.9 / vp.scale.x));
+          for (const sat of crewRef.current.sats) {
+            const a = sat.phase + time * ORBIT_SPEED * 1.5;
+            sat.node.position.set(Math.cos(a) * sat.radius, Math.sin(a) * sat.radius);
+          }
         }
         if (harbourRef.current) harbourRef.current.node.scale.set(stationScale);
         for (const q of particles) {
@@ -387,6 +449,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       // Destroyed with the app; an effect running before the next init must not touch them
       routesRef.current = [];
       fleetsRef.current = [];
+      crewRef.current = null;
       eventLayerRef.current = null;
       fleetLinesRef.current = null;
       harbourRef.current = null;
@@ -536,42 +599,104 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       for (const e of fleetEvents) for (const g of e.genres) weight[g.genreId] = (weight[g.genreId] ?? 0) + g.share;
       const main = genreById[Object.entries(weight).sort((a, b) => b[1] - a[1])[0][0]];
       const color = hex(data.families[main.family].color);
-      const icon = new Graphics();
+
+      // The ships point at the star of the main genre: they sail towards their sound.
+      // Facing left they are mirrored, so the cockpit stays on top.
+      const trail = new Graphics();
+      const body = new Container();
+      const heading = Math.atan2(main.y - y, main.x - x);
+      body.rotation = heading;
+      if (Math.cos(heading) < 0) body.scale.y = -1;
+      const engines: { x: number; y: number }[] = [];
+      const arrows = new Graphics();
+      body.addChild(arrows);
+      const addShip = (dx: number, dy: number) => {
+        drawShip(arrows, dx, dy, color);
+        // The notch at the back of the arrow is the engine
+        engines.push({ x: dx - 4, y: dy });
+      };
+
       let name: Text | null = null;
       if (fleetEvents.length === 1) {
-        drawShip(icon, 0, 0, color);
+        addShip(0, 0);
         name = new Text({
           text: shortName(fleetEvents[0].nameParty),
           style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xe9e6ff },
         });
         name.anchor.set(0.5, 0);
-        name.position.set(0, 12);
-        node.addChild(icon, name);
+        name.position.set(0, 14);
+        node.addChild(trail, body, name);
       } else {
-        drawShip(icon, -9, 4, color);
-        drawShip(icon, 9, 4, color);
-        drawShip(icon, 0, -6, color);
+        // A small formation: the leader ahead, two wingmen behind
+        addShip(6, 0);
+        addShip(-8, -10);
+        addShip(-8, 10);
         const n = new Text({
           text: `×${fleetEvents.length}`,
           style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: '600', fill: 0xffffff },
         });
-        n.anchor.set(0, 0.5);
-        n.position.set(20, 0);
-        node.addChild(icon, n);
+        n.anchor.set(0.5, 0);
+        n.position.set(0, 16);
+        node.addChild(trail, body, n);
       }
       node.eventMode = 'static';
       node.cursor = 'pointer';
-      node.hitArea = { contains: (px: number, py: number) => Math.abs(px) < 26 && Math.abs(py) < 18 };
+      node.hitArea = { contains: (px: number, py: number) => px * px + py * py < 26 * 26 };
       node.on('pointerover', () => { hoverFleetRef.current = fleetEvents; drawFleetLines.current(); });
       node.on('pointerout', () => { hoverFleetRef.current = null; drawFleetLines.current(); });
       node.on('pointertap', () => onSelectFleetRef.current(fleetEvents.map((e) => e.id)));
       layer.addChild(node);
-      fleetsRef.current.push({ events: fleetEvents, x, y, node, name });
+      fleetsRef.current.push({
+        events: fleetEvents, x, y, node, name, body, trail, color, engines,
+        particles: [], spawn: 0, phase: Math.random() * Math.PI * 2,
+      });
     }
     drawFleetLines.current();
   }, [events, ready]);
 
   useEffect(() => drawFleetLines.current(), [selectedFleet, ready]);
+
+  // Camera flies to the opened ship or fleet, leaving room on the right for the HUD
+  useEffect(() => {
+    const vp = viewportRef.current;
+    const fleet = selectedFleet && fleetsRef.current.find((f) => f.events.some((e) => e.id === selectedFleet[0]));
+    if (!vp || !fleet) return;
+    const scale = Math.max(vp.scale.x, 1.3);
+    vp.animate({ position: { x: fleet.x + 180 / scale, y: fleet.y }, scale, time: 700, ease: 'easeInOutSine' });
+  }, [selectedFleet, events, ready]);
+
+  // Crew of the boarded ship: its line-up as satellites on alternating orbits around it
+  useEffect(() => {
+    const layer = eventLayerRef.current;
+    crewRef.current?.orbit.destroy({ children: true });
+    crewRef.current = null;
+    const fleet = selectedFleet && fleetsRef.current.find((f) => f.events.some((e) => e.id === selectedFleet[0]));
+    if (!layer || !fleet || !crew?.length) return;
+    const orbit = new Container();
+    orbit.position.set(fleet.x, fleet.y);
+    const rings = new Graphics();
+    const radiusOf = (i: number) => 74 + (i % 2) * 24 + Math.floor(i / 24) * 52;
+    for (const r of new Set(crew.map((_, i) => radiusOf(i)))) rings.circle(0, 0, r).stroke({ width: 1, color: fleet.color, alpha: 0.2 });
+    orbit.addChild(rings);
+    const ringSize = (i: number) => Math.min(24, crew.length - Math.floor(i / 24) * 24);
+    const sats = crew.map((member, i) => {
+      const node = new Container();
+      const color = member.color ? hex(member.color) : 0xcfcaf2;
+      const dot = new Graphics().circle(0, 0, 4).fill(color).circle(0, 0, 7).stroke({ width: 1.5, color: fleet.color, alpha: 0.8 });
+      const text = new Text({ text: member.name, style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xe9e6ff } });
+      text.anchor.set(0.5, 0);
+      text.position.set(0, 9);
+      node.addChild(dot, text);
+      node.eventMode = 'static';
+      node.cursor = 'pointer';
+      node.hitArea = { contains: (x: number, y: number) => (x * x + y * y < 14 * 14) || (Math.abs(x) < text.width / 2 && y > 6 && y < 24) };
+      node.on('pointertap', () => onSelectCrewRef.current(member));
+      orbit.addChild(node);
+      return { node, radius: radiusOf(i), phase: ((i % 24) / ringSize(i)) * Math.PI * 2 };
+    });
+    layer.addChild(orbit);
+    crewRef.current = { orbit, sats };
+  }, [crew, selectedFleet, events, ready]);
 
   // Camera frames the whole focus group
   useEffect(() => {
