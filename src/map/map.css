@@ -469,3 +469,8 @@
 @media (max-width: 1100px), (max-height: 500px) {
   .topbar__menu.is-open { max-height: calc(100dvh - 230px); }
 }
+/* "All 12 gigs →" under an artist's next gigs */
+.hud__more { display: inline-block; margin-top: 8px; font: 12px var(--mono); color: var(--fam); text-decoration: none; }
+.hud__more:hover, .hud__more:focus-visible { text-decoration: underline; outline: none; }
+/* Long event names shorten with "…" instead of pushing the date out of the panel */
+.hud__list > li { min-width: 0; }

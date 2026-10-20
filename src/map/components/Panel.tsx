@@ -1,5 +1,6 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import { ProducerCorner } from './ProducerCorner';
+import { NextGigs } from './NextGigs';
 import { HeartButton } from './Playlist';
 import type { PlaylistApi } from '../hooks/usePlaylist';
 import {
@@ -219,6 +220,8 @@ export function Panel({
             {p.since && <span>ACTIVE SINCE <b>{p.since}</b></span>}
           </div>
         )}
+
+        <NextGigs name={artist} />
 
         {tracks.length > 0 && (<><div className="hud__label">Tracks on the map</div>{trackList(tracks)}</>)}
 
