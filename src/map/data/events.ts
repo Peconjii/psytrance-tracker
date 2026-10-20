@@ -79,8 +79,8 @@ const NEAR_STAR = 60;
 const SHIP_OFFSET = 78;
 /** Ships within one grid cell of each other form a fleet */
 const FLEET_GRID = 34;
-/** Where events of unknown genre wait: open space south-east of the dark systems, clear of the ship console */
-export const HARBOUR = { x: 2350, y: 2120 };
+/** Where events of unknown genre wait: open space in the upper left, between psychedelic rock and Detroit techno */
+export const HARBOUR = { x: 200, y: 700 };
 
 /** Ships parked at the same spot, and the genre with the biggest share across them (it sets their color) */
 export interface FleetSpot {
