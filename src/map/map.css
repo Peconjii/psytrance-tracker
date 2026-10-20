@@ -372,3 +372,6 @@
 .fleet__meta span:first-child { color: var(--fg); }
 .fleet__link { font: 12px var(--mono); color: var(--fam); text-decoration: none; justify-self: start; }
 .fleet__link:hover, .fleet__link:focus-visible { text-decoration: underline; outline: none; }
+/* The navigation legend in the idle HUD: symbol on the left, what it is on the right */
+.hud__legend { margin-top: 14px; gap: 9px 12px; }
+.hud__legend dt { color: var(--accent); white-space: nowrap; }

@@ -177,7 +177,23 @@ export function Panel({
     return (
       <HudShell className="hud hud--idle">
         <div className="hud__tag">// NAVIGATION</div>
-        <p>Pick a star system to open its genre data, or search for it above. Drag to move, scroll to zoom. Zoom in close to see artists orbiting each star. Click a ◇ station for a festival or a ⬡ marker for a record label; you can switch festivals and labels on or off in the legend at the top. Tracks marked ▶ play in the player while you explore; ♡ saves them to your playlist.</p>
+        <p>Drag to move, scroll or pinch to zoom. Click anything on the map to open it here.</p>
+        <dl className="hud__specs hud__legend">
+          <dt>● STAR</dt>
+          <dd>A genre: its sound, history and key tracks. Zoom in close to see its artists orbiting.</dd>
+          <dt>▲3</dt>
+          <dd>Events this week (or month) that play the genre. Switch with ▲ Events in the legend.</dd>
+          <dt>▲ SHIP</dt>
+          <dd>An upcoming party, parked between the stars of the genres its line-up plays. Hover to see its course.</dd>
+          <dt>▲▲ ×4</dt>
+          <dd>A fleet: several parties that sound alike.</dd>
+          <dt>⚓ HARBOUR</dt>
+          <dd>Parties whose genre isn't known yet.</dd>
+          <dt>◇ ⬡</dt>
+          <dd>Festival stations and record labels; turn them on or off in the legend.</dd>
+          <dt>▶ ♡</dt>
+          <dd>Play a track while you explore; save it to your playlist.</dd>
+        </dl>
       </HudShell>
     );
   }
