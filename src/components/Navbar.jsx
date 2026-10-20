@@ -37,7 +37,10 @@ function Navbar() {
     return (
         <nav className="site-nav">
             <div className="site-nav__inner">
-                <Link to="/" className="site-nav__brand">PSYTRANCE EVENT TRACKER</Link>
+                <Link to="/" className="site-nav__home" aria-label="Psytrance Event Tracker, home">
+                    <img src="/logo.svg" alt="" className="site-nav__logo" width="50" height="32" />
+                    <span className="site-nav__brand">PSYTRANCE EVENT TRACKER</span>
+                </Link>
 
                 <div className="site-nav__links">
                     {navLinks.map(link => (
