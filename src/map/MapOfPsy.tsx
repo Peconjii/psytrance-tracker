@@ -141,7 +141,7 @@ export default function MapOfPsy() {
     const url = q.size ? `?${q}` : window.location.pathname;
     window.history.replaceState(null, '', url);
     const name = artist ?? (festival ? festivalById[festival].name : null) ?? label ?? (selectedId ? genreById[selectedId].name : null);
-    document.title = name ? `${name} · Map of Psy` : 'Map of Psy · interactive galaxy of psytrance';
+    document.title = name ? `${name} · Map of Psy` : 'Map of Psy · psytrance galaxy + event tracker';
   }, [selectedId, artist, festival, label]);
 
   const clearFocus = () => {
@@ -250,7 +250,7 @@ export default function MapOfPsy() {
       <header className="topbar">
         <div className="brand">
           <h1>MAP OF PSY</h1>
-          <p className="brand__sub">interactive galaxy of psytrance</p>
+          <p className="brand__sub">psytrance galaxy <span className="brand__plus">+</span> event tracker</p>
         </div>
         <button className="menu-toggle" onClick={() => setMenu((m) => !m)} aria-expanded={menu} aria-controls="topbar-menu">
           {menu ? '✕ Close' : '☰ Menu'}

@@ -307,6 +307,7 @@
 .brand { display: grid; gap: 2px; }
 .brand h1 { line-height: 1; }
 .brand__sub { margin: 0; font: 11px var(--mono); letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.brand__plus { color: var(--accent); }
 
 /* Readable top bar over the map */
 .topbar { z-index: 5; }
