@@ -35,7 +35,8 @@ function Navbar() {
     )
 
     return (
-        <nav className="site-nav">
+        // On the galaxy page the map's own menu has the pages too, so phones get one menu, not two
+        <nav className={location.pathname === '/' ? 'site-nav site-nav--home' : 'site-nav'}>
             <div className="site-nav__inner">
                 <Link to="/" className="site-nav__home" aria-label="Map of Psy, home">
                     <img src="/logo.svg" alt="" className="site-nav__logo" width="50" height="32" />

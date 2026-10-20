@@ -78,6 +78,7 @@ a { color: inherit; }
 @media (max-width: 860px) {
   .site-nav__links, .site-nav__auth { display: none; }
   .btn.site-nav__burger { display: inline-flex; }
+  .site-nav--home .btn.site-nav__burger, .site-nav--home .site-nav__mobile { display: none; }
   .site-nav__mobile { display: grid; gap: 2px; padding: 8px 20px 16px; border-top: 1px solid var(--line); }
   .site-nav__mobile .site-nav__link { padding: 10px 0; border-bottom: 1px dashed var(--line); }
   .site-nav__inner { gap: 12px; padding: 10px 16px; }

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { fetchEventDetails } from '../api/backend.js';
 import './map.css';
 import { Galaxy, type CrewMember, type Focus, type ViewBounds } from './galaxy/Galaxy';
@@ -67,6 +68,7 @@ export default function MapOfPsy() {
   // The ship the user boarded (a fleet of one): its captain and crew, loaded from the event's details
   const [boarded, setBoarded] = useState<Boarded | null>(null);
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const boardedId = fleet?.length === 1 ? fleet[0] : null;
 
   useEffect(() => {
@@ -267,6 +269,24 @@ export default function MapOfPsy() {
           <button className={showLabels ? 'legend__toggle is-on is-label' : 'legend__toggle is-label'} onClick={() => setShowLabels((s) => !s)}
             aria-pressed={showLabels} title="Click to show or hide record labels">⬡ Labels {showLabels ? 'on' : 'off'}</button>
         </div>
+        {/* On phones the navbar's own menu is hidden on this page, so the site's pages live here too */}
+        <nav className="topbar__pages" aria-label="Pages" data-closes-menu>
+          <Link to="/events">Events</Link>
+          <Link to="/map">World map</Link>
+          <Link to="/artists">Artists</Link>
+          {user ? (
+            <>
+              <Link to="/favorites">Favorites</Link>
+              <Link to="/profile">{user.username}</Link>
+              <button onClick={logout}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/register">Register</Link>
+              <Link to="/login">Login</Link>
+            </>
+          )}
+        </nav>
         <div className="topbar__tools">
           <ToursMenu onStart={(t) => goToStop(t, 0)} />
           <LabelsMenu onOpen={openLabel} />
