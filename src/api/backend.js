@@ -85,6 +85,19 @@ export async function fetchGoingForEvents(events, signal) {
     }
 }
 
+// Map of Psy genres for a whole list of events in one request: { [eventId]: [{ genreId, share, source }] }.
+// Events with no known genre are missing; on failure the cards simply show no genres.
+export async function fetchGenresForEvents(events, signal) {
+    const ids = events.map(event => event.id).filter(Boolean)
+    if (ids.length === 0) return {}
+    try {
+        const response = await api.get('/api/map/genres', { params: { ids: ids.join(',') }, signal })
+        return response.data || {}
+    } catch {
+        return {}
+    }
+}
+
 export async function fetchGoing(eventId, signal) {
     try {
         const response = await api.get(`/api/events/${eventId}/going`, { signal })

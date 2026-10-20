@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react'
-import { fetchEventById, fetchGoing } from '../api/backend'
+import { fetchEventById, fetchGenresForEvents, fetchGoing } from '../api/backend'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather'
-import EventRow from './EventRow'
+import EventTicket from './EventTicket'
 
 function FavoriteCard({ favorite }) {
     const [event, setEvent] = useState(null)
     const [weather, setWeather] = useState(null)
     const [going, setGoing] = useState(null)
+    const [genres, setGenres] = useState([])
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
@@ -17,6 +18,7 @@ function FavoriteCard({ favorite }) {
                 // Not awaited, so the card shows right away and the weather badge appears when ready
                 fetchWeatherForEvents([data]).then(found => setWeather(found[weatherKey(data)]))
                 fetchGoing(data.id).then(setGoing)
+                fetchGenresForEvents([data]).then(found => setGenres(found[data.id] || []))
             } catch (err) {
                 console.error("Error loading favorite event:", err)
             } finally {
@@ -29,10 +31,10 @@ function FavoriteCard({ favorite }) {
         }
     }, [favorite.eventId])
 
-    if (loading) return <div className="board__row"><div className="skeleton h-10 col-span-4" /></div>
+    if (loading) return <div className="ticket skeleton h-28" aria-busy="true" />
     if (!event) return null
 
-    return <EventRow event={event} weather={weather} going={going} onGoingChange={setGoing} />
+    return <EventTicket event={event} weather={weather} going={going} genres={genres} onGoingChange={setGoing} />
 }
 
 export default FavoriteCard

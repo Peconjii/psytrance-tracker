@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { fetchArtist, fetchGoingForEvents } from '../api/backend.js'
+import { fetchArtist, fetchGenresForEvents, fetchGoingForEvents } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
-import EventRow, { BoardHead } from '../components/EventRow.jsx'
+import EventTicket from '../components/EventTicket.jsx'
+import EventDays from '../components/EventDays.jsx'
+import { TicketSkeletons } from '../components/EventFeed.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 function soundCloudSearchUrl(artist) {
@@ -21,6 +23,7 @@ function Artist() {
     const [loaded, setLoaded] = useState({ slug: null, artist: null, error: null })
     const [weather, setWeather] = useState({})
     const [goingByEvent, setGoingByEvent] = useState({})
+    const [genresByEvent, setGenresByEvent] = useState({})
     const [attempt, setAttempt] = useState(0)
 
     const artist = loaded.slug === slug ? loaded.artist : null
@@ -46,6 +49,8 @@ function Artist() {
                     .then(found => setWeather(prev => ({ ...prev, ...found })))
                 fetchGoingForEvents(data.upcomingEvents, controller.signal)
                     .then(found => setGoingByEvent(prev => ({ ...prev, ...found })))
+                fetchGenresForEvents(data.upcomingEvents, controller.signal)
+                    .then(found => setGenresByEvent(prev => ({ ...prev, ...found })))
             })
             .catch(err => {
                 if (controller.signal.aborted) return
@@ -98,25 +103,21 @@ function Artist() {
                     <button onClick={() => setAttempt(count => count + 1)} className="btn">Try again</button>
                 </div>
             ) : !artist ? (
-                <div className="board" aria-busy="true">
-                    <BoardHead />
-                    {[...Array(4)].map((_, i) => (
-                        <div key={i} className="board__row"><div className="skeleton h-10 col-span-4" /></div>
-                    ))}
-                </div>
+                <TicketSkeletons count={4} />
             ) : artist.upcomingEvents.length > 0 && (
-                <div className="board">
-                    <BoardHead />
-                    {artist.upcomingEvents.map(event => (
-                        <EventRow
+                <EventDays
+                    events={artist.upcomingEvents}
+                    renderTicket={event => (
+                        <EventTicket
                             key={event.id}
                             event={event}
                             weather={weather[weatherKey(event)]}
                             going={goingByEvent[event.id]}
+                            genres={genresByEvent[event.id]}
                             onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
                         />
-                    ))}
-                </div>
+                    )}
+                />
             )}
         </div>
     )

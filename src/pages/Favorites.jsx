@@ -2,7 +2,6 @@ import { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { FavoritesContext } from '../context/FavoritesContext'
 import FavoriteCard from '../components/FavoriteCard'
-import { BoardHead } from '../components/EventRow'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 function Favorites() {
@@ -23,8 +22,7 @@ function Favorites() {
                     <p>Press ♡ on an <Link to="/events" className="link">event</Link> to keep it here.</p>
                 </div>
             ) : (
-                <div className="board">
-                    <BoardHead />
+                <div className="tickets">
                     {favorites.map(favorite => (
                         <FavoriteCard key={favorite.id} favorite={favorite} />
                     ))}

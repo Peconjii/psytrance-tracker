@@ -1,8 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigationType } from 'react-router-dom'
-import { fetchEventsPage, fetchGoingForEvents } from '../api/backend.js'
+import { fetchEventsPage, fetchGenresForEvents, fetchGoingForEvents } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
-import EventRow, { BoardHead } from './EventRow.jsx'
+import EventTicket from './EventTicket.jsx'
+import EventDays from './EventDays.jsx'
 
 const PAGE_SIZE = 24
 // Start loading the next page once the user has scrolled through this share of the list
@@ -31,6 +32,8 @@ function EventFeed({ search, country, genre, timeline }) {
     const [weather, setWeather] = useState(restored?.weather ?? {})
     // { [eventId]: { count, going } }, loaded per page like the weather
     const [goingByEvent, setGoingByEvent] = useState(restored?.goingByEvent ?? {})
+    // { [eventId]: [{ genreId, share, source }] }: the event's genres on the galaxy map
+    const [genresByEvent, setGenresByEvent] = useState(restored?.genresByEvent ?? {})
     const sentinelRef = useRef(null)
     const weatherController = useRef(new AbortController())
     const latest = useRef(null)
@@ -38,7 +41,7 @@ function EventFeed({ search, country, genre, timeline }) {
     const loading = pagesLoaded < pagesWanted && !error
 
     useEffect(() => {
-        latest.current = { filtersKey, events, pagesLoaded, hasMore, total, weather, goingByEvent }
+        latest.current = { filtersKey, events, pagesLoaded, hasMore, total, weather, goingByEvent, genresByEvent }
     })
 
     // Layout effect: it runs before the browser paints (no flash at the top of the list) and its
@@ -78,6 +81,9 @@ function EventFeed({ search, country, genre, timeline }) {
                 // Same for "I'm going": one request for the whole page
                 fetchGoingForEvents(data.content, weatherController.current.signal)
                     .then(found => setGoingByEvent(prev => ({ ...prev, ...found })))
+                // And the map genres, for the colored genre tags
+                fetchGenresForEvents(data.content, weatherController.current.signal)
+                    .then(found => setGenresByEvent(prev => ({ ...prev, ...found })))
             })
             .catch(err => {
                 if (controller.signal.aborted) return
@@ -108,22 +114,7 @@ function EventFeed({ search, country, genre, timeline }) {
     }, [loading, hasMore, error])
 
     if (events.length === 0 && loading) {
-        return (
-            <div className="board" aria-busy="true">
-                <BoardHead />
-                {[...Array(8)].map((_, i) => (
-                    <div key={i} className="board__row">
-                        <div className="skeleton h-10" />
-                        <div className="skeleton h-16 w-16 board__thumb-link" />
-                        <div className="grid gap-2">
-                            <div className="skeleton h-4 w-2/3" />
-                            <div className="skeleton h-3 w-1/3" />
-                        </div>
-                        <span />
-                    </div>
-                ))}
-            </div>
-        )
+        return <TicketSkeletons />
     }
 
     if (events.length === 0 && !error) {
@@ -139,18 +130,21 @@ function EventFeed({ search, country, genre, timeline }) {
         <>
             {events.length > 0 && (
                 <>
-                    <p className="mono text-xs muted mb-3">Showing {events.length} of {total} events</p>
-                    <div className="relative board">
-                        <BoardHead />
-                        {events.map(event => (
-                            <EventRow
-                                key={event.id}
-                                event={event}
-                                weather={weather[weatherKey(event)]}
-                                going={goingByEvent[event.id]}
-                                onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
-                            />
-                        ))}
+                    <p className="mono text-xs muted mb-4">Showing {events.length} of {total} events</p>
+                    <div className="relative">
+                        <EventDays
+                            events={events}
+                            renderTicket={event => (
+                                <EventTicket
+                                    key={event.id}
+                                    event={event}
+                                    weather={weather[weatherKey(event)]}
+                                    going={goingByEvent[event.id]}
+                                    genres={genresByEvent[event.id]}
+                                    onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
+                                />
+                            )}
+                        />
                         {hasMore && !error && (
                             <div
                                 ref={sentinelRef}
@@ -173,9 +167,29 @@ function EventFeed({ search, country, genre, timeline }) {
                     {loading && 'Loading more events...'}
                 </p>
             ) : (
-                <p className="text-center py-10 mono text-xs muted tracking-widest">END OF THE BOARD</p>
+                <p className="text-center py-10 mono text-xs muted tracking-widest">END OF THE LIST</p>
             )}
         </>
+    )
+}
+
+// Placeholder tickets while the first page loads
+export function TicketSkeletons({ count = 6 }) {
+    return (
+        <div className="tickets" aria-busy="true">
+            {[...Array(count)].map((_, i) => (
+                <div key={i} className="ticket">
+                    <div className="ticket__stub"><div className="skeleton h-8 w-8" /></div>
+                    <div className="ticket__body">
+                        <div className="skeleton ticket__flyer" />
+                        <div className="grid gap-2 content-start">
+                            <div className="skeleton h-4 w-3/4" />
+                            <div className="skeleton h-3 w-1/2" />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
     )
 }
 
