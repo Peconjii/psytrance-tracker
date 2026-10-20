@@ -66,6 +66,8 @@ interface Fleet {
 const hex = (c: string) => parseInt(c.slice(1), 16);
 /** Zoom level from which every star shows its satellites, not just the selected one */
 const SAT_ZOOM = 1.6;
+/** Festival names appear from this zoom; in the full overview they crowd the centre of the map */
+const STATION_NAME_ZOOM = 0.5;
 const ORBIT_SPEED = 0.05;
 /** Zoom level from which ships are drawn; further out, the stars show how many events they have */
 const SHIP_ZOOM = 0.7;
@@ -75,7 +77,7 @@ const SHIP_OFFSET = 78;
 /** Ships within one grid cell of each other form a fleet */
 const FLEET_GRID = 34;
 /** Where events of unknown genre wait: an empty corner south of the chill systems */
-const HARBOUR = { x: 420, y: 1720 };
+const HARBOUR = { x: 546, y: 2030 };
 
 const shortName = (name: string) => (name.length > 26 ? name.slice(0, 25).trimEnd() + '…' : name);
 
@@ -138,7 +140,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         worldHeight: WORLD.height,
         events: app.renderer.events,
       });
-      vp.drag().pinch().wheel().decelerate().clampZoom({ minScale: 0.3, maxScale: 3 });
+      vp.drag().pinch().wheel().decelerate().clampZoom({ minScale: 0.23, maxScale: 3 });
       // Leave room for the top bar so the northern stars are not hidden under it
       vp.fit(true, WORLD.width * 1.06, WORLD.height * 1.18);
       vp.moveCenter(WORLD.width / 2, WORLD.height * 0.46);
@@ -336,7 +338,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         time += tk.deltaMS / 1000;
         for (const icon of stations) icon.rotation = Math.PI / 4 + time * 0.3;
         const stationScale = Math.max(1, 0.9 / vp.scale.x);
-        for (const t of stationTexts) t.scale.set(stationScale);
+        const showStationNames = vp.scale.x >= STATION_NAME_ZOOM;
+        for (const t of stationTexts) { t.visible = showStationNames; t.scale.set(stationScale); }
         // Label names appear at mid zoom: hidden in the overview (too crowded) and up close, where artist satellites need the room
         const showLabelNames = vp.scale.x >= 0.75 && vp.scale.x < SAT_ZOOM;
         for (const t of labelTexts) { t.visible = showLabelNames; t.scale.set(stationScale); }

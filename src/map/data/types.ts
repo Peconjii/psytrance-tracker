@@ -69,7 +69,7 @@ export const tracksOfArtist = (name: string) =>
   data.genres.flatMap((g) => g.tracks)
     .filter((t) => t.artist === name || t.artist.split(/ & |, | x | vs\.? | ft\.? | feat\.? /i).includes(name));
 
-export const WORLD = { width: 2500, height: 1950 };
+export const WORLD = { width: 3250, height: 2535 };
 
 export interface TourStop {
   genre: string;

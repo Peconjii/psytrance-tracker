@@ -16,8 +16,8 @@
     ],
     "country": "UK",
     "since": 1993,
-    "x": 1269,
-    "y": 673
+    "x": 1650,
+    "y": 875
   },
   "TIP Records": {
     "artists": [
@@ -41,8 +41,8 @@
     ],
     "country": "UK",
     "since": 1994,
-    "x": 1108,
-    "y": 816
+    "x": 1440,
+    "y": 1061
   },
   "Flying Rhino": {
     "artists": [
@@ -58,8 +58,8 @@
     ],
     "country": "UK",
     "since": 1994,
-    "x": 1125,
-    "y": 671
+    "x": 1463,
+    "y": 872
   },
   "Blue Room Released": {
     "artists": [
@@ -73,26 +73,26 @@
     ],
     "country": "UK",
     "since": 1994,
-    "x": 1328,
-    "y": 901
+    "x": 1726,
+    "y": 1171
   },
   "HOMmega Productions": {
     "artists": [],
-    "x": 1513,
-    "y": 323,
+    "x": 1967,
+    "y": 420,
     "country": "Israel",
     "since": 1997
   },
   "Spin Twist Records": {
     "artists": [],
-    "x": 1745,
-    "y": 722,
+    "x": 2269,
+    "y": 939,
     "since": 2005
   },
   "TIP World": {
     "artists": [],
-    "x": 1383,
-    "y": 398,
+    "x": 1798,
+    "y": 517,
     "country": "UK",
     "since": 1999
   },
@@ -116,8 +116,8 @@
     ],
     "country": "Belgium",
     "since": 2004,
-    "x": 891,
-    "y": 787
+    "x": 1158,
+    "y": 1023
   },
   "Iboga Records": {
     "artists": [
@@ -147,8 +147,8 @@
     ],
     "country": "Denmark",
     "since": 1997,
-    "x": 2011,
-    "y": 1127
+    "x": 2614,
+    "y": 1465
   },
   "Zenon Records": {
     "artists": [
@@ -160,8 +160,8 @@
       "Tetrameth"
     ],
     "country": "Australia",
-    "x": 2148,
-    "y": 1071,
+    "x": 2792,
+    "y": 1392,
     "since": 2003
   },
   "Parvati Records": {
@@ -176,15 +176,15 @@
       "Procs"
     ],
     "country": "Denmark",
-    "x": 1180,
-    "y": 1590
+    "x": 1534,
+    "y": 2067
   },
   "Triplag Records": {
     "artists": [],
     "country": "Ireland",
     "since": 2007,
-    "x": 1420,
-    "y": 1440
+    "x": 1846,
+    "y": 1872
   },
   "Sangoma Records": {
     "artists": [
@@ -197,8 +197,8 @@
     ],
     "country": "Germany",
     "since": 2011,
-    "x": 1513,
-    "y": 1126
+    "x": 1967,
+    "y": 1464
   },
   "Twisted Records": {
     "artists": [
@@ -215,8 +215,8 @@
     ],
     "country": "UK",
     "since": 1996,
-    "x": 472,
-    "y": 928
+    "x": 614,
+    "y": 1206
   },
   "Ultimae Records": {
     "artists": [
@@ -228,8 +228,8 @@
     ],
     "country": "France",
     "since": 2000,
-    "x": 584,
-    "y": 824
+    "x": 759,
+    "y": 1071
   },
   "Interchill Records": {
     "artists": [
@@ -241,8 +241,8 @@
     ],
     "country": "Canada",
     "since": 1994,
-    "x": 508,
-    "y": 1073
+    "x": 660,
+    "y": 1395
   },
   "Spiral Trax": {
     "artists": [
@@ -263,8 +263,8 @@
     ],
     "country": "Sweden",
     "since": 1997,
-    "x": 1703,
-    "y": 875
+    "x": 2214,
+    "y": 1138
   },
   "Digital Structures": {
     "artists": [
@@ -274,8 +274,8 @@
       "Vibrasphere"
     ],
     "country": "Sweden",
-    "x": 1890,
-    "y": 758
+    "x": 2457,
+    "y": 985
   },
   "Iono Music": {
     "artists": [
@@ -290,8 +290,8 @@
     ],
     "country": "Germany",
     "since": 2005,
-    "x": 2014,
-    "y": 1487
+    "x": 2618,
+    "y": 1933
   },
   "Broken Robot Records": {
     "artists": [
@@ -300,8 +300,8 @@
       "Hedflux",
       "Monk3y Logic"
     ],
-    "x": 2220,
-    "y": 1360,
+    "x": 2886,
+    "y": 1768,
     "country": "UK",
     "since": 2009
   },
@@ -310,13 +310,13 @@
       "Grouch",
       "Hedflux"
     ],
-    "x": 2420,
-    "y": 1503
+    "x": 3146,
+    "y": 1954
   },
   "Neom Recordings": {
     "artists": [],
-    "x": 2195,
-    "y": 1533,
+    "x": 2854,
+    "y": 1993,
     "country": "Spain"
   },
   "Wax Trax!": {
@@ -328,8 +328,8 @@
     ],
     "country": "USA",
     "since": 1981,
-    "x": 666,
-    "y": 80
+    "x": 866,
+    "y": 104
   },
   "Antler-Subway": {
     "artists": [
@@ -338,8 +338,8 @@
     ],
     "country": "Belgium",
     "since": 1989,
-    "x": 955,
-    "y": 142
+    "x": 1242,
+    "y": 185
   },
   "Harthouse": {
     "artists": [
@@ -349,16 +349,16 @@
     ],
     "country": "Germany",
     "since": 1992,
-    "x": 780,
-    "y": 235
+    "x": 1014,
+    "y": 306
   },
   "Trax Records": {
     "country": "USA",
     "artists": [
       "Phuture"
     ],
-    "x": 925,
-    "y": 334,
+    "x": 1203,
+    "y": 434,
     "since": 1984
   },
   "Transmat": {
@@ -369,8 +369,8 @@
     ],
     "country": "USA",
     "since": 1986,
-    "x": 451,
-    "y": 597
+    "x": 586,
+    "y": 776
   },
   "Metroplex": {
     "artists": [
@@ -378,8 +378,8 @@
     ],
     "country": "USA",
     "since": 1985,
-    "x": 457,
-    "y": 360
+    "x": 594,
+    "y": 468
   },
   "Eye Q": {
     "artists": [
@@ -390,13 +390,13 @@
     ],
     "country": "Germany",
     "since": 1990,
-    "x": 1143,
-    "y": 309
+    "x": 1486,
+    "y": 402
   },
   "Bluehour Sounds": {
     "country": "Italy",
     "artists": [],
-    "x": 1882,
-    "y": 1049
+    "x": 2447,
+    "y": 1364
   }
 }
