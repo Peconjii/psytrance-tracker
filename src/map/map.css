@@ -383,3 +383,67 @@
 .fleet__captain a { color: var(--fam); text-decoration: none; }
 .fleet__captain a:hover { text-decoration: underline; }
 .fleet__hint { font-size: 12px; margin-top: 10px; }
+
+/* ---------- Bottom of the map: ship console on the left, year timeline on the right ---------- */
+.timeline { left: auto; right: 20px; transform: none; width: min(420px, calc(100% - 420px)); }
+.timeline__born { left: auto; right: 20px; transform: none; animation-name: born-right; }
+@keyframes born-right { from { opacity: 0; transform: translateY(8px); } 15% { opacity: 1; transform: none; } }
+.player { bottom: 20px; }
+
+.cockpit {
+  position: absolute; left: 20px; bottom: 20px; width: 340px; z-index: 4; padding: 10px 12px 12px;
+  background: rgba(14, 12, 32, 0.92); border: 1px solid var(--line); border-left: 2px solid var(--accent);
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  background-image: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px);
+}
+/* While a track plays, the console sits on top of the player */
+.player:not([hidden]) + .cockpit { bottom: 244px; }
+.cockpit.is-folded { padding-bottom: 10px; }
+.is-touring .cockpit { display: none; }
+.cockpit__head { display: flex; align-items: center; gap: 10px; width: 100%; padding: 0; background: none; border: 0; color: var(--muted); cursor: pointer; font: 12px var(--mono); }
+.cockpit__tag { flex: 1; text-align: left; font-size: 10px; letter-spacing: 0.14em; color: var(--accent); }
+.cockpit__mini { color: var(--fg); font-size: 11px; }
+.cockpit__top { display: grid; grid-template-columns: 104px 1fr; gap: 14px; align-items: center; margin-top: 10px; }
+.cockpit__radar { width: 104px; height: 104px; cursor: crosshair; }
+.radar__ring { fill: none; stroke: var(--line); stroke-width: 1; }
+.radar__sweep { fill: var(--accent); opacity: 0.16; transform-origin: 52px 52px; animation: radar-sweep 4s linear infinite; }
+@keyframes radar-sweep { to { transform: rotate(360deg); } }
+.radar__star { fill: #8f88c4; opacity: 0.6; }
+.radar__harbour { fill: #9a94b8; }
+.radar__view { fill: rgba(233, 230, 255, 0.05); stroke: var(--fg); stroke-width: 0.8; opacity: 0.75; }
+.cockpit__periods { display: flex; gap: 4px; margin-bottom: 10px; }
+.cockpit__periods button { font: 10px var(--mono); letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 8px; color: var(--muted); background: none; border: 1px solid var(--line); cursor: pointer; }
+.cockpit__periods button:hover, .cockpit__periods button:focus-visible { color: var(--fg); outline: none; }
+.cockpit__periods button.is-on { color: var(--accent); border-color: var(--accent); }
+.cockpit__counts { margin: 0; font: 11px/1.8 var(--mono); color: var(--muted); }
+.cockpit__counts b { color: var(--fg); font-weight: 600; }
+.cockpit__harbour { padding: 0; background: none; border: 0; font: inherit; color: inherit; cursor: pointer; }
+.cockpit__harbour:hover, .cockpit__harbour:focus-visible { color: var(--fg); outline: none; text-decoration: underline; }
+.cockpit__label { margin: 12px 0 2px; font: 10px var(--mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+.cockpit__departures { list-style: none; margin: 0; padding: 0; }
+.cockpit__departures li { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px dashed var(--line); }
+.cockpit__when { font: 10px var(--mono); letter-spacing: 0.08em; color: var(--muted); }
+.cockpit__when.is-now { color: var(--accent); }
+.cockpit__event { min-width: 0; display: grid; font-size: 12px; line-height: 1.35; }
+.cockpit__event b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cockpit__event span { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cockpit__event i { font-style: normal; }
+.cockpit__board { font: 10px var(--mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); background: none; border: 1px solid var(--line); padding: 3px 7px; cursor: pointer; white-space: nowrap; }
+.cockpit__board:hover, .cockpit__board:focus-visible { border-color: var(--accent); outline: none; }
+
+@media (max-width: 1100px) {
+  .player { bottom: 20px; }
+  .player:not([hidden]) + .cockpit { bottom: 206px; }
+}
+@media (max-width: 760px) {
+  /* Too narrow for both side by side: the timeline gets the full width, the console folds above it */
+  .timeline { left: 12px; right: 12px; width: auto; bottom: 12px; }
+  .timeline__born { right: 12px; bottom: 70px; }
+  .cockpit { left: 12px; right: 12px; width: auto; bottom: 64px; max-height: calc(100% - 140px); overflow: auto; }
+  .player:not([hidden]) + .cockpit { bottom: 64px; }
+}
+@media (prefers-reduced-motion: reduce) { .radar__sweep { animation: none; } }
+@media (max-width: 700px) {
+  /* The info sheet sits above the folded ship console */
+  .hud { bottom: 112px; max-height: calc(100% - 200px); }
+}

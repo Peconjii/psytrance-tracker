@@ -182,7 +182,7 @@ export function Panel({
           <dt>● STAR</dt>
           <dd>A genre: its sound, history and key tracks. Zoom in close to see its artists orbiting.</dd>
           <dt>▲3</dt>
-          <dd>Events this week (or month) that play the genre. Switch with ▲ Events in the legend.</dd>
+          <dd>Events this week (or month) that play the genre. Switch in the ship console, bottom left.</dd>
           <dt>▲ SHIP</dt>
           <dd>An upcoming party, parked between the stars of the genres its line-up plays. Hover to see its course.</dd>
           <dt>▲▲ ×4</dt>

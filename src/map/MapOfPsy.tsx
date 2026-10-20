@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchEventDetails } from '../api/backend.js';
 import './map.css';
-import { Galaxy, type CrewMember, type Focus } from './galaxy/Galaxy';
+import { Galaxy, type CrewMember, type Focus, type ViewBounds } from './galaxy/Galaxy';
+import { Cockpit } from './components/Cockpit';
 import { Panel } from './components/Panel';
 import { Player } from './components/Player';
 import { Search } from './components/Search';
@@ -60,6 +61,9 @@ export default function MapOfPsy() {
   const [events, setEvents] = useState<MapEvent[] | null>(null);
   const [fleet, setFleet] = useState<number[] | null>(null);
   const [harbour, setHarbour] = useState(false);
+  // What the camera sees, and a way to move it: for the cockpit radar
+  const [view, setView] = useState<ViewBounds | null>(null);
+  const cameraRef = useRef<((x: number, y: number) => void) | null>(null);
   // The ship the user boarded (a fleet of one): its captain and crew, loaded from the event's details
   const [boarded, setBoarded] = useState<Boarded | null>(null);
   const navigate = useNavigate();
@@ -240,7 +244,8 @@ export default function MapOfPsy() {
         tourPath={tourPath} focus={focus} showStations={showStations} onSelectFestival={openFestival}
         showLabels={showLabels} onSelectLabel={openLabel}
         events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour}
-        crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew} />
+        crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew}
+        onView={setView} cameraRef={cameraRef} />
 
       <header className="topbar">
         <div className="brand">
@@ -261,13 +266,6 @@ export default function MapOfPsy() {
             aria-pressed={showStations} title="Click to show or hide festival stations">◇ Festivals {showStations ? 'on' : 'off'}</button>
           <button className={showLabels ? 'legend__toggle is-on is-label' : 'legend__toggle is-label'} onClick={() => setShowLabels((s) => !s)}
             aria-pressed={showLabels} title="Click to show or hide record labels">⬡ Labels {showLabels ? 'on' : 'off'}</button>
-          <span className="legend__events" role="group" aria-label="Upcoming events on the map">
-            ▲ Events
-            {([['WEEK', 'week'], ['MONTH', 'month'], [null, 'off']] as const).map(([p, text]) => (
-              <button key={text} className={period === p ? 'legend__toggle is-on is-event' : 'legend__toggle is-event'}
-                onClick={() => { setPeriod(p); setFleet(null); setHarbour(false); }} aria-pressed={period === p}>{text}</button>
-            ))}
-          </span>
         </div>
         <div className="topbar__tools">
           <ToursMenu onStart={(t) => goToStop(t, 0)} />
@@ -299,6 +297,9 @@ export default function MapOfPsy() {
         hasPrev={!!queue && !!playing && queue.findIndex((t) => t.youtube === playing.youtube) > 0}
         hasNext={!!queue && !!playing && queue.findIndex((t) => t.youtube === playing.youtube) < queue.length - 1}
         onPrev={() => step(-1)} onNext={() => step(1)} onEnded={() => step(1)} onClose={() => play(null)} />
+      <Cockpit period={period} events={events} view={view}
+        onPeriod={(p) => { setPeriod(p); setFleet(null); setHarbour(false); }}
+        onLook={(x, y) => cameraRef.current?.(x, y)} onBoard={(id) => openFleet([id])} onHarbour={openHarbour} />
 
       {compare && (
         <Compare ids={compare} playing={playing} onChange={(a, b) => setCompare([a, b])}

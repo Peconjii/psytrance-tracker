@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type MutableRefObject } from 'react';
 import { Application, BlurFilter, Container, Graphics, Text } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { data, festivals, genreById, genresOfArtist, labels, WORLD, type Genre } from '../data/types';
-import { shipPosition, type MapEvent } from '../data/events';
+import { buildFleets, HARBOUR, type MapEvent } from '../data/events';
 
 interface Props {
   selectedId: string | null;
@@ -27,6 +27,18 @@ interface Props {
   /** Line-up of the boarded ship (one event selected): drawn as satellites orbiting it */
   crew: CrewMember[] | null;
   onSelectCrew: (member: CrewMember) => void;
+  /** Reports the part of the world on screen whenever the camera moves (for the cockpit radar) */
+  onView?: (view: ViewBounds) => void;
+  /** Filled with a function that flies the camera to a world point (the radar uses it) */
+  cameraRef?: MutableRefObject<((x: number, y: number) => void) | null>;
+}
+
+/** The visible part of the world, in world coordinates */
+export interface ViewBounds {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
 }
 
 /** An artist in a ship's line-up; color is their genre's scene color when they are on the map */
@@ -91,13 +103,6 @@ const STATION_NAME_ZOOM = 0.5;
 const ORBIT_SPEED = 0.05;
 /** Zoom level from which ships are drawn; further out, the stars show how many events they have */
 const SHIP_ZOOM = 0.7;
-/** Ships closer than this to a star are moved out of the star's glow */
-const NEAR_STAR = 60;
-const SHIP_OFFSET = 78;
-/** Ships within one grid cell of each other form a fleet */
-const FLEET_GRID = 34;
-/** Where events of unknown genre wait: an empty corner south of the chill systems */
-const HARBOUR = { x: 546, y: 2030 };
 
 const shortName = (name: string) => (name.length > 26 ? name.slice(0, 25).trimEnd() + '…' : name);
 
@@ -110,7 +115,7 @@ const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -133,6 +138,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   onSelectHarbourRef.current = onSelectHarbour;
   const onSelectCrewRef = useRef(onSelectCrew);
   onSelectCrewRef.current = onSelectCrew;
+  const onViewRef = useRef(onView);
+  onViewRef.current = onView;
+  const cameraRefRef = useRef(cameraRef);
+  cameraRefRef.current = cameraRef;
   const crewRef = useRef<{ orbit: Container; sats: { node: Container; radius: number; phase: number }[] } | null>(null);
   const onSelectLabelRef = useRef(onSelectLabel);
   onSelectLabelRef.current = onSelectLabel;
@@ -172,7 +181,25 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       vp.moveCenter(WORLD.width / 2, WORLD.height * 0.46);
       app.stage.addChild(vp);
       viewportRef.current = vp;
-      app.renderer.on('resize', (w: number, h: number) => vp.resize(w, h));
+      // Tell the radar what is on screen: at most once per frame while the camera moves
+      let viewPending = false;
+      const reportView = () => {
+        if (viewPending) return;
+        viewPending = true;
+        requestAnimationFrame(() => {
+          viewPending = false;
+          if (destroyed) return;
+          const b = vp.getVisibleBounds();
+          onViewRef.current?.({ x0: b.x, y0: b.y, x1: b.x + b.width, y1: b.y + b.height });
+        });
+      };
+      vp.on('moved', reportView);
+      app.renderer.on('resize', (w: number, h: number) => { vp.resize(w, h); reportView(); });
+      reportView();
+      if (cameraRefRef.current) {
+        cameraRefRef.current.current = (x: number, y: number) =>
+          vp.animate({ position: { x, y }, time: 600, ease: 'easeInOutSine' });
+      }
 
       // Background stars
       const field = new Graphics();
@@ -445,6 +472,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     return () => {
       destroyed = true;
       setReady(false);
+      if (cameraRefRef.current) cameraRefRef.current.current = null;
       viewportRef.current = null;
       // Destroyed with the app; an effect running before the next init must not touch them
       routesRef.current = [];
@@ -572,32 +600,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     harbour.node.visible = !!events;
     harbour.text.text = `HARBOUR\n${unknown.length} of unknown genre`;
 
-    const groups = new Map<string, { events: MapEvent[]; x: number; y: number }>();
-    for (const e of events ?? []) {
-      const p = shipPosition(e);
-      if (!p) continue;
-      // A ship right on a star would hide in its glow: move it out, away from the star
-      const top = genreById[e.genres[0].genreId];
-      const dx = p.x - top.x, dy = p.y - top.y;
-      const d = Math.hypot(dx, dy);
-      if (d < NEAR_STAR) {
-        const [ux, uy] = d > 1 ? [dx / d, dy / d] : [Math.SQRT1_2, -Math.SQRT1_2];
-        p.x = top.x + ux * SHIP_OFFSET;
-        p.y = top.y + uy * SHIP_OFFSET;
-      }
-      const key = `${Math.round(p.x / FLEET_GRID)}:${Math.round(p.y / FLEET_GRID)}`;
-      const group = groups.get(key) ?? { events: [], x: p.x, y: p.y };
-      group.events.push(e);
-      groups.set(key, group);
-    }
-
-    for (const { events: fleetEvents, x, y } of groups.values()) {
+    for (const { events: fleetEvents, x, y, mainGenre } of buildFleets(events ?? [])) {
       const node = new Container();
       node.position.set(x, y);
-      // Color of the genre with the biggest share across the fleet
-      const weight: Record<string, number> = {};
-      for (const e of fleetEvents) for (const g of e.genres) weight[g.genreId] = (weight[g.genreId] ?? 0) + g.share;
-      const main = genreById[Object.entries(weight).sort((a, b) => b[1] - a[1])[0][0]];
+      const main = genreById[mainGenre];
       const color = hex(data.families[main.family].color);
 
       // The ships point at the star of the main genre: they sail towards their sound.

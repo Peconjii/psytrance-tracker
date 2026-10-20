@@ -73,3 +73,46 @@ for (const g of data.genres) for (const name of g.artists) if (!bySlug.has(artis
 export function mapArtistBySlug(slug: string): { name: string; genreId: string } | null {
   return bySlug.get(slug) ?? null;
 }
+
+/** Ships closer than this to a star are moved out of the star's glow */
+const NEAR_STAR = 60;
+const SHIP_OFFSET = 78;
+/** Ships within one grid cell of each other form a fleet */
+const FLEET_GRID = 34;
+/** Where events of unknown genre wait: open space south-east of the dark systems, clear of the ship console */
+export const HARBOUR = { x: 2350, y: 2120 };
+
+/** Ships parked at the same spot, and the genre with the biggest share across them (it sets their color) */
+export interface FleetSpot {
+  events: MapEvent[];
+  x: number;
+  y: number;
+  mainGenre: string;
+}
+
+/** Where every event with a known genre sits on the map, grouped into fleets. Used by the map and the radar. */
+export function buildFleets(events: MapEvent[]): FleetSpot[] {
+  const groups = new Map<string, { events: MapEvent[]; x: number; y: number }>();
+  for (const e of events) {
+    const p = shipPosition(e);
+    if (!p) continue;
+    // A ship right on a star would hide in its glow: move it out, away from the star
+    const top = genreById[e.genres[0].genreId];
+    const dx = p.x - top.x, dy = p.y - top.y;
+    const d = Math.hypot(dx, dy);
+    if (d < NEAR_STAR) {
+      const [ux, uy] = d > 1 ? [dx / d, dy / d] : [Math.SQRT1_2, -Math.SQRT1_2];
+      p.x = top.x + ux * SHIP_OFFSET;
+      p.y = top.y + uy * SHIP_OFFSET;
+    }
+    const key = `${Math.round(p.x / FLEET_GRID)}:${Math.round(p.y / FLEET_GRID)}`;
+    const group = groups.get(key) ?? { events: [], x: p.x, y: p.y };
+    group.events.push(e);
+    groups.set(key, group);
+  }
+  return [...groups.values()].map((group) => {
+    const weight: Record<string, number> = {};
+    for (const e of group.events) for (const g of e.genres) weight[g.genreId] = (weight[g.genreId] ?? 0) + g.share;
+    return { ...group, mainGenre: Object.entries(weight).sort((a, b) => b[1] - a[1])[0][0] };
+  });
+}
