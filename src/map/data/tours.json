@@ -1,0 +1,197 @@
+[
+  {
+    "id": "goa-to-hitech",
+    "title": "From Goa to Hi-tech",
+    "blurb": "Six jumps from the beaches of Goa to 180 BPM: how psytrance got faster, harder and darker.",
+    "stops": [
+      {
+        "genre": "goa",
+        "track": "LSD",
+        "text": "It all starts on the beaches of Anjuna and Vagator. DJs mix EBM, acid and industrial records for all-night parties, and producers start writing music for exactly that dancefloor: oriental scales, 303 acid lines, long hypnotic builds."
+      },
+      {
+        "genre": "oldschool",
+        "track": "Conflict",
+        "text": "Mid-90s London takes the Goa sound and makes it tighter, crazier and more danceable. Labels like TIP, Dragonfly and Flying Rhino are the engine room. Listen to how the kick gets harder and the humour gets weirder."
+      },
+      {
+        "genre": "psy",
+        "track": "Gamma Goblins",
+        "text": "By the late 90s 'Goa' becomes 'psytrance'. The sound goes digital, the oriental melodies fade, and the rolling bassline starts to take over. This is the trunk every later branch grows from."
+      },
+      {
+        "genre": "fullon",
+        "track": "Becoming Insane",
+        "text": "The Israeli school turns psy into a stadium sport: the classic rolling bass (kick plus three bass notes), huge leads and non-stop energy. Full-on becomes the most widespread form of psy in the world."
+      },
+      {
+        "genre": "night",
+        "track": "A Frenchman in Mumbai",
+        "text": "Full-on after sunset: more distortion, denser FX, fewer melodies. Night full-on is the bridge between the festival main stage and the dark side."
+      },
+      {
+        "genre": "dark",
+        "track": "Achtung Kinder",
+        "text": "Russia and Germany push it further: horror samples, metallic textures, abstract structures with no classic melodies. Tempos climb past 150 BPM."
+      },
+      {
+        "genre": "hitech",
+        "track": "Revolution",
+        "text": "The end of the road: 160 to 200 BPM, programmed with surgical precision and packed with thousands of micro-sounds. Compare this to where we started: same family, a completely different universe."
+      }
+    ]
+  },
+  {
+    "id": "roots",
+    "title": "The roots of psy",
+    "blurb": "Before there was Goa: the rock, EBM, acid and techno records that psytrance was built from.",
+    "stops": [
+      {
+        "genre": "psyrock",
+        "track": "Interstellar Overdrive",
+        "text": "The 60s psychedelic movement gives psy its name and its ethos, and sends the first travellers to Goa. Long spacey jams, tape echo and the idea that music is a trip."
+      },
+      {
+        "genre": "ebm",
+        "track": "Headhunter",
+        "text": "Electronic Body Music: hard sequenced bass and a militant pulse. Early Goa DJs played a lot of it, and you can hear its sequenced basslines in every Goa track that followed."
+      },
+      {
+        "genre": "newbeat",
+        "track": "Flesh",
+        "text": "Belgium slows EBM down and adds acid and samples. New beat records were part of the late-80s Goa record bags."
+      },
+      {
+        "genre": "detroit",
+        "track": "Strings of Life",
+        "text": "Detroit invents machine music for the future: the straight 4/4 grid, sci-fi pads and the producer as programmer. Trance and psy are built on this idea."
+      },
+      {
+        "genre": "acidhouse",
+        "track": "Acid Tracks",
+        "text": "In Chicago a misused bass synth, the Roland TB-303, starts to squelch. That acid line becomes one of the signature sounds of Goa and is still all over psytrance today."
+      },
+      {
+        "genre": "frankfurt",
+        "track": "Stella",
+        "text": "In Germany trance grows in parallel, around Sven Väth, Harthouse and Eye Q. More a cousin than a parent, it shared DJs, ideas and dancefloors with Goa."
+      },
+      {
+        "genre": "goa",
+        "track": "Teleport",
+        "text": "Put it all together on a beach in India and you get Goa trance. Every star you've visited on this tour is audible in here somewhere."
+      }
+    ]
+  },
+  {
+    "id": "progressive",
+    "title": "The progressive path",
+    "blurb": "From stripped-down Swedish minimalism to Zenon, psy-techno and darkprog: psy that grooves instead of pounds.",
+    "stops": [
+      {
+        "genre": "psy",
+        "track": "Gamma Goblins",
+        "text": "Our starting point: late-90s psytrance, loud and busy. Around 2000 some producers start asking what happens if you take things away instead of adding more."
+      },
+      {
+        "genre": "swedish",
+        "track": "Jukebox",
+        "text": "Sweden answers first. Vibrasphere, Atmos, Son Kite and friends strip psy to the bone: less melody, more groove, lots of space. Notice how much happens with how little."
+      },
+      {
+        "genre": "prog",
+        "track": "Presence",
+        "text": "Progressive psy grows into its own world: slower tempos, deep round kicks, slow filter sweeps and hypnotic loops. Today it is the most played psy in clubs."
+      },
+      {
+        "genre": "zenon",
+        "track": "Orbiter",
+        "text": "In Australia, Zenon Records makes it drier and weirder: short percussive bass notes, glitches and a techno pulse. 'Zenonesque' becomes a sound of its own."
+      },
+      {
+        "genre": "psytechno",
+        "track": "Mr. Gold",
+        "text": "Progressive meets techno: a straight kick, a rumbling bass and psychedelic FX on top. The circle closes back towards the techno roots of the whole family."
+      },
+      {
+        "genre": "darkprog",
+        "track": "Patient Zero",
+        "text": "And the shadow side: dark progressive keeps the slower groove but borrows the unease of darkpsy. Halfway between Zenon and the forest."
+      }
+    ]
+  },
+  {
+    "id": "dark-side",
+    "title": "The dark side",
+    "blurb": "Night full-on, twilight, darkpsy, forest, hi-tech and psycore: the music of 4 AM.",
+    "stops": [
+      {
+        "genre": "night",
+        "track": "Make Some Noise",
+        "text": "The sun has set and full-on gets heavier. This is where most people first cross from the main stage into the darker sounds."
+      },
+      {
+        "genre": "twilight",
+        "track": "Idiot",
+        "text": "Twilight sits between full-on and dark: a dark mood, but still with groove and even melodies. Swedish acts like Hux Flux shaped it."
+      },
+      {
+        "genre": "dark",
+        "track": "P.O. Saga",
+        "text": "Darkpsy proper: distortion, horror samples, abstract structures. The Russian scene, with Psykovsky and Kindzadza, is its heartland."
+      },
+      {
+        "genre": "forest",
+        "track": "Clairvoyage",
+        "text": "Dark, but organic: forest psy fills the mix with rustling, insects and mystical atmospheres. Where exactly dark ends and forest begins is a favourite scene debate."
+      },
+      {
+        "genre": "hitech",
+        "track": "Revolution",
+        "text": "Faster and more precise: hi-tech is programmed at 160 to 200 BPM with sci-fi sound design and constant micro-changes."
+      },
+      {
+        "genre": "psycore",
+        "track": "Macabra Queen",
+        "text": "The far edge of the spectrum: psycore adds industrial and noise influences at extreme tempos. This is as heavy as the map gets."
+      }
+    ]
+  },
+  {
+    "id": "chill",
+    "title": "The chill-out galaxy",
+    "blurb": "What happens when you take the beat away: from psybient to psy-dub, psystep and glitchy psybass.",
+    "stops": [
+      {
+        "genre": "goa",
+        "track": "People Can Fly",
+        "text": "Every Goa party needed a place to come down. The chill-out zone becomes a scene of its own."
+      },
+      {
+        "genre": "psybient",
+        "track": "Divine Moments of Truth",
+        "text": "Psybient keeps the psychedelic sound design but drops the dance beat: vast reverbs, ethnic instruments and layered textures."
+      },
+      {
+        "genre": "psyworld",
+        "track": "Navras",
+        "text": "Psy-world brings in instruments and rhythms from around the planet: sitar, didgeridoo, tabla and vocals."
+      },
+      {
+        "genre": "psydub",
+        "track": "Squirrel and Biscuits",
+        "text": "Add dub bass, delays and reggae rhythms and you get psy-dub. The UK scene around Ott and Twisted Records defined it."
+      },
+      {
+        "genre": "psystep",
+        "track": "Yessence",
+        "text": "Psystep moves to half-time dubstep rhythms with wobble and sub bass, still full of psychedelic detail."
+      },
+      {
+        "genre": "psybass",
+        "track": "Tip Hop",
+        "text": "The end of the chill path: glitch, heavy bass and micro-edits. Psybass is extremely detailed headphone music."
+      }
+    ]
+  }
+]

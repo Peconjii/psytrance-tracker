@@ -1,0 +1,234 @@
+{
+  "goa": {
+    "tempo": "140–145 BPM (early tracks from 135)",
+    "groove": "Four-on-the-floor kick with a driving 16th-note bassline that plays every 16th, often with a gentle swing between notes",
+    "structure": "Long and evolving: intro 32 → main 64 → breakdown 32 → main 64 → outro 32. Tracks of 8–10 minutes are normal.",
+    "sounds": "Analog-style saw and square leads with portamento, TB-303 acid lines, oriental scales (Phrygian, harmonic minor), 909 hats and claps",
+    "tip": "Write the lead melody first and let the arrangement follow it: Goa is melody-driven. A 303 clone (e.g. ABL3, or FL's own 3x Osc with a resonant filter) gets you most of the way.",
+    "plugins": "Any analog-style synth: Sylenth1, Diva, Vital (free), FL 3x Osc for basses"
+  },
+  "oldschool": {
+    "tempo": "140–145 BPM",
+    "groove": "Tighter, punchier kick than Goa; the 16th bassline gets more digital and aggressive",
+    "structure": "Shorter phrases than Goa, more frequent changes every 8–16 bars, sudden breaks and drops",
+    "sounds": "Squelchy acid, weird vocal samples and film quotes, zappy FX, less oriental melody",
+    "tip": "Humour is part of the style: a ridiculous sample in the right place is a feature, not a mistake.",
+    "plugins": "303 emulations, samplers for vocal clips, FL Fruity Granulizer for glitchy textures"
+  },
+  "psy": {
+    "tempo": "140–145 BPM",
+    "groove": "Kick plus a rolling bass starting to replace the 16th-note Goa bassline",
+    "structure": "Intro 32 → build 16 → main 32 → breakdown 32 → main 32 → outro 32",
+    "sounds": "Digital leads, lots of FX and automation, less melody and more sound design",
+    "tip": "Automate filter cutoff and resonance on almost everything: movement is what keeps a psy loop alive.",
+    "plugins": "Serum or Vital for leads and FX, Sylenth1 for basses"
+  },
+  "fullon": {
+    "tempo": "142–148 BPM (145 is the classic)",
+    "groove": "Rolling bass: kick on every beat and three short bass notes in between (K-b-b-b). Kick and bass never overlap",
+    "structure": "Intro 32 → build 16 → main 32 → breakdown 32 → build 16 → main 32 → outro 32, with a change every 8 or 16 bars",
+    "sounds": "Big supersaw or pluck leads with glide, risers and white-noise sweeps before every drop, vocal samples in breakdowns",
+    "tip": "Use a short-envelope saw for the bass, low-pass filter it, add slight distortion, and keep it in mono. Tune the kick tail to the key of the track.",
+    "plugins": "Sylenth1 or Serum for bass and leads, Vital (free), light sidechain (Kickstart) or volume shaping on the bass"
+  },
+  "morning": {
+    "tempo": "140–145 BPM",
+    "groove": "Classic full-on rolling bass, but softer and rounder in tone",
+    "structure": "Like full-on, with longer melodic breakdowns",
+    "sounds": "Major-key or uplifting melodies, bright pads, arpeggios, less aggressive FX",
+    "tip": "Try major or Lydian scales for the lead: that brightness is what separates morning from night full-on.",
+    "plugins": "Sylenth1, Spire, Serum; reverb-heavy pads (Valhalla)"
+  },
+  "night": {
+    "tempo": "144–148 BPM",
+    "groove": "Rolling bass with more distortion and a harder kick",
+    "structure": "Full-on structure with shorter breakdowns and more tension builds",
+    "sounds": "Dark leads, dense FX layers, screeches, fewer melodic themes",
+    "tip": "Stack FX instead of melodies: short automated stabs and screeches every 2–4 bars keep the energy up.",
+    "plugins": "Serum for FX, distortion (FabFilter Saturn, FL Fruity Blood Overdrive)"
+  },
+  "brazil": {
+    "tempo": "142–146 BPM",
+    "groove": "Dense, loud rolling bass with a very compressed modern kick",
+    "structure": "Festival-oriented: big build-ups and clear drops, shorter intros",
+    "sounds": "Loud leads, vocal hooks, big risers and impacts",
+    "tip": "Loudness and clarity matter here: spend time on kick–bass balance and master bus clipping.",
+    "plugins": "Serum, Spire, clippers (StandardCLIP, FL Fruity Soft Clipper)"
+  },
+  "neogoa": {
+    "tempo": "140–146 BPM",
+    "groove": "Goa-style 16th-note bassline with a modern, clean kick",
+    "structure": "Long Goa-style arrangements, 8–10 minutes",
+    "sounds": "Acid lines, oriental melodies, analog-style leads, modern mixing",
+    "tip": "Treat it like Goa with today's mix quality: classic writing, modern low end.",
+    "plugins": "Diva, Sylenth1, ABL3 or other 303 emulations"
+  },
+  "mainstream": {
+    "tempo": "138–140 BPM",
+    "groove": "Simplified rolling bass that drops out completely in breaks",
+    "structure": "EDM-style: short intro → build → drop → break → build → drop. Often 3–4 minute radio edits",
+    "sounds": "Vocals and ethnic chants, big leads, huge risers and impacts",
+    "tip": "Everything serves the drop: keep the main hook simple enough to sing.",
+    "plugins": "Serum, Spire, Nexus for quick leads and vocal chops"
+  },
+  "prog": {
+    "tempo": "130–138 BPM",
+    "groove": "Off-beat bass (the bass plays on the 'and') or a shorter rolling bass, with heavy sidechain",
+    "structure": "Slow evolution: intro 32 → groove 64 → breakdown 32 → groove 64 → outro 32, with filter sweeps over 32–64 bars",
+    "sounds": "Deep round kick, hypnotic loops, minimal melodies, long pad swells",
+    "tip": "Automate one or two parameters very slowly across the whole track instead of adding new parts.",
+    "plugins": "Serum, Diva, FL Fruity Limiter or a dedicated ducking plugin for sidechain"
+  },
+  "zenon": {
+    "tempo": "130–136 BPM",
+    "groove": "Short, percussive bass notes with lots of space, techno-style kick",
+    "structure": "Minimal and loop-based, small changes every 8 bars",
+    "sounds": "Glitches, micro-samples, dry percussion, odd FX",
+    "tip": "Leave space: mute more than you add. The silence between bass hits is part of the groove.",
+    "plugins": "Granular tools, FL Fruity Granulizer, Serum for clicky FX"
+  },
+  "psytechno": {
+    "tempo": "128–135 BPM",
+    "groove": "Straight 4/4 techno kick with rumble bass underneath instead of a rolling bass",
+    "structure": "Techno-style: long grooves, tension through layering rather than drops",
+    "sounds": "Dark pads, psychedelic FX, acid details, hypnotic percussion",
+    "tip": "Make the rumble by sending the kick to a reverb, then filtering and sidechaining that reverb.",
+    "plugins": "Reverb + EQ for rumble, Serum, ABL3"
+  },
+  "twilight": {
+    "tempo": "145–150 BPM",
+    "groove": "Rolling bass with groove and swing, medium-hard kick",
+    "structure": "Between full-on and dark: tension builds, fewer drops",
+    "sounds": "Dark melodies, mysterious atmospheres, more melody than darkpsy",
+    "tip": "Use minor or diminished melodies over a groovy bass: dark mood, still danceable.",
+    "plugins": "Serum, Sylenth1"
+  },
+  "dark": {
+    "tempo": "145–160 BPM",
+    "groove": "Fast, distorted rolling bass, hard kick",
+    "structure": "Abstract: constant changes, few classic breakdowns",
+    "sounds": "Horror samples, metallic textures, screams, granular noise",
+    "tip": "Resample constantly: bounce FX to audio, then mangle them again. That's where the weirdness comes from.",
+    "plugins": "Serum, granular samplers, distortion, FL Edison for resampling"
+  },
+  "suomi": {
+    "tempo": "140–150 BPM",
+    "groove": "Irregular, bouncy basslines, varying kick",
+    "structure": "Chaotic on purpose: unexpected changes and breaks",
+    "sounds": "Humour, live-played parts, strange samples",
+    "tip": "Break your own rules: try an odd bar length or a sudden tempo jump.",
+    "plugins": "Anything goes; samplers, live instruments"
+  },
+  "forest": {
+    "tempo": "145–155 BPM",
+    "groove": "Rolling bass with organic textures, muffled earthy kick",
+    "structure": "Hypnotic and continuous, few big breakdowns",
+    "sounds": "Forest field recordings, rustling, insects, wooden percussion, mystical pads",
+    "tip": "Layer real nature recordings under the groove and automate their filters so they breathe.",
+    "plugins": "Field recordings, granular tools, convolution reverb"
+  },
+  "hitech": {
+    "tempo": "160–200 BPM",
+    "groove": "Very fast rolling bass, often in 16ths, short sharp kick",
+    "structure": "A change every 2–4 bars, constant micro-variation",
+    "sounds": "Thousands of short FX hits, sci-fi sound design, glitches",
+    "tip": "Program in small 1–2 bar blocks and vary every repetition; the piano roll zoomed way in is your friend.",
+    "plugins": "Serum, FL Patcher for FX chains, transient shapers"
+  },
+  "psycore": {
+    "tempo": "160–200+ BPM",
+    "groove": "Fast, aggressive bass with an industrial kick",
+    "structure": "Chaotic, noise breaks, sudden switches",
+    "sounds": "Noise, heavy distortion, industrial textures, horror samples",
+    "tip": "Distortion is an instrument here; chain several in series and automate their drive.",
+    "plugins": "Saturn, Trash, FL Fruity Waveshaper"
+  },
+  "psybient": {
+    "tempo": "60–110 BPM, often no straight beat",
+    "groove": "Soft or no kick, slow deep pads instead of a bassline",
+    "structure": "Free-form, long journeys, slow transitions",
+    "sounds": "Vast reverbs, ethnic instruments, layered textures, field recordings",
+    "tip": "Long reverb and delay tails are the instrument: automate their mix and size.",
+    "plugins": "Valhalla reverbs, Omnisphere, granular tools"
+  },
+  "psyworld": {
+    "tempo": "90–130 BPM",
+    "groove": "Ethnic percussion instead of a clean kick, organic bass",
+    "structure": "Song-like, often with vocal or instrumental themes",
+    "sounds": "Sitar, didgeridoo, tabla, world vocals",
+    "tip": "Record or sample real instruments and leave their imperfections in.",
+    "plugins": "Sample libraries, live recordings"
+  },
+  "psydub": {
+    "tempo": "70–100 BPM",
+    "groove": "Deep dub bass, slow soft kick, reggae offbeat skank",
+    "structure": "Dub-style: elements drop in and out, echo throws",
+    "sounds": "Delay with feedback, spring reverb, dub sirens, psychedelic FX",
+    "tip": "Do 'dub throws': send single hits into a feedback delay and ride the send live.",
+    "plugins": "Echo/delay (Valhalla Delay, FL Fruity Delay 3), spring reverb"
+  },
+  "psystep": {
+    "tempo": "70–75 BPM (half-time of 140–150)",
+    "groove": "Half-time dubstep rhythm with wobble and sub bass",
+    "structure": "Build and drop, like dubstep with psychedelic sections",
+    "sounds": "Wobble bass, sub, psychedelic FX, ethnic details",
+    "tip": "Automate an LFO on the filter for the wobble and sync it to 1/8 or 1/4 triplets.",
+    "plugins": "Serum, Vital, OTT"
+  },
+  "psybass": {
+    "tempo": "90–110 BPM",
+    "groove": "Broken breakbeat rhythms with heavy distorted bass",
+    "structure": "Detailed and evolving, many micro-edits",
+    "sounds": "Glitches, micro-edits, spatial FX, heavy bass",
+    "tip": "Chop and re-sequence audio at 1/32 resolution for those glitch fills.",
+    "plugins": "Serum, Glitch 2, Edison"
+  },
+  "nitzhonot": {
+    "tempo": "145–155 BPM",
+    "groove": "Hard loud kick with a simple off-beat or galloping bass",
+    "structure": "Long uplifting builds into anthemic main sections",
+    "sounds": "Anthemic leads, Eastern scales, epic pads",
+    "tip": "Harmonic minor with a big supersaw lead gets you very close to the classic sound.",
+    "plugins": "Sylenth1, Nexus, supersaws"
+  },
+  "sapsy": {
+    "tempo": "138–146 BPM",
+    "groove": "Rolling bass, from soft progressive to full-on weight",
+    "structure": "Varies with the artist: progressive builds or full-on structures",
+    "sounds": "Melodic themes, sunny festival energy, forest elements in the deeper corners",
+    "tip": "Listen to how melody and groove are balanced: neither dominates.",
+    "plugins": "Serum, Sylenth1"
+  },
+  "swedish": {
+    "tempo": "134–140 BPM",
+    "groove": "Short, tight bass notes with heavy sidechain, deep minimal kick",
+    "structure": "Hypnotic repetition with tiny filter changes",
+    "sounds": "Minimal stabs, dubby delays, very little melody",
+    "tip": "Try making a whole track from three sounds and filter automation only.",
+    "plugins": "Simple subtractive synths, FL 3x Osc, delays"
+  },
+  "darkprog": {
+    "tempo": "134–140 BPM",
+    "groove": "Deep, percussive, groovy bass with a dry hard kick",
+    "structure": "Progressive pacing with darker tension builds",
+    "sounds": "Dark pads, glitch and horror FX, lots of space",
+    "tip": "Use progressive arrangement with darkpsy sound design.",
+    "plugins": "Serum, granular tools"
+  },
+  "psybreaks": {
+    "tempo": "130–140 BPM",
+    "groove": "Breakbeat drums instead of straight 4/4, psy rolling or acid bass on top",
+    "structure": "Breaks-style with psy builds",
+    "sounds": "Psy FX and acid lines with funk/breaks groove",
+    "tip": "Chop a classic break (Amen, Think) and lock its groove to your bassline.",
+    "plugins": "FL Slicex, Serum, 303 emulations"
+  },
+  "offbeat": {
+    "tempo": "136–140 BPM",
+    "groove": "Strict offbeat bass: kick on the beat, one short bass note on the 'and', with heavy sidechain",
+    "structure": "Intro 32 → groove 64 → melodic breakdown 32 → drop 64 → outro 32",
+    "sounds": "Punchy kick, offbeat bass, plucky arpeggios, a clear lead melody in the breakdown",
+    "tip": "Keep the bass note short and tuned to the kick so the two never overlap.",
+    "plugins": "Serum or Sylenth1 for the bass and leads, a ducking plugin for the sidechain"
+  }
+}

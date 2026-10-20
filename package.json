@@ -12,6 +12,8 @@
   "dependencies": {
     "axios": "^1.17.0",
     "leaflet": "^1.9.4",
+    "pixi-viewport": "^6.0.3",
+    "pixi.js": "^8.6.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-leaflet": "^5.0.0",

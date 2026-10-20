@@ -1,6 +1,6 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import './App.css'
-import Home from './pages/Home'
+import MapOfPsy from './map/MapOfPsy'
 import Events from './pages/Events'
 import EventDetails from './pages/EventDetails'
 import Navbar from './components/Navbar'
@@ -19,51 +19,61 @@ import Artist from './pages/Artist'
 import CymaticsBackground from './components/CymaticsBackground'
 import ProtectedRoute from './components/ProtectedRoute'
 
+// The home page is the galaxy map, which fills the window under the navbar on its own
+// background, so it gets neither the animated background nor the footer
+function Shell() {
+  const isHome = useLocation().pathname === '/'
+  return (
+    // On the home page the layout is exactly one window tall and the map takes what the navbar leaves
+    <div className={`relative flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden ${isHome ? 'h-dvh overflow-hidden' : 'min-h-screen'}`}>
+      {!isHome && <CymaticsBackground />}
+
+      <Navbar />
+
+      <main className={`relative z-10 flex-1 ${isHome ? 'min-h-0' : ''}`}>
+        <Routes>
+          <Route path="/" element={<MapOfPsy />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/map" element={<GlobalMap />} />
+          <Route path="/artists" element={<Artists />} />
+          <Route path="/artists/:slug" element={<Artist />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* Only for logged-in users; guests are redirected to /login */}
+          <Route 
+            path="/favorites" 
+            element={
+              <ProtectedRoute>
+                <Favorites />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile" 
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            } 
+          />
+        </Routes>
+      </main>
+
+      {!isHome && <Footer />}
+    </div>
+  )
+}
+
 function App() {
   return (
     <AuthProvider>
       <FavoritesProvider>
         <BrowserRouter>
-          <div className="relative min-h-screen flex flex-col bg-slate-950 text-slate-100 overflow-x-hidden">
-            <CymaticsBackground />
-
-            <Navbar />
-
-            <main className="relative z-10 flex-1">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/events" element={<Events />} />
-                <Route path="/events/:id" element={<EventDetails />} />
-                <Route path="/map" element={<GlobalMap />} />
-                <Route path="/artists" element={<Artists />} />
-                <Route path="/artists/:slug" element={<Artist />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
-
-                {/* Only for logged-in users; guests are redirected to /login */}
-                <Route 
-                  path="/favorites" 
-                  element={
-                    <ProtectedRoute>
-                      <Favorites />
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <Profile />
-                    </ProtectedRoute>
-                  } 
-                />
-              </Routes>
-            </main>
-
-            <Footer />
-          </div>
+          <Shell />
         </BrowserRouter>
       </FavoritesProvider>
     </AuthProvider>

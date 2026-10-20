@@ -1,0 +1,246 @@
+[
+  {
+    "id": "goa-beach",
+    "name": "Goa beach parties",
+    "country": "India",
+    "description": "The all-night parties on Anjuna and Vagator beaches in the late 80s and early 90s where it all started. Not a festival with a ticket, but the original psy dancefloor.",
+    "x": 1170,
+    "y": 560,
+    "genres": [
+      "goa",
+      "oldschool"
+    ]
+  },
+  {
+    "id": "boom",
+    "name": "Boom Festival",
+    "country": "Portugal",
+    "since": 1997,
+    "description": "Biennial gathering at Idanha-a-Nova, famous for its sustainability work and art. The Dance Temple covers the whole psy spectrum, the Alchemy Circle the darker and deeper side, and the Chill Out Gardens the ambient side.",
+    "x": 1060,
+    "y": 1080,
+    "genres": [
+      "fullon",
+      "prog",
+      "dark",
+      "forest",
+      "psybient",
+      "psyworld"
+    ]
+  },
+  {
+    "id": "ozora",
+    "name": "Ozora Festival",
+    "country": "Hungary",
+    "since": 2004,
+    "description": "A week-long festival in the Hungarian countryside that grew out of a 1999 solar eclipse gathering. Known for its Dome (chill and bass) and a main stage that runs from progressive to dark.",
+    "x": 1420,
+    "y": 1050,
+    "genres": [
+      "prog",
+      "fullon",
+      "twilight",
+      "dark",
+      "psybient",
+      "psydub"
+    ]
+  },
+  {
+    "id": "up",
+    "name": "Universo Paralello",
+    "country": "Brazil",
+    "since": 2000,
+    "description": "New Year's festival on the beach at Pratigi, Bahia, and the heart of the Brazilian scene.",
+    "x": 1880,
+    "y": 465,
+    "genres": [
+      "brazil",
+      "fullon",
+      "night",
+      "prog",
+      "dark"
+    ]
+  },
+  {
+    "id": "rainbow",
+    "name": "Rainbow Serpent",
+    "country": "Australia",
+    "since": 1998,
+    "description": "Australia's biggest psy gathering, held in rural Victoria. Closely tied to the minimal, Zenon-style Australian sound.",
+    "x": 2400,
+    "y": 1020,
+    "genres": [
+      "zenon",
+      "prog",
+      "psytechno",
+      "psybient"
+    ]
+  },
+  {
+    "id": "psyfi",
+    "name": "Psy-Fi",
+    "country": "Netherlands",
+    "description": "Dutch open-air festival with a strong full-on and progressive line-up.",
+    "x": 1720,
+    "y": 1070,
+    "genres": [
+      "fullon",
+      "night",
+      "prog",
+      "forest",
+      "dark"
+    ]
+  },
+  {
+    "id": "hadra",
+    "name": "Hadra Trance Festival",
+    "country": "France",
+    "description": "Run by the French Hadra collective, known for a broad psy line-up from goa to darker sounds.",
+    "x": 1080,
+    "y": 1210,
+    "genres": [
+      "goa",
+      "prog",
+      "psytechno",
+      "dark"
+    ]
+  },
+  {
+    "id": "vortex",
+    "name": "Vortex Open Air",
+    "country": "South Africa",
+    "description": "Long-running South African open-air party series, one of the pillars of the Cape scene.",
+    "x": 2160,
+    "y": 620,
+    "genres": [
+      "sapsy",
+      "prog",
+      "fullon"
+    ]
+  },
+  {
+    "id": "origin",
+    "name": "Origin Festival",
+    "country": "South Africa",
+    "description": "One of the major South African psytrance festivals.",
+    "x": 1995,
+    "y": 800,
+    "genres": [
+      "sapsy",
+      "forest",
+      "night"
+    ]
+  },
+  {
+    "id": "pyramid",
+    "name": "Pyramid Festival",
+    "country": "Serbia",
+    "description": "Boutique open-air gathering at the foot of Rtanj mountain in eastern Serbia, capped at around 2,000 people. Musically it leans towards twilight and night full-on with forest and progressive around them, mixed with wellness, Slavic traditions and eco-consciousness.",
+    "x": 1760,
+    "y": 1180,
+    "genres": [
+      "twilight",
+      "night",
+      "forest",
+      "prog"
+    ]
+  },
+  {
+    "id": "modem",
+    "name": "MoDem (Momento Demento)",
+    "country": "Croatia",
+    "description": "Underground festival on the Mrežnica river in Primišlje, central Croatia, with The Hive as its main stage for high-energy psytrance from twilight to darkpsy and hi-tech.",
+    "x": 1490,
+    "y": 1330,
+    "genres": [
+      "twilight",
+      "dark",
+      "forest",
+      "hitech",
+      "prog"
+    ]
+  },
+  {
+    "id": "mop",
+    "name": "Masters of Puppets",
+    "country": "Czech Republic",
+    "since": 2014,
+    "description": "One of Europe's key festivals for the fast side of psy: darkpsy, hi-tech and psycore, with the Rage Stage reserved for the hardest material.",
+    "x": 1640,
+    "y": 1740,
+    "genres": [
+      "dark",
+      "hitech",
+      "psycore",
+      "forest"
+    ]
+  },
+  {
+    "id": "magna",
+    "name": "Magna Mysteria",
+    "country": "Greece",
+    "description": "Week-long gathering in the Larisa region near Mount Olympus, run as one continuous ceremony. Its focus is darkpsy, hi-tech and psycore, with forest and night sounds around them.",
+    "x": 1110,
+    "y": 1705,
+    "genres": [
+      "dark",
+      "hitech",
+      "psycore",
+      "forest"
+    ]
+  },
+  {
+    "id": "naturaiz",
+    "name": "Naturaíz",
+    "country": "Brazil",
+    "description": "Festival linked to the Brazilian label Naturaiz Records and the country's darkpsy and psycore underground.",
+    "x": 1150,
+    "y": 1425,
+    "genres": [
+      "dark",
+      "psycore",
+      "forest"
+    ]
+  },
+  {
+    "id": "freeearth",
+    "name": "Free Earth Festival",
+    "country": "Greece",
+    "description": "Beach festival on the Halkidiki peninsula, covering goa, full-on, dark and forest psytrance.",
+    "x": 1220,
+    "y": 1150,
+    "genres": [
+      "goa",
+      "fullon",
+      "dark",
+      "forest"
+    ]
+  },
+  {
+    "id": "jungle",
+    "name": "Jungle Island",
+    "country": "Serbia",
+    "description": "Three-day psychedelic trance and downtempo festival run by the Novi Sad collective of the same name, held in nature around Novi Sad (a Danube island, later the Fruška Gora forest).",
+    "x": 1330,
+    "y": 505,
+    "genres": [
+      "psy",
+      "fullon",
+      "prog",
+      "psybient"
+    ]
+  },
+  {
+    "id": "psypek",
+    "name": "Psypek",
+    "country": "Serbia",
+    "description": "Underground open-air festival at Veliko Gradište on the Danube, for the darkest and fastest end of the map: hi-tech, darkpsy and psycore at 180+ BPM.",
+    "x": 1450,
+    "y": 1610,
+    "genres": [
+      "hitech",
+      "dark",
+      "psycore"
+    ]
+  }
+]

@@ -1,0 +1,2929 @@
+{
+  "Astral Projection": {
+    "musicbrainz": "2ba31cc4-df9e-4c21-9dbc-bb8fa9af424f",
+    "discogs": 12458,
+    "lastfm": "https://www.last.fm/music/Astral+Projection",
+    "tags": [
+      "psytrance",
+      "goa",
+      "trance",
+      "goa trance",
+      "psychedelic trance",
+      "psychedelic",
+      "psy-trance"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Hallucinogen": {
+    "musicbrainz": "37186f53-8d72-44e6-81e6-7dfd18223747",
+    "discogs": 4748,
+    "lastfm": "https://www.last.fm/music/Hallucinogen",
+    "tags": [
+      "goa trance",
+      "psytrance",
+      "progressive psytrance",
+      "trance",
+      "goa",
+      "psychedelic trance",
+      "psychedelic"
+    ],
+    "check": {
+      "goa": "confirmed",
+      "oldschool": "confirmed",
+      "psy": "related"
+    },
+    "suggest": [
+      "prog"
+    ]
+  },
+  "Man With No Name": {
+    "musicbrainz": "df369da2-c88e-473e-ab6a-d0f5ab8007c5",
+    "discogs": 5342,
+    "lastfm": "https://www.last.fm/music/Man+With+No+Name",
+    "tags": [
+      "goa",
+      "goa trance",
+      "psytrance",
+      "trance",
+      "psy-trance",
+      "psychedelic"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Juno Reactor": {
+    "musicbrainz": "16231a34-9ccd-410e-8690-f74e98fe16a4",
+    "discogs": 2699,
+    "lastfm": "https://www.last.fm/music/Juno+Reactor",
+    "tags": [
+      "goa trance",
+      "trance",
+      "psytrance",
+      "psy-trance",
+      "world fusion",
+      "goa"
+    ],
+    "check": {
+      "goa": "confirmed",
+      "psyworld": "confirmed"
+    },
+    "suggest": []
+  },
+  "Electric Universe": {
+    "musicbrainz": "c4acef6a-1835-4da4-bdea-ba3b789dd36d",
+    "discogs": 21849,
+    "lastfm": "https://www.last.fm/music/Electric+Universe",
+    "tags": [
+      "psytrance",
+      "goa",
+      "psychedelic trance",
+      "goa trance",
+      "full-on",
+      "psychedelic",
+      "trance"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Cosmosis": {
+    "lastfm": "https://www.last.fm/music/Cosmosis",
+    "tags": [
+      "psychedelic trance",
+      "goa",
+      "psytrance",
+      "psychedelic",
+      "goa trance"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Total Eclipse": {
+    "musicbrainz": "79484531-2a64-41fd-b44a-60d0b0f14a14",
+    "discogs": 516,
+    "lastfm": "https://www.last.fm/music/Total+Eclipse",
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "trance",
+      "psy-trance",
+      "goa",
+      "psychedelic"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Pleiadians": {
+    "musicbrainz": "ec045cb6-2752-4eea-a356-a5c798784ccc",
+    "discogs": 9830,
+    "lastfm": "https://www.last.fm/music/Pleiadians",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "trance",
+      "psy-trance",
+      "psychedelic trance",
+      "goa",
+      "goa trance"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Koxbox": {
+    "musicbrainz": "6c3a79d7-a2e2-4b9c-b9d9-a14b10ca988b",
+    "discogs": 1347,
+    "lastfm": "https://www.last.fm/music/Koxbox",
+    "tags": [
+      "goa trance",
+      "psytrance",
+      "goa",
+      "psychedelic trance",
+      "psychedelic",
+      "trance"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Prana": {
+    "musicbrainz": "221dac85-5e1b-478b-a330-369faf1e37bc",
+    "discogs": 12074,
+    "lastfm": "https://www.last.fm/music/Prana",
+    "tags": [
+      "goa trance",
+      "goa",
+      "trance",
+      "psytrance",
+      "psychedelic trance"
+    ],
+    "check": {
+      "goa": "confirmed"
+    },
+    "suggest": []
+  },
+  "Green Nuns of the Revolution": {
+    "musicbrainz": "c41e0fde-bf03-4caf-8a42-1da9b6c06097",
+    "discogs": 60766,
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "goa",
+      "psy-trance"
+    ],
+    "check": {
+      "oldschool": "confirmed"
+    },
+    "suggest": []
+  },
+  "Eat Static": {
+    "musicbrainz": "9cd39202-6c67-400a-b96e-df351c9f9484",
+    "discogs": 4759,
+    "lastfm": "https://www.last.fm/music/Eat+Static",
+    "tags": [
+      "trance",
+      "breakbeat",
+      "psytrance",
+      "psybient",
+      "progressive psytrance",
+      "psybreaks",
+      "psychedelic",
+      "goa"
+    ],
+    "check": {
+      "oldschool": "confirmed"
+    },
+    "suggest": [
+      "psybreaks",
+      "psybient",
+      "prog"
+    ]
+  },
+  "Doof": {
+    "musicbrainz": "db929327-3750-4576-bfad-10924004481e",
+    "discogs": 11431,
+    "lastfm": "https://www.last.fm/music/Doof",
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "psy-trance",
+      "goa",
+      "psychedelic",
+      "trance"
+    ],
+    "check": {
+      "oldschool": "confirmed"
+    },
+    "suggest": []
+  },
+  "Shakta": {
+    "musicbrainz": "5c35d7a0-eb2c-42fe-88da-05782d91a194",
+    "discogs": 11440,
+    "lastfm": "https://www.last.fm/music/Shakta",
+    "tags": [
+      "goa trance",
+      "psytrance",
+      "goa",
+      "trance",
+      "ambient"
+    ],
+    "check": {
+      "oldschool": "confirmed"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Slinky Wizard": {
+    "musicbrainz": "7d7a6fc6-3daa-4a27-8e10-6d3bd471a2a1",
+    "discogs": 4745,
+    "lastfm": "https://www.last.fm/music/Slinky+Wizard",
+    "tags": [
+      "goa trance",
+      "psytrance",
+      "goa",
+      "psychedelic trance",
+      "trance"
+    ],
+    "check": {
+      "oldschool": "confirmed"
+    },
+    "suggest": []
+  },
+  "Technossomy": {
+    "musicbrainz": "90d7e428-25f5-4997-89ba-01b740233075",
+    "discogs": 4750,
+    "lastfm": "https://www.last.fm/music/Technossomy",
+    "tags": [
+      "goa trance",
+      "goa",
+      "psytrance",
+      "psychedelic trance",
+      "psychedelic"
+    ],
+    "check": {
+      "oldschool": "confirmed"
+    },
+    "suggest": []
+  },
+  "Psysex": {
+    "musicbrainz": "f86ca5d1-4c03-4801-9e5d-e915cfdfe576",
+    "discogs": 38989,
+    "lastfm": "https://www.last.fm/music/Psysex",
+    "tags": [
+      "psytrance",
+      "goa",
+      "psychedelic",
+      "psychedelic trance"
+    ],
+    "check": {
+      "psy": "related"
+    },
+    "suggest": []
+  },
+  "Etnica": {
+    "musicbrainz": "9abb82ae-4bbb-4460-bf56-0aff131ae963",
+    "discogs": 4513,
+    "lastfm": "https://www.last.fm/music/Etnica",
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "goa",
+      "psychedelic",
+      "psychedelic trance"
+    ],
+    "check": {
+      "psy": "related"
+    },
+    "suggest": []
+  },
+  "1200 Micrograms": {
+    "musicbrainz": "bf346e67-b4b1-41c0-bcc7-a8f4df4fbbbb",
+    "discogs": 28118,
+    "lastfm": "https://www.last.fm/music/1200+Micrograms",
+    "tags": [
+      "psychedelic trance",
+      "full-on",
+      "psytrance",
+      "psychedelic",
+      "goa",
+      "trance"
+    ],
+    "check": {
+      "psy": "related"
+    },
+    "suggest": []
+  },
+  "Space Tribe": {
+    "musicbrainz": "22af4a27-bb80-4408-909b-6125887c80c3",
+    "discogs": 4777,
+    "lastfm": "https://www.last.fm/music/Space+Tribe",
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "psychedelic trance",
+      "goa",
+      "psychedelic"
+    ],
+    "check": {
+      "psy": "related"
+    },
+    "suggest": []
+  },
+  "X-Dream": {
+    "musicbrainz": "635da8c0-f19a-41b9-8764-fd80306b4159",
+    "discogs": 4751,
+    "lastfm": "https://www.last.fm/music/X-Dream",
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "goa",
+      "psychedelic trance",
+      "trance",
+      "psychedelic"
+    ],
+    "check": {
+      "psy": "related"
+    },
+    "suggest": []
+  },
+  "Cosmic Dimension": {
+    "musicbrainz": "18956546-6fb0-4131-9110-00f46a3c4a85",
+    "discogs": 3310953,
+    "lastfm": "https://www.last.fm/music/Cosmic+Dimension",
+    "tags": [
+      "psy-trance",
+      "psychedelic trance",
+      "trance",
+      "psychedelic",
+      "goa trance",
+      "goa"
+    ],
+    "check": {
+      "psy": "related"
+    },
+    "suggest": []
+  },
+  "Alien Project": {
+    "musicbrainz": "8d56e655-efb7-4f03-b3c1-320c5ea838fb",
+    "discogs": 27722,
+    "lastfm": "https://www.last.fm/music/Alien+Project",
+    "tags": [
+      "psytrance",
+      "goa",
+      "psychedelic trance",
+      "psychedelic"
+    ],
+    "check": {
+      "psy": "related"
+    },
+    "suggest": []
+  },
+  "Infected Mushroom": {
+    "musicbrainz": "eab76c9f-ff91-4431-b6dd-3b976c598020",
+    "discogs": 14602,
+    "lastfm": "https://www.last.fm/music/Infected+Mushroom",
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "psychedelic trance",
+      "goa",
+      "trance",
+      "dubstep",
+      "progressive trance",
+      "edm"
+    ],
+    "check": {
+      "fullon": "related",
+      "mainstream": "confirmed"
+    },
+    "suggest": [
+      "psystep",
+      "prog"
+    ]
+  },
+  "GMS": {
+    "lastfm": "https://www.last.fm/music/GMS",
+    "tags": [
+      "psychedelic trance",
+      "psytrance",
+      "goa",
+      "psychedelic",
+      "trance"
+    ],
+    "check": {
+      "fullon": "related"
+    },
+    "suggest": []
+  },
+  "Skazi": {
+    "musicbrainz": "8d62a782-3c12-4067-9bce-80fd91ddd5c0",
+    "discogs": 48999,
+    "lastfm": "https://www.last.fm/music/Skazi",
+    "tags": [
+      "psytrance",
+      "trance",
+      "psychedelic trance",
+      "psychedelic"
+    ],
+    "check": {
+      "fullon": "related"
+    },
+    "suggest": []
+  },
+  "Astrix": {
+    "musicbrainz": "13875f81-5bfc-4939-a6cc-296c3f8d0fa5",
+    "discogs": 51519,
+    "lastfm": "https://www.last.fm/music/Astrix",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "trance",
+      "goa",
+      "psychedelic trance"
+    ],
+    "check": {
+      "fullon": "related",
+      "mainstream": "related",
+      "nitzhonot": "confirmed"
+    },
+    "suggest": []
+  },
+  "Talamasca": {
+    "musicbrainz": "7e1666e2-b82d-40f6-98ff-920dc6fe3f8b",
+    "discogs": 27716,
+    "lastfm": "https://www.last.fm/music/Talamasca",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "psychedelic trance",
+      "goa",
+      "trance"
+    ],
+    "check": {
+      "fullon": "related",
+      "night": "related"
+    },
+    "suggest": []
+  },
+  "Bizzare Contact": {
+    "musicbrainz": "4742160b-e036-4bc7-a6b5-c0d6c9f091dc",
+    "discogs": 175182,
+    "lastfm": "https://www.last.fm/music/Bizzare+Contact",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "full-on",
+      "psychedelic trance"
+    ],
+    "check": {
+      "fullon": "confirmed"
+    },
+    "suggest": []
+  },
+  "Electro Sun": {
+    "musicbrainz": "6c965db2-88df-4e2c-86c8-81eb56dd48b3",
+    "discogs": 159578,
+    "lastfm": "https://www.last.fm/music/Electro+Sun",
+    "tags": [
+      "psytrance",
+      "full-on",
+      "psychedelic trance",
+      "psychedelic",
+      "trance"
+    ],
+    "check": {
+      "fullon": "confirmed"
+    },
+    "suggest": []
+  },
+  "Eskimo": {
+    "musicbrainz": "b4411d5d-2130-49f2-b075-8e727333f192",
+    "discogs": 101918,
+    "lastfm": "https://www.last.fm/music/Eskimo",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "psychedelic trance",
+      "goa"
+    ],
+    "check": {
+      "fullon": "related"
+    },
+    "suggest": []
+  },
+  "Domestic": {
+    "musicbrainz": "7deaad1b-82e1-4412-ad77-d610551b4858",
+    "discogs": 18935,
+    "lastfm": "https://www.last.fm/music/Domestic",
+    "tags": [
+      "psytrance",
+      "full on",
+      "full-on",
+      "trance"
+    ],
+    "check": {
+      "fullon": "confirmed"
+    },
+    "suggest": []
+  },
+  "Space Cat": {
+    "musicbrainz": "eadb195b-a506-4437-99c2-75f5f53a73d3",
+    "discogs": 904,
+    "lastfm": "https://www.last.fm/music/Space+Cat",
+    "tags": [
+      "psytrance",
+      "goa",
+      "psychedelic",
+      "psychedelic trance"
+    ],
+    "check": {
+      "fullon": "related"
+    },
+    "suggest": []
+  },
+  "Hypnoise": {
+    "musicbrainz": "2ecbde52-8864-4849-97da-7611d94a96ab",
+    "discogs": 2213327,
+    "lastfm": "https://www.last.fm/music/Hypnoise",
+    "tags": [
+      "psytrance",
+      "goa",
+      "full on",
+      "goa trance"
+    ],
+    "check": {
+      "fullon": "confirmed"
+    },
+    "suggest": []
+  },
+  "Freedom Fighters": {
+    "musicbrainz": "5d4d6e7c-9009-419f-9da7-20de92d113af",
+    "discogs": 817612,
+    "lastfm": "https://www.last.fm/music/Freedom+Fighters",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "goa trance",
+      "full on",
+      "psy-trance"
+    ],
+    "check": {
+      "fullon": "confirmed"
+    },
+    "suggest": []
+  },
+  "Vibe Tribe": {
+    "musicbrainz": "a71436a7-2b5b-44d5-bb37-a8e3b4f9906a",
+    "discogs": 171437,
+    "lastfm": "https://www.last.fm/music/Vibe+Tribe",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "goa",
+      "psychedelic"
+    ],
+    "check": {
+      "morning": "related"
+    },
+    "suggest": []
+  },
+  "Bliss": {
+    "musicbrainz": "0f3fc559-32bd-4c1d-9735-fe00957de432",
+    "discogs": 16712,
+    "tags": [],
+    "check": {
+      "morning": "nodata"
+    },
+    "suggest": []
+  },
+  "Ajja": {
+    "musicbrainz": "6e6e3359-1291-4a71-83d2-181c5ece4acd",
+    "discogs": 248138,
+    "lastfm": "https://www.last.fm/music/Ajja",
+    "tags": [
+      "psytrance",
+      "trance",
+      "psychedelic trance",
+      "psychedelic",
+      "psy-trance",
+      "darkpsy"
+    ],
+    "check": {
+      "morning": "related",
+      "twilight": "related"
+    },
+    "suggest": []
+  },
+  "Ital": {
+    "musicbrainz": "223787ec-c4d0-44db-9699-f7aaa98a6794",
+    "discogs": 289206,
+    "lastfm": "https://www.last.fm/music/Ital",
+    "tags": [
+      "psytrance",
+      "psy-trance",
+      "psychedelic",
+      "trance",
+      "progressive"
+    ],
+    "check": {
+      "morning": "related"
+    },
+    "suggest": [
+      "prog"
+    ]
+  },
+  "Sesto Sento": {
+    "musicbrainz": "e3bd2490-1380-4633-a32b-e7d9f249610a",
+    "discogs": 28022,
+    "lastfm": "https://www.last.fm/music/Sesto+Sento",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "psychedelic",
+      "goa",
+      "trance"
+    ],
+    "check": {
+      "morning": "related"
+    },
+    "suggest": []
+  },
+  "Rinkadink": {
+    "lastfm": "https://www.last.fm/music/Rinkadink",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "goa",
+      "psychedelic"
+    ],
+    "check": {
+      "night": "related"
+    },
+    "suggest": []
+  },
+  "Hujaboy": {
+    "musicbrainz": "6f246f8c-9f81-4bd1-9c40-0c09fa5595d2",
+    "discogs": 44812,
+    "lastfm": "https://www.last.fm/music/Hujaboy",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "goa",
+      "psychedelic"
+    ],
+    "check": {
+      "night": "related"
+    },
+    "suggest": []
+  },
+  "Avalon": {
+    "musicbrainz": "91043379-ac4b-4eaf-8b52-12641811bc57",
+    "discogs": 583609,
+    "tags": [],
+    "check": {
+      "night": "nodata"
+    },
+    "suggest": []
+  },
+  "Dickster": {
+    "musicbrainz": "6d642546-8188-4189-b25a-3a0bedab5b45",
+    "discogs": 27899,
+    "lastfm": "https://www.last.fm/music/Dickster",
+    "tags": [
+      "psychedelic trance",
+      "psytrance",
+      "psychedelic",
+      "full-on"
+    ],
+    "check": {
+      "night": "related"
+    },
+    "suggest": []
+  },
+  "Tristan": {
+    "musicbrainz": "8e3fbfcf-e072-47d0-80cb-a01700ea90c9",
+    "discogs": 18710,
+    "lastfm": "https://www.last.fm/music/Tristan",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "psychedelic trance",
+      "goa"
+    ],
+    "check": {
+      "night": "related"
+    },
+    "suggest": []
+  },
+  "Cosinus": {
+    "musicbrainz": "e532d60a-e7a2-48bc-8d82-92d891db5f23",
+    "discogs": 3824463,
+    "lastfm": "https://www.last.fm/music/Cosinus",
+    "tags": [
+      "darkpsy",
+      "psychedelic",
+      "psytrance"
+    ],
+    "check": {
+      "night": "related"
+    },
+    "suggest": [
+      "dark"
+    ]
+  },
+  "Rezonant": {
+    "musicbrainz": "f46ca8f1-7afd-4867-a688-d49c3bd85ee3",
+    "discogs": 5215221,
+    "lastfm": "https://www.last.fm/music/Rezonant",
+    "tags": [
+      "psychedelic",
+      "trance",
+      "psytrance",
+      "goa"
+    ],
+    "check": {
+      "night": "related"
+    },
+    "suggest": []
+  },
+  "Vegas": {
+    "musicbrainz": "25f7f8ae-b7df-4b84-b514-6d9f07c7148f",
+    "discogs": 3290672,
+    "lastfm": "https://www.last.fm/music/Vegas",
+    "tags": [
+      "psytrance",
+      "progressive trance"
+    ],
+    "check": {
+      "brazil": "confirmed"
+    },
+    "suggest": [
+      "prog"
+    ]
+  },
+  "Burn In Noise": {
+    "musicbrainz": "4b867ef4-006a-4b8d-8764-8b83edd0fd6d",
+    "discogs": 149373,
+    "tags": [
+      "psytrance"
+    ],
+    "check": {
+      "fullon": "related"
+    },
+    "suggest": []
+  },
+  "Mandragora": {
+    "musicbrainz": "dd8bf94e-0bb9-4f9b-9d8a-f3b8a40b62e2",
+    "discogs": 3763123,
+    "lastfm": "https://www.last.fm/music/Mandragora",
+    "tags": [
+      "psytrance"
+    ],
+    "check": {
+      "brazil": "related"
+    },
+    "suggest": []
+  },
+  "Wrecked Machines": {
+    "lastfm": "https://www.last.fm/music/Wrecked+Machines",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "goa"
+    ],
+    "check": {
+      "fullon": "related"
+    },
+    "suggest": []
+  },
+  "Filteria": {
+    "musicbrainz": "383772d7-a69f-438b-9448-960cf394b076",
+    "discogs": 240123,
+    "lastfm": "https://www.last.fm/music/Filteria",
+    "tags": [
+      "psytrance",
+      "goa trance",
+      "trance",
+      "psychedelic trance",
+      "psychedelic",
+      "psy-trance",
+      "goa"
+    ],
+    "check": {
+      "neogoa": "related"
+    },
+    "suggest": []
+  },
+  "Ra": {
+    "musicbrainz": "b62f2a5d-ee82-482f-a10d-536c929edfff",
+    "discogs": 605852,
+    "tags": [],
+    "check": {
+      "neogoa": "nodata"
+    },
+    "suggest": []
+  },
+  "Artifact303": {
+    "musicbrainz": "29690abf-0fea-4d45-9f9c-4c75afc3832d",
+    "discogs": 873456,
+    "lastfm": "https://www.last.fm/music/Artifact303",
+    "tags": [
+      "trance",
+      "psytrance",
+      "psy-trance",
+      "psychedelic trance",
+      "psychedelic",
+      "goa trance",
+      "goa"
+    ],
+    "check": {
+      "neogoa": "related"
+    },
+    "suggest": []
+  },
+  "E-Mantra": {
+    "musicbrainz": "55f3eec5-cd4e-4344-80b1-0da9cd768c4c",
+    "discogs": 269989,
+    "lastfm": "https://www.last.fm/music/E-Mantra",
+    "tags": [
+      "downtempo",
+      "psytrance",
+      "psychedelic trance",
+      "psy-trance",
+      "trance",
+      "psychedelic",
+      "goa trance",
+      "goa"
+    ],
+    "check": {
+      "neogoa": "related"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Chi-A.D.": {
+    "musicbrainz": "91c05111-c6aa-4c5a-8329-b9489f1acdb8",
+    "discogs": 12977,
+    "lastfm": "https://www.last.fm/music/Chi-A.D.",
+    "tags": [
+      "psybient",
+      "goa",
+      "psytrance",
+      "goa trance",
+      "psychedelic",
+      "psychedelic trance"
+    ],
+    "check": {
+      "neogoa": "related"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Hypnoxock": {
+    "lastfm": "https://www.last.fm/music/Hypnoxock",
+    "tags": [
+      "psytrance",
+      "full on",
+      "psychedelic trance",
+      "goa",
+      "psy trance"
+    ],
+    "check": {
+      "neogoa": "related"
+    },
+    "suggest": []
+  },
+  "Imba": {
+    "musicbrainz": "33082f9b-587e-455b-ba7e-2f9851faa343",
+    "tags": [
+      "trance",
+      "psytrance",
+      "psychedelic trance",
+      "psychedelic",
+      "goa trance",
+      "psy-trance"
+    ],
+    "check": {
+      "neogoa": "related"
+    },
+    "suggest": [],
+    "discogs": 1509721
+  },
+  "Vini Vici": {
+    "musicbrainz": "14276a83-d21d-41ab-b809-09b494645645",
+    "discogs": 3769239,
+    "lastfm": "https://www.last.fm/music/Vini+Vici",
+    "tags": [
+      "psytrance",
+      "progressive psytrance",
+      "psychedelic trance"
+    ],
+    "check": {
+      "mainstream": "related"
+    },
+    "suggest": [
+      "prog"
+    ]
+  },
+  "Blastoyz": {
+    "musicbrainz": "cf1d0ddf-9794-4c7b-9758-a43b261f5a97",
+    "discogs": 3290607,
+    "lastfm": "https://www.last.fm/music/Blastoyz",
+    "tags": [
+      "psytrance",
+      "full-on",
+      "full-on psytrance"
+    ],
+    "check": {
+      "mainstream": "related"
+    },
+    "suggest": []
+  },
+  "Ace Ventura": {
+    "musicbrainz": "0c205acd-5003-4b0d-b603-fb91b93b6eae",
+    "discogs": 278966,
+    "lastfm": "https://www.last.fm/music/Ace+Ventura",
+    "tags": [
+      "psytrance",
+      "trance",
+      "psychedelic",
+      "psy-trance",
+      "progressive",
+      "progressive trance",
+      "progressive psytrance"
+    ],
+    "check": {
+      "prog": "confirmed"
+    },
+    "suggest": []
+  },
+  "Liquid Soul": {
+    "musicbrainz": "b2e9df97-3deb-4e4e-8193-ab1af10cfd83",
+    "discogs": 294233,
+    "lastfm": "https://www.last.fm/music/Liquid+Soul",
+    "tags": [
+      "psytrance",
+      "progressive trance",
+      "psychedelic",
+      "trance",
+      "progressive psytrance"
+    ],
+    "check": {
+      "prog": "confirmed"
+    },
+    "suggest": []
+  },
+  "Atmos": {
+    "musicbrainz": "ed4a0895-dfc9-412c-97fc-399bce0aff91",
+    "discogs": 22573,
+    "lastfm": "https://www.last.fm/music/Atmos",
+    "tags": [
+      "progressive psytrance",
+      "psytrance",
+      "progressive trance",
+      "psychedelic",
+      "goa"
+    ],
+    "check": {
+      "prog": "confirmed",
+      "swedish": "confirmed"
+    },
+    "suggest": []
+  },
+  "Ritmo": {
+    "musicbrainz": "43a2fdeb-0aa8-4083-a02a-14b2af6f7fb1",
+    "discogs": 685642,
+    "lastfm": "https://www.last.fm/music/Ritmo",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "psy-trance",
+      "progressive psytrance",
+      "progressive trance",
+      "psychedelic trance",
+      "goa trance"
+    ],
+    "check": {
+      "prog": "confirmed",
+      "psytechno": "related"
+    },
+    "suggest": [
+      "goa"
+    ]
+  },
+  "Captain Hook": {
+    "musicbrainz": "ca18d03b-3cd1-401d-b0d5-a09219fbc69c",
+    "discogs": 2043159,
+    "lastfm": "https://www.last.fm/music/Captain+Hook",
+    "tags": [
+      "psytrance",
+      "progressive psytrance",
+      "progressive trance",
+      "psychedelic"
+    ],
+    "check": {
+      "prog": "confirmed",
+      "psytechno": "related"
+    },
+    "suggest": []
+  },
+  "Talpa": {
+    "musicbrainz": "5a67151d-3c1f-43bb-8f17-24ecfd1dd357",
+    "discogs": 170518,
+    "lastfm": "https://www.last.fm/music/Talpa",
+    "tags": [
+      "psytrance",
+      "dark psytrance",
+      "psychedelic trance",
+      "goa",
+      "psychedelic",
+      "goa trance"
+    ],
+    "check": {
+      "prog": "related"
+    },
+    "suggest": [
+      "dark",
+      "goa"
+    ]
+  },
+  "Neelix": {
+    "musicbrainz": "86acb593-2bd8-41cb-8edc-fc8ba3620b15",
+    "discogs": 145561,
+    "lastfm": "https://www.last.fm/music/Neelix",
+    "tags": [
+      "progressive psytrance",
+      "psychedelic",
+      "progressive trance",
+      "psytrance",
+      "trance",
+      "goa"
+    ],
+    "check": {
+      "prog": "confirmed"
+    },
+    "suggest": []
+  },
+  "Phaxe": {
+    "musicbrainz": "acb695c0-bcdb-421c-9674-47c3a4b4cbbd",
+    "discogs": 979668,
+    "lastfm": "https://www.last.fm/music/Phaxe",
+    "tags": [
+      "psytrance",
+      "progressive trance",
+      "psychedelic",
+      "progressive psytrance"
+    ],
+    "check": {
+      "prog": "confirmed",
+      "offbeat": "related"
+    },
+    "suggest": []
+  },
+  "Interactive Noise": {
+    "musicbrainz": "6cb7de02-783a-4814-ae01-d5ea5fb03b9e",
+    "discogs": 1592823,
+    "lastfm": "https://www.last.fm/music/Interactive+Noise",
+    "tags": [
+      "psytrance",
+      "progressive trance",
+      "progressive psytrance",
+      "psychedelic trance",
+      "progressive psychedelic",
+      "psychedelic"
+    ],
+    "check": {
+      "prog": "confirmed"
+    },
+    "suggest": []
+  },
+  "Tegma": {
+    "musicbrainz": "f4b62538-50f2-44e7-ac81-7bc200ce41dc",
+    "discogs": 20723,
+    "lastfm": "https://www.last.fm/music/Tegma",
+    "tags": [
+      "psytrance",
+      "progressive trance",
+      "progressive psytrance",
+      "psychedelic",
+      "goa"
+    ],
+    "check": {
+      "prog": "confirmed"
+    },
+    "suggest": []
+  },
+  "Morten Granau": {
+    "musicbrainz": "821e12f8-e3ff-4e44-afbc-276148c8d871",
+    "discogs": 1081739,
+    "lastfm": "https://www.last.fm/music/Morten+Granau",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "progressive psytrance",
+      "progressive trance"
+    ],
+    "check": {
+      "prog": "confirmed",
+      "offbeat": "related"
+    },
+    "suggest": []
+  },
+  "Zyce": {
+    "musicbrainz": "130351cc-17a2-4cc9-8264-3a7e78d60e94",
+    "discogs": 1301514,
+    "lastfm": "https://www.last.fm/music/Zyce",
+    "tags": [
+      "progressive psytrance",
+      "progressive trance",
+      "psytrance",
+      "psychedelic trance"
+    ],
+    "check": {
+      "prog": "confirmed"
+    },
+    "suggest": []
+  },
+  "Sensient": {
+    "musicbrainz": "782c0b2f-7562-41af-b3cc-6ef3d0a1722b",
+    "discogs": 48986,
+    "lastfm": "https://www.last.fm/music/Sensient",
+    "tags": [
+      "progressive trance",
+      "zenonesque",
+      "psytrance",
+      "progressive psytrance",
+      "psychedelic"
+    ],
+    "check": {
+      "zenon": "confirmed"
+    },
+    "suggest": []
+  },
+  "Grouch": {
+    "musicbrainz": "0317e0ff-245e-4ee2-a398-dda248361dc5",
+    "discogs": 607844,
+    "lastfm": "https://www.last.fm/music/Grouch",
+    "tags": [
+      "dub",
+      "psytrance",
+      "psychedelic",
+      "trance",
+      "psychedelic trance",
+      "psy-trance",
+      "progressive psytrance",
+      "progressive trance"
+    ],
+    "check": {
+      "zenon": "related"
+    },
+    "suggest": [
+      "psydub",
+      "psystep"
+    ]
+  },
+  "Cid Inc": {
+    "tags": [],
+    "check": {
+      "zenon": "nodata"
+    },
+    "suggest": []
+  },
+  "Tetrameth": {
+    "lastfm": "https://www.last.fm/music/Tetrameth",
+    "tags": [
+      "psytrance",
+      "progressive trance",
+      "psychedelic trance",
+      "progressive",
+      "progressive psytrance"
+    ],
+    "check": {
+      "zenon": "related"
+    },
+    "suggest": []
+  },
+  "Vertical Mode": {
+    "musicbrainz": "a4ee4c28-5711-493a-8025-92347035b7fc",
+    "discogs": 2678862,
+    "lastfm": "https://www.last.fm/music/Vertical+Mode",
+    "tags": [
+      "psychedelic",
+      "progressive trance",
+      "progressive psytrance",
+      "psytrance",
+      "psychedelic trance",
+      "trance"
+    ],
+    "check": {
+      "psytechno": "related"
+    },
+    "suggest": []
+  },
+  "Symphonix": {
+    "musicbrainz": "7f9e6bb1-178e-4846-baf0-d320c0a60d35",
+    "discogs": 82056,
+    "lastfm": "https://www.last.fm/music/Symphonix",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "progressive trance",
+      "progressive psytrance",
+      "trance"
+    ],
+    "check": {
+      "psytechno": "related"
+    },
+    "suggest": []
+  },
+  "Hux Flux": {
+    "tags": [],
+    "check": {
+      "twilight": "nodata"
+    },
+    "suggest": []
+  },
+  "Xikwri Neyrra": {
+    "lastfm": "https://www.last.fm/music/Xikwri+Neyrra",
+    "tags": [
+      "darkpsy",
+      "psytrance",
+      "trance",
+      "dark psy",
+      "dark psytrance"
+    ],
+    "check": {
+      "twilight": "related",
+      "psycore": "related"
+    },
+    "suggest": []
+  },
+  "Ajna": {
+    "musicbrainz": "8aefdd75-8635-45cb-a6ac-9338a0b340b2",
+    "discogs": 2984749,
+    "tags": [],
+    "check": {
+      "twilight": "nodata"
+    },
+    "suggest": []
+  },
+  "Digicult": {
+    "musicbrainz": "baba8182-be8c-4fce-8b9d-630abb778304",
+    "discogs": 402059,
+    "lastfm": "https://www.last.fm/music/Digicult",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "full on"
+    ],
+    "check": {
+      "twilight": "related"
+    },
+    "suggest": [
+      "fullon"
+    ]
+  },
+  "Ka-Sol": {
+    "musicbrainz": "f7dc12b6-6faa-461f-b5ca-621485c0f1ae",
+    "discogs": 74469,
+    "tags": [
+      "psy-trance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "forest psytrance",
+      "dark psytrance"
+    ],
+    "check": {
+      "twilight": "related"
+    },
+    "suggest": []
+  },
+  "Ocelot": {
+    "musicbrainz": "febb200b-f91c-476f-a2aa-815126ed072d",
+    "discogs": 51514,
+    "lastfm": "https://www.last.fm/music/Ocelot",
+    "tags": [
+      "psychedelic",
+      "psytrance",
+      "psychedelic trance",
+      "psy-trance",
+      "dark psytrance",
+      "forest psytrance",
+      "forest",
+      "trance"
+    ],
+    "check": {
+      "twilight": "related"
+    },
+    "suggest": []
+  },
+  "Xenomorph": {
+    "musicbrainz": "5a1c0332-1c1f-423e-9128-1e0ba42f0855",
+    "discogs": 28096,
+    "lastfm": "https://www.last.fm/music/Xenomorph",
+    "tags": [
+      "psytrance",
+      "darkpsy",
+      "dark psytrance"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Kindzadza": {
+    "musicbrainz": "bf892d4a-1ea9-4feb-bfd2-5a9cf121b123",
+    "discogs": 94795,
+    "lastfm": "https://www.last.fm/music/Kindzadza",
+    "tags": [
+      "psytrance",
+      "dark psytrance",
+      "psychedelic trance",
+      "psychedelic",
+      "psy-trance",
+      "trance",
+      "darkpsy",
+      "dark psy"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Parasense": {
+    "musicbrainz": "193a655b-bfeb-4959-9e8d-adff4a52a9e5",
+    "discogs": 43263,
+    "lastfm": "https://www.last.fm/music/Parasense",
+    "tags": [
+      "darkpsy",
+      "psytrance",
+      "psychedelic trance",
+      "psychedelic",
+      "goa"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Psykovsky": {
+    "musicbrainz": "9ddd7582-13fc-4e85-9df1-6b40776743fc",
+    "discogs": 150224,
+    "lastfm": "https://www.last.fm/music/Psykovsky",
+    "tags": [
+      "psytrance",
+      "trance",
+      "dark psytrance",
+      "psychedelic",
+      "psychedelic trance",
+      "psy-trance",
+      "darkpsy",
+      "dark psy"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Dark Nebula": {
+    "musicbrainz": "fcbb35fc-d001-4cdb-b340-2d0b35f5fc94",
+    "discogs": 48987,
+    "lastfm": "https://www.last.fm/music/Dark+Nebula",
+    "tags": [
+      "psychedelic trance",
+      "psychedelic",
+      "psytrance",
+      "psy-trance",
+      "trance",
+      "darkpsy",
+      "goa"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Polyphonia": {
+    "musicbrainz": "96b6547d-0e6f-49e8-92da-040922b18bd9",
+    "discogs": 351951,
+    "lastfm": "https://www.last.fm/music/Polyphonia",
+    "tags": [
+      "darkpsy",
+      "psytrance",
+      "psychedelic trance",
+      "psychedelic",
+      "dark psy"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Archaic": {
+    "musicbrainz": "c9c61d61-7903-4829-86cb-4294781455a1",
+    "discogs": 997167,
+    "lastfm": "https://www.last.fm/music/Archaic",
+    "tags": [
+      "psytrance",
+      "trance",
+      "psychedelic",
+      "psychedelic trance",
+      "psy-trance",
+      "forest psytrance",
+      "dark psytrance"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Squaremeat": {
+    "lastfm": "https://www.last.fm/music/Squaremeat",
+    "tags": [
+      "suomisaundi",
+      "psytrance",
+      "goa",
+      "psychedelic"
+    ],
+    "check": {
+      "suomi": "confirmed"
+    },
+    "suggest": []
+  },
+  "Haltya": {
+    "lastfm": "https://www.last.fm/music/Haltya",
+    "tags": [
+      "suomisaundi",
+      "psytrance",
+      "psychedelic",
+      "psychedelic trance"
+    ],
+    "check": {
+      "suomi": "confirmed"
+    },
+    "suggest": []
+  },
+  "Salakavala": {
+    "musicbrainz": "8ca6ee19-17c9-468f-af5f-85479fb128ab",
+    "discogs": 46378,
+    "lastfm": "https://www.last.fm/music/Salakavala",
+    "tags": [
+      "psy-trance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "suomisaundi",
+      "suomi",
+      "psytrance",
+      "suomitrance"
+    ],
+    "check": {
+      "suomi": "confirmed"
+    },
+    "suggest": []
+  },
+  "Texas Faggott": {
+    "musicbrainz": "7d766105-550c-44c0-9335-8e2d25bee949",
+    "discogs": 46383,
+    "lastfm": "https://www.last.fm/music/Texas+Faggott",
+    "tags": [
+      "suomisaundi",
+      "psytrance",
+      "suomi",
+      "psychedelic trance",
+      "psychedelic"
+    ],
+    "check": {
+      "suomi": "confirmed"
+    },
+    "suggest": []
+  },
+  "Igor Swamp": {
+    "musicbrainz": "8c9a4d57-1274-42b5-aabf-66a90478ab1c",
+    "discogs": 516140,
+    "lastfm": "https://www.last.fm/music/Igor+Swamp",
+    "tags": [
+      "psytrance",
+      "psy-trance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "suomi",
+      "suomisaundi"
+    ],
+    "check": {
+      "suomi": "confirmed"
+    },
+    "suggest": []
+  },
+  "Derango": {
+    "musicbrainz": "b37769ce-acb1-4be1-b206-77f75c4f51b0",
+    "discogs": 151181,
+    "lastfm": "https://www.last.fm/music/Derango",
+    "tags": [
+      "psytrance",
+      "dark psytrance",
+      "psychedelic",
+      "psy-trance",
+      "psychedelic trance",
+      "forest psytrance",
+      "trance",
+      "darkpsy"
+    ],
+    "check": {
+      "forest": "confirmed"
+    },
+    "suggest": []
+  },
+  "Fungus Funk": {
+    "musicbrainz": "4bdd317f-614c-48b0-9351-adcfd1d07ef6",
+    "discogs": 28097,
+    "lastfm": "https://www.last.fm/music/Fungus+Funk",
+    "tags": [
+      "psytrance",
+      "darkpsy",
+      "dark psy",
+      "trance",
+      "psychedelic trance"
+    ],
+    "check": {
+      "night": "related"
+    },
+    "suggest": []
+  },
+  "Megalopsy": {
+    "musicbrainz": "b58692fa-448e-4b65-a63b-04afdd6b77da",
+    "discogs": 248697,
+    "lastfm": "https://www.last.fm/music/Megalopsy",
+    "tags": [
+      "psy-trance",
+      "darkpsy",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "dark psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "forest": "related"
+    },
+    "suggest": []
+  },
+  "Kalilaskov AS": {
+    "musicbrainz": "1e35d329-1eac-4df2-a6e5-2716d81ebe01",
+    "discogs": 349432,
+    "lastfm": "https://www.last.fm/music/Kalilaskov+AS",
+    "tags": [
+      "psy-trance",
+      "psychedelic",
+      "dark psytrance",
+      "psychedelic trance",
+      "trance",
+      "darkpsy",
+      "psytrance"
+    ],
+    "check": {
+      "forest": "related"
+    },
+    "suggest": []
+  },
+  "Onkel Dunkel": {
+    "musicbrainz": "453d513c-a0df-4191-8b7c-e8a32e1c9bd3",
+    "discogs": 865813,
+    "lastfm": "https://www.last.fm/music/Onkel+Dunkel",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "psy-trance",
+      "trance",
+      "psychedelic",
+      "darkpsy",
+      "forest dark",
+      "ambient"
+    ],
+    "check": {
+      "forest": "confirmed"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Mubali": {
+    "musicbrainz": "8a524b80-1a41-4be1-a2a4-1b2a7ad52db2",
+    "discogs": 235296,
+    "lastfm": "https://www.last.fm/music/Mubali",
+    "tags": [
+      "dark psytrance",
+      "psychedelic",
+      "trance",
+      "psy-trance",
+      "psychedelic trance",
+      "psytrance",
+      "darkpsy"
+    ],
+    "check": {
+      "forest": "related"
+    },
+    "suggest": []
+  },
+  "Farebi Jalebi": {
+    "musicbrainz": "f6069ebe-844f-41fa-9250-ad1d5d27726c",
+    "discogs": 1343467,
+    "lastfm": "https://www.last.fm/music/Farebi+Jalebi",
+    "tags": [
+      "psy-trance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "dark psytrance",
+      "forest psytrance",
+      "darkpsy",
+      "psytrance"
+    ],
+    "check": {
+      "forest": "confirmed"
+    },
+    "suggest": []
+  },
+  "Krapul": {
+    "musicbrainz": "127a2790-a1a5-4472-ae8a-d28ed60520ca",
+    "discogs": 5116306,
+    "lastfm": "https://www.last.fm/music/Krapul",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "psy-trance",
+      "trance",
+      "psychedelic",
+      "dark psytrance",
+      "forest psytrance",
+      "forest"
+    ],
+    "check": {
+      "forest": "confirmed"
+    },
+    "suggest": []
+  },
+  "Procs": {
+    "musicbrainz": "d859f69d-516e-4316-b4c4-58b90cae2662",
+    "discogs": 41481,
+    "lastfm": "https://www.last.fm/music/Procs",
+    "tags": [
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "psytrance",
+      "forest psytrance",
+      "psy-trance",
+      "darkpsy",
+      "forestpsy"
+    ],
+    "check": {
+      "forest": "confirmed"
+    },
+    "suggest": []
+  },
+  "Daksinamurti": {
+    "musicbrainz": "6243cdad-9e40-4a9e-a619-9566b6d47d44",
+    "discogs": 726960,
+    "tags": [
+      "trance",
+      "psychedelic trance",
+      "psychedelic",
+      "psy-trance"
+    ],
+    "check": {
+      "forest": "related"
+    },
+    "suggest": []
+  },
+  "Naima": {
+    "tags": [],
+    "check": {
+      "forest": "nodata"
+    },
+    "suggest": []
+  },
+  "Highko": {
+    "musicbrainz": "838d1bad-359a-4214-b499-e43febee6bee",
+    "discogs": 339238,
+    "lastfm": "https://www.last.fm/music/Highko",
+    "tags": [
+      "darkpsy",
+      "psytrance",
+      "dark psy",
+      "psychedelic",
+      "dark psytrance"
+    ],
+    "check": {
+      "hitech": "related",
+      "psycore": "related"
+    },
+    "suggest": []
+  },
+  "Zik": {
+    "musicbrainz": "256cac19-9b54-42d2-8f0a-e27a874691c0",
+    "discogs": 269717,
+    "lastfm": "https://www.last.fm/music/Zik",
+    "tags": [
+      "dark psytrance",
+      "psy-trance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "darkpsy",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "related"
+    },
+    "suggest": []
+  },
+  "Arjuna": {
+    "musicbrainz": "802df383-3cf3-4fcc-989a-1131d3d3ca50",
+    "discogs": 743998,
+    "lastfm": "https://www.last.fm/music/Arjuna",
+    "tags": [
+      "trance",
+      "psytrance",
+      "psychedelic trance",
+      "psychedelic",
+      "psy-trance",
+      "darkpsy",
+      "dark psytrance"
+    ],
+    "check": {
+      "hitech": "related"
+    },
+    "suggest": []
+  },
+  "Oxidaksi": {
+    "musicbrainz": "4b89ae90-4076-41e1-9f3a-4138d8ffd536",
+    "discogs": 1970071,
+    "tags": [],
+    "check": {
+      "hitech": "nodata"
+    },
+    "suggest": []
+  },
+  "Kashyyyk": {
+    "musicbrainz": "214b5280-5c16-45c0-9cc5-eda7a0fefffd",
+    "discogs": 344058,
+    "lastfm": "https://www.last.fm/music/Kashyyyk",
+    "tags": [
+      "psychedelic trance",
+      "psy-trance",
+      "psychedelic",
+      "trance",
+      "darkpsy",
+      "psytrance",
+      "dark psy"
+    ],
+    "check": {
+      "hitech": "related"
+    },
+    "suggest": []
+  },
+  "Arcek": {
+    "musicbrainz": "f4250332-75dd-46c7-95b1-e442f7845f9b",
+    "discogs": 1478464,
+    "lastfm": "https://www.last.fm/music/Arcek",
+    "tags": [
+      "psytrance",
+      "darkpsy",
+      "trance",
+      "psychedelic",
+      "hi-tech"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Torog": {
+    "musicbrainz": "5b7fda43-b9f2-4e70-8359-6495ef6e78ac",
+    "discogs": 678889,
+    "lastfm": "https://www.last.fm/music/Torog",
+    "tags": [
+      "trance",
+      "psychedelic trance",
+      "psychedelic",
+      "psy-trance",
+      "hi-tech",
+      "dark psytrance",
+      "hitech",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Kneether": {
+    "musicbrainz": "c83f20a4-2b4b-458c-acf0-87592236598c",
+    "tags": [
+      "hi-tech"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Zis0ky": {
+    "musicbrainz": "f9a9686f-e7fb-480c-8bb9-6bd09c04e1c0",
+    "discogs": 6906986,
+    "lastfm": "https://www.last.fm/music/Zis0ky",
+    "tags": [
+      "breakbeat",
+      "psytrance",
+      "hi-tech",
+      "hi-tech psychedelic trance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": [
+      "psybreaks"
+    ]
+  },
+  "Necropsycho": {
+    "musicbrainz": "3c8cb1e7-0a25-4212-b455-439b76378e31",
+    "discogs": 817767,
+    "lastfm": "https://www.last.fm/music/Necropsycho",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "psy-trance",
+      "psychedelic",
+      "dark psytrance",
+      "trance",
+      "darkpsy"
+    ],
+    "check": {
+      "psycore": "related"
+    },
+    "suggest": []
+  },
+  "Dark Whisper": {
+    "musicbrainz": "96ac5983-07ad-4598-8821-7914ff8aee52",
+    "discogs": 1317227,
+    "lastfm": "https://www.last.fm/music/Dark+Whisper",
+    "tags": [
+      "psychedelic trance",
+      "psy-trance",
+      "trance",
+      "psychedelic",
+      "psytrance",
+      "darkpsy",
+      "dark psytrance"
+    ],
+    "check": {
+      "psycore": "related"
+    },
+    "suggest": []
+  },
+  "Biomechanimal": {
+    "tags": [],
+    "check": {
+      "psycore": "nodata"
+    },
+    "suggest": []
+  },
+  "Atriohm": {
+    "musicbrainz": "798e0542-214e-4e61-b4fa-aa4fcb683611",
+    "discogs": 331427,
+    "lastfm": "https://www.last.fm/music/Atriohm",
+    "tags": [
+      "dark psytrance",
+      "psytrance",
+      "psy-trance",
+      "psychedelic",
+      "trance",
+      "forest psytrance",
+      "psychedelic trance",
+      "darkpsy"
+    ],
+    "check": {
+      "psycore": "related"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Hammerer": {
+    "tags": [],
+    "check": {
+      "psycore": "nodata"
+    },
+    "suggest": []
+  },
+  "Shpongle": {
+    "musicbrainz": "ffe9ec08-6b6b-4993-9394-e280b429dbfd",
+    "discogs": 22673,
+    "lastfm": "https://www.last.fm/music/Shpongle",
+    "tags": [
+      "psybient",
+      "psytrance",
+      "trance",
+      "chillout",
+      "ambient",
+      "goa",
+      "goa trance",
+      "chill out"
+    ],
+    "check": {
+      "psybient": "confirmed",
+      "psyworld": "related"
+    },
+    "suggest": [
+      "goa"
+    ]
+  },
+  "Entheogenic": {
+    "musicbrainz": "9dbe0453-2f86-45a2-a54c-df0d947f857e",
+    "discogs": 29700,
+    "lastfm": "https://www.last.fm/music/Entheogenic",
+    "tags": [
+      "ambient",
+      "psybient",
+      "psychedelic",
+      "psychill",
+      "chillout"
+    ],
+    "check": {
+      "psybient": "confirmed"
+    },
+    "suggest": []
+  },
+  "Carbon Based Lifeforms": {
+    "musicbrainz": "8229a8f1-b315-4fae-af57-b3eb71efdaf4",
+    "discogs": 99459,
+    "lastfm": "https://www.last.fm/music/Carbon+Based+Lifeforms",
+    "tags": [
+      "ambient",
+      "psybient",
+      "downtempo",
+      "psychedelic",
+      "trance",
+      "psytrance",
+      "chillout",
+      "psychedelic trance"
+    ],
+    "check": {
+      "psybient": "confirmed"
+    },
+    "suggest": []
+  },
+  "Solar Fields": {
+    "musicbrainz": "a2af1f31-c9eb-4fff-990c-c4f547a11b75",
+    "discogs": 56494,
+    "lastfm": "https://www.last.fm/music/Solar+Fields",
+    "tags": [
+      "ambient",
+      "downtempo",
+      "psybient",
+      "progressive psytrance",
+      "psytrance",
+      "ambient techno",
+      "idm",
+      "progressive trance"
+    ],
+    "check": {
+      "psybient": "confirmed"
+    },
+    "suggest": [
+      "prog"
+    ]
+  },
+  "Aes Dana": {
+    "musicbrainz": "ed5cd4a2-0eb1-4e3b-a9b5-73547a6447da",
+    "discogs": 56495,
+    "lastfm": "https://www.last.fm/music/Aes+Dana",
+    "tags": [
+      "trance",
+      "downtempo",
+      "chillout",
+      "ambient",
+      "psybient",
+      "goa",
+      "psychedelic",
+      "psychill"
+    ],
+    "check": {
+      "psybient": "confirmed"
+    },
+    "suggest": []
+  },
+  "Asura": {
+    "musicbrainz": "49a5f5b9-44f3-4db2-a9a8-db8773de4edc",
+    "discogs": 27984,
+    "lastfm": "https://www.last.fm/music/Asura",
+    "tags": [
+      "ambient",
+      "psychill",
+      "ambient house",
+      "downtempo",
+      "psy-trance",
+      "psytrance",
+      "psy-chill",
+      "chillout"
+    ],
+    "check": {
+      "psybient": "confirmed"
+    },
+    "suggest": []
+  },
+  "Ishq": {
+    "musicbrainz": "96c5dcd8-4dc9-48e3-b040-1e1ccf51b2a1",
+    "discogs": 11370,
+    "lastfm": "https://www.last.fm/music/Ishq",
+    "tags": [
+      "psybient",
+      "psychedelic",
+      "ambient",
+      "chillout",
+      "downtempo"
+    ],
+    "check": {
+      "psybient": "confirmed"
+    },
+    "suggest": []
+  },
+  "Hol Baumann": {
+    "lastfm": "https://www.last.fm/music/Hol+Baumann",
+    "tags": [
+      "ambient",
+      "downtempo",
+      "chillout",
+      "psychill"
+    ],
+    "check": {
+      "psybient": "confirmed"
+    },
+    "suggest": []
+  },
+  "Desert Dwellers": {
+    "musicbrainz": "a933a8ba-54b3-42d8-b2d8-a5fc5405d015",
+    "discogs": 187974,
+    "lastfm": "https://www.last.fm/music/Desert+Dwellers",
+    "tags": [
+      "downtempo",
+      "psytrance",
+      "psybient",
+      "trance",
+      "chillout",
+      "psychedelic trance",
+      "psychedelic",
+      "psychill"
+    ],
+    "check": {
+      "psyworld": "confirmed",
+      "psydub": "related",
+      "psybass": "related"
+    },
+    "suggest": []
+  },
+  "Hilight Tribe": {
+    "musicbrainz": "1c8f8ab5-ba03-4aa6-9eab-850e1d3a2ff7",
+    "discogs": 51792,
+    "lastfm": "https://www.last.fm/music/Hilight+Tribe",
+    "tags": [
+      "trance",
+      "tribal",
+      "psytrance",
+      "goa"
+    ],
+    "check": {
+      "psyworld": "confirmed"
+    },
+    "suggest": []
+  },
+  "Banco de Gaia": {
+    "musicbrainz": "70cc316b-37a3-4174-bdc0-f546b3b3d03c",
+    "discogs": 935,
+    "tags": [
+      "ambient"
+    ],
+    "check": {
+      "psyworld": "related"
+    },
+    "suggest": []
+  },
+  "Ott": {
+    "musicbrainz": "1a40f886-0877-4bab-9ab1-761147dadb89",
+    "discogs": 27862,
+    "lastfm": "https://www.last.fm/music/Ott",
+    "tags": [
+      "psybient",
+      "downtempo",
+      "psydub",
+      "psychill",
+      "psychedelic",
+      "ambient dub",
+      "psy-chill",
+      "dub"
+    ],
+    "check": {
+      "psydub": "confirmed"
+    },
+    "suggest": []
+  },
+  "Kalya Scintilla": {
+    "lastfm": "https://www.last.fm/music/Kalya+Scintilla",
+    "tags": [
+      "chillout",
+      "dubstep",
+      "psychedelic",
+      "glitch-hop"
+    ],
+    "check": {
+      "psydub": "related",
+      "psystep": "confirmed"
+    },
+    "suggest": []
+  },
+  "Bluetech": {
+    "musicbrainz": "54980b39-7dea-4e2b-8b1f-21322a464ef5",
+    "discogs": 152835,
+    "lastfm": "https://www.last.fm/music/Bluetech",
+    "tags": [
+      "psytrance",
+      "downtempo",
+      "ambient",
+      "psychedelic trance",
+      "psybient",
+      "psychill",
+      "chillout"
+    ],
+    "check": {
+      "psydub": "related",
+      "psybass": "related"
+    },
+    "suggest": []
+  },
+  "Globular": {
+    "musicbrainz": "ccdce929-84c9-4013-a8c9-12ae3f531447",
+    "discogs": 1838648,
+    "lastfm": "https://www.last.fm/music/Globular",
+    "tags": [
+      "ambient",
+      "psychill",
+      "psychedelic",
+      "downtempo",
+      "psybient",
+      "psy-chill",
+      "psydub",
+      "chillout"
+    ],
+    "check": {
+      "psydub": "confirmed"
+    },
+    "suggest": []
+  },
+  "Dub Trees": {
+    "musicbrainz": "fac24966-fc3e-4221-905a-f8897011bb76",
+    "discogs": 25448,
+    "lastfm": "https://www.last.fm/music/Dub+Trees",
+    "tags": [
+      "dub",
+      "psybient",
+      "ambient",
+      "psy-trance",
+      "psychedelic",
+      "psychedelic trance",
+      "trance",
+      "psydub"
+    ],
+    "check": {
+      "psydub": "confirmed"
+    },
+    "suggest": []
+  },
+  "Kaminanda": {
+    "musicbrainz": "0b382ebc-9813-4162-b856-b4eaa26883c7",
+    "discogs": 840047,
+    "lastfm": "https://www.last.fm/music/Kaminanda",
+    "tags": [
+      "ambient dub",
+      "downtempo",
+      "psybient",
+      "dub",
+      "tribal",
+      "psychedelic",
+      "ambient",
+      "psytrance"
+    ],
+    "check": {
+      "psystep": "related"
+    },
+    "suggest": []
+  },
+  "Liquid Stranger": {
+    "musicbrainz": "c1281222-c989-4987-a87e-9a42a65727f0",
+    "discogs": 95102,
+    "lastfm": "https://www.last.fm/music/Liquid+Stranger",
+    "tags": [
+      "dubstep",
+      "dub",
+      "downtempo",
+      "psybient",
+      "ambient dub",
+      "chillout",
+      "idm",
+      "world"
+    ],
+    "check": {
+      "psystep": "confirmed"
+    },
+    "suggest": []
+  },
+  "Quanta": {
+    "musicbrainz": "4cc0c1a1-8609-4983-94bc-dd956809c5bf",
+    "discogs": 52359,
+    "lastfm": "https://www.last.fm/music/Quanta",
+    "tags": [
+      "psydub",
+      "dubstep",
+      "chill out",
+      "downtempo",
+      "psystep",
+      "dub"
+    ],
+    "check": {
+      "psystep": "confirmed"
+    },
+    "suggest": []
+  },
+  "Tipper": {
+    "musicbrainz": "c3cf7f15-4a5e-4e9e-bce7-5e5b101fa29c",
+    "discogs": 6736,
+    "lastfm": "https://www.last.fm/music/Tipper",
+    "tags": [
+      "breakbeat",
+      "ambient",
+      "glitch",
+      "glitch hop",
+      "neurohop",
+      "idm",
+      "psybient",
+      "psychill"
+    ],
+    "check": {
+      "psybass": "confirmed"
+    },
+    "suggest": [
+      "psybreaks"
+    ]
+  },
+  "Phutureprimitive": {
+    "musicbrainz": "0c445197-bab3-442a-b1d2-32963f1b39a0",
+    "discogs": 121308,
+    "lastfm": "https://www.last.fm/music/Phutureprimitive",
+    "tags": [
+      "idm",
+      "psychedelic",
+      "glitch hop",
+      "glitch",
+      "psychill",
+      "ambient",
+      "dubstep",
+      "downtempo"
+    ],
+    "check": {
+      "psybass": "confirmed"
+    },
+    "suggest": []
+  },
+  "Opiuo": {
+    "musicbrainz": "d768c6d7-cbb6-4089-a0ce-76186d314dd7",
+    "discogs": 1755644,
+    "tags": [
+      "glitch hop",
+      "neurohop",
+      "glitch hop [edm]"
+    ],
+    "check": {
+      "psybass": "confirmed"
+    },
+    "suggest": []
+  },
+  "Eyal Barkan": {
+    "musicbrainz": "f6a69bd8-9361-4b62-a8c8-829e1ae168a9",
+    "discogs": 70732,
+    "lastfm": "https://www.last.fm/music/Eyal+Barkan",
+    "tags": [
+      "trance",
+      "uplifting trance",
+      "psychedelic trance",
+      "progressive trance"
+    ],
+    "check": {
+      "nitzhonot": "confirmed"
+    },
+    "suggest": [
+      "prog"
+    ]
+  },
+  "Yahel": {
+    "musicbrainz": "efbbb4b2-b0aa-40b7-a15a-dfb3963697c9",
+    "discogs": 13834,
+    "lastfm": "https://www.last.fm/music/Yahel",
+    "tags": [
+      "trance",
+      "psytrance",
+      "psychedelic trance",
+      "goa",
+      "psychedelic"
+    ],
+    "check": {
+      "nitzhonot": "confirmed"
+    },
+    "suggest": []
+  },
+  "Holymen": {
+    "lastfm": "https://www.last.fm/music/Holymen",
+    "tags": [
+      "psytrance",
+      "goa",
+      "psychedelic trance",
+      "psychedelic",
+      "trance"
+    ],
+    "check": {
+      "nitzhonot": "related"
+    },
+    "suggest": []
+  },
+  "Protoculture": {
+    "musicbrainz": "7e85fff1-eb98-4602-b057-d0c84f0994b8",
+    "discogs": 118082,
+    "lastfm": "https://www.last.fm/music/Protoculture",
+    "tags": [
+      "psytrance",
+      "psychedelic",
+      "trance",
+      "psychedelic trance",
+      "goa"
+    ],
+    "check": {
+      "sapsy": "confirmed"
+    },
+    "suggest": []
+  },
+  "Headroom": {
+    "musicbrainz": "5f6f21f1-fa81-456b-a26b-a255432cf170",
+    "discogs": 9428,
+    "tags": [],
+    "check": {
+      "sapsy": "nodata"
+    },
+    "suggest": []
+  },
+  "Broken Toy": {
+    "musicbrainz": "070ecafe-7da8-4594-98da-681d87d4a38a",
+    "discogs": 138441,
+    "lastfm": "https://www.last.fm/music/Broken+Toy",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "full on",
+      "psychedelic"
+    ],
+    "check": {
+      "sapsy": "confirmed"
+    },
+    "suggest": []
+  },
+  "Gataka": {
+    "lastfm": "https://www.last.fm/music/Gataka",
+    "tags": [
+      "psytrance",
+      "psychedelic trance",
+      "psychedelic"
+    ],
+    "check": {
+      "sapsy": "related"
+    },
+    "suggest": []
+  },
+  "Lysandros": {
+    "musicbrainz": "d0fed1ce-1bbd-4332-ad13-ae9ba6057e75",
+    "discogs": 9914170,
+    "tags": [],
+    "check": {
+      "sapsy": "confirmed"
+    },
+    "suggest": []
+  },
+  "Vibrasphere": {
+    "musicbrainz": "b822008d-f2eb-46fe-8ec4-3ad7499a6062",
+    "discogs": 20726,
+    "lastfm": "https://www.last.fm/music/Vibrasphere",
+    "tags": [
+      "trance",
+      "psytrance",
+      "ambient",
+      "progressive trance",
+      "psychedelic",
+      "chillout"
+    ],
+    "check": {
+      "swedish": "confirmed"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Son Kite": {
+    "musicbrainz": "ca78e972-0349-4d99-af6d-56646376ba9b",
+    "discogs": 20721,
+    "lastfm": "https://www.last.fm/music/Son+Kite",
+    "tags": [
+      "goa trance",
+      "psytrance",
+      "progressive trance",
+      "progressive psytrance",
+      "goa"
+    ],
+    "check": {
+      "swedish": "confirmed"
+    },
+    "suggest": [
+      "goa"
+    ]
+  },
+  "Noma": {
+    "musicbrainz": "0e5d5414-5919-4633-ac67-6db12b951310",
+    "discogs": 4820189,
+    "tags": [],
+    "check": {
+      "swedish": "nodata"
+    },
+    "suggest": []
+  },
+  "Human Blue": {
+    "lastfm": "https://www.last.fm/music/Human+Blue",
+    "tags": [
+      "psytrance",
+      "progressive psytrance",
+      "progressive trance",
+      "psychedelic",
+      "goa"
+    ],
+    "check": {
+      "swedish": "related"
+    },
+    "suggest": []
+  },
+  "Ticon": {
+    "musicbrainz": "5ae8c299-9103-4917-8258-c2c9161181e4",
+    "discogs": 19875,
+    "lastfm": "https://www.last.fm/music/Ticon",
+    "tags": [
+      "psytrance",
+      "progressive trance",
+      "progressive psytrance",
+      "goa"
+    ],
+    "check": {
+      "swedish": "confirmed"
+    },
+    "suggest": []
+  },
+  "Kromagon": {
+    "musicbrainz": "ade03fdb-c8d8-420c-a538-2fb2e702b4bc",
+    "discogs": 2944187,
+    "lastfm": "https://www.last.fm/music/Kromagon",
+    "tags": [
+      "dark progressive",
+      "progressive",
+      "psychedelic",
+      "trance",
+      "psychedelic trance",
+      "darkpsy",
+      "psytrance"
+    ],
+    "check": {
+      "darkprog": "confirmed"
+    },
+    "suggest": [
+      "dark"
+    ]
+  },
+  "HypoGeo": {
+    "musicbrainz": "5eff3618-d79e-4d67-a324-a94792d0398e",
+    "discogs": 1462371,
+    "tags": [],
+    "check": {
+      "darkprog": "nodata"
+    },
+    "suggest": []
+  },
+  "Radioactive.Cake": {
+    "musicbrainz": "e4d0b659-6fce-40ca-9c41-efa1b4de6d9b",
+    "discogs": 1755984,
+    "lastfm": "https://www.last.fm/music/Radioactive.Cake",
+    "tags": [
+      "dark progressive",
+      "psytrance",
+      "psychedelic",
+      "zenonesque"
+    ],
+    "check": {
+      "darkprog": "confirmed"
+    },
+    "suggest": []
+  },
+  "Gojja": {
+    "musicbrainz": "a264e04a-07dd-4fc1-9daf-a9d4d789539c",
+    "discogs": 1946681,
+    "tags": [
+      "psychedelic",
+      "psychedelic trance",
+      "dark progressive",
+      "psytrance",
+      "progressive",
+      "psy-trance",
+      "forest",
+      "trance"
+    ],
+    "check": {
+      "darkprog": "confirmed"
+    },
+    "suggest": [
+      "forest"
+    ]
+  },
+  "Mood Deluxe": {
+    "lastfm": "https://www.last.fm/music/Mood+Deluxe",
+    "tags": [
+      "psybreaks",
+      "breakbeat",
+      "psytrance",
+      "psychedelic"
+    ],
+    "check": {
+      "psybreaks": "confirmed"
+    },
+    "suggest": []
+  },
+  "Digitalis": {
+    "musicbrainz": "ff965aaa-25d5-4a13-8a8b-6ea9c80784a1",
+    "discogs": 30784,
+    "lastfm": "https://www.last.fm/music/Digitalis",
+    "tags": [
+      "breakbeat",
+      "psybreaks",
+      "ambient",
+      "trance"
+    ],
+    "check": {
+      "psybreaks": "confirmed"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Slack Baba": {
+    "lastfm": "https://www.last.fm/music/Slack+Baba",
+    "tags": [
+      "chillout",
+      "psychedelic",
+      "psytrance"
+    ],
+    "check": {
+      "psybreaks": "related"
+    },
+    "suggest": [
+      "psybient"
+    ]
+  },
+  "Hedflux": {
+    "lastfm": "https://www.last.fm/music/Hedflux",
+    "tags": [
+      "psybreaks",
+      "breakbeat",
+      "breaks"
+    ],
+    "check": {
+      "psybreaks": "confirmed"
+    },
+    "suggest": []
+  },
+  "Bad Tango": {
+    "lastfm": "https://www.last.fm/music/Bad+Tango",
+    "tags": [
+      "psybreaks",
+      "breaks",
+      "breakbeat"
+    ],
+    "check": {
+      "psybreaks": "confirmed"
+    },
+    "suggest": []
+  },
+  "Monk3y Logic": {
+    "tags": [],
+    "check": {
+      "psybreaks": "nodata"
+    },
+    "suggest": []
+  },
+  "Pink Floyd": {
+    "musicbrainz": "83d91898-7763-47d7-b03b-b92132375c47",
+    "discogs": 45467,
+    "lastfm": "https://www.last.fm/music/Pink+Floyd",
+    "tags": [
+      "progressive rock",
+      "psychedelic rock",
+      "space rock",
+      "progressive",
+      "psychedelic"
+    ],
+    "check": {
+      "psyrock": "confirmed"
+    },
+    "suggest": []
+  },
+  "Gong": {
+    "musicbrainz": "5927990e-34bb-493f-b5da-b7b28d43698f",
+    "discogs": 10346,
+    "lastfm": "https://www.last.fm/music/Gong",
+    "tags": [
+      "progressive rock",
+      "psychedelic rock",
+      "space rock",
+      "psychedelic"
+    ],
+    "check": {
+      "psyrock": "confirmed"
+    },
+    "suggest": []
+  },
+  "Hawkwind": {
+    "musicbrainz": "5a28f8c2-31fb-4047-ae57-c5c326989262",
+    "discogs": 309822,
+    "lastfm": "https://www.last.fm/music/Hawkwind",
+    "tags": [
+      "space rock",
+      "psychedelic rock",
+      "progressive rock",
+      "psychedelic"
+    ],
+    "check": {
+      "psyrock": "confirmed"
+    },
+    "suggest": []
+  },
+  "The Grateful Dead": {
+    "tags": [],
+    "check": {
+      "psyrock": "nodata"
+    },
+    "suggest": []
+  },
+  "Front 242": {
+    "musicbrainz": "8fb6c00f-61d8-4f27-98f9-53e1ba481626",
+    "discogs": 4655,
+    "lastfm": "https://www.last.fm/music/Front+242",
+    "tags": [
+      "ebm",
+      "industrial",
+      "electro-industrial",
+      "electronic body music",
+      "old school ebm"
+    ],
+    "check": {
+      "ebm": "confirmed"
+    },
+    "suggest": []
+  },
+  "Nitzer Ebb": {
+    "musicbrainz": "d260c14e-2ef1-4d3d-8739-70d517efac8a",
+    "discogs": 2709,
+    "lastfm": "https://www.last.fm/music/Nitzer+Ebb",
+    "tags": [
+      "ebm",
+      "industrial",
+      "industrial rock",
+      "old school ebm"
+    ],
+    "check": {
+      "ebm": "confirmed"
+    },
+    "suggest": []
+  },
+  "DAF": {
+    "musicbrainz": "f1dc644e-1166-482e-8f7b-eafc89ed4322",
+    "tags": [],
+    "check": {
+      "ebm": "nodata"
+    },
+    "suggest": []
+  },
+  "Cabaret Voltaire": {
+    "musicbrainz": "439a29ad-f4ef-4857-a7cd-3d4a551056c8",
+    "discogs": 11202,
+    "lastfm": "https://www.last.fm/music/Cabaret+Voltaire",
+    "tags": [
+      "industrial",
+      "electro-industrial",
+      "ambient techno",
+      "industrial music",
+      "ebm"
+    ],
+    "check": {
+      "ebm": "confirmed"
+    },
+    "suggest": []
+  },
+  "A Split-Second": {
+    "musicbrainz": "bf270b87-6da7-485b-8c5b-0d02c9c47f41",
+    "discogs": 4878,
+    "tags": [
+      "ebm",
+      "new beat"
+    ],
+    "check": {
+      "newbeat": "confirmed"
+    },
+    "suggest": []
+  },
+  "Lords of Acid": {
+    "musicbrainz": "b0e81c40-ea89-40b9-95b3-e63d5cad5e67",
+    "discogs": 4059,
+    "lastfm": "https://www.last.fm/music/Lords+of+Acid",
+    "tags": [
+      "new beat",
+      "industrial",
+      "industrial rock",
+      "industrial metal",
+      "ebm",
+      "electro-industrial",
+      "post-industrial",
+      "acid house"
+    ],
+    "check": {
+      "newbeat": "confirmed"
+    },
+    "suggest": []
+  },
+  "The Neon Judgement": {
+    "musicbrainz": "5fbefbed-09d5-4e9b-9c58-520b9511158b",
+    "discogs": 7972,
+    "lastfm": "https://www.last.fm/music/The+Neon+Judgement",
+    "tags": [
+      "ebm",
+      "industrial"
+    ],
+    "check": {
+      "newbeat": "related"
+    },
+    "suggest": []
+  },
+  "Phuture": {
+    "musicbrainz": "d4c75da5-45d7-49ef-abd6-babca3eb8d18",
+    "discogs": 1705,
+    "lastfm": "https://www.last.fm/music/Phuture",
+    "tags": [
+      "acid house"
+    ],
+    "check": {
+      "acidhouse": "confirmed"
+    },
+    "suggest": []
+  },
+  "808 State": {
+    "musicbrainz": "36f35db0-bc09-43e7-8650-a123224943c7",
+    "discogs": 318,
+    "lastfm": "https://www.last.fm/music/808+State",
+    "tags": [
+      "acid house",
+      "ambient",
+      "idm",
+      "ambient house"
+    ],
+    "check": {
+      "acidhouse": "confirmed"
+    },
+    "suggest": []
+  },
+  "Hardfloor": {
+    "musicbrainz": "49c5cce4-aaa6-4600-a9a2-2b045fb6a87b",
+    "discogs": 858,
+    "lastfm": "https://www.last.fm/music/Hardfloor",
+    "tags": [
+      "acid house",
+      "hard trance",
+      "trance",
+      "downtempo",
+      "breakbeat",
+      "breaks",
+      "progressive house",
+      "edm"
+    ],
+    "check": {
+      "acidhouse": "confirmed",
+      "frankfurt": "confirmed"
+    },
+    "suggest": []
+  },
+  "Rhythim Is Rhythim": {
+    "musicbrainz": "159edf29-c4ae-49c7-b1e6-1f082c60d4e3",
+    "discogs": 3133,
+    "lastfm": "https://www.last.fm/music/Rhythim+Is+Rhythim",
+    "tags": [
+      "detroit techno",
+      "detroit"
+    ],
+    "check": {
+      "detroit": "confirmed"
+    },
+    "suggest": []
+  },
+  "Model 500": {
+    "musicbrainz": "e569aee8-33ff-48e5-b0ed-4ceba1a37714",
+    "discogs": 1141,
+    "lastfm": "https://www.last.fm/music/Model+500",
+    "tags": [
+      "detroit techno",
+      "detroit"
+    ],
+    "check": {
+      "detroit": "confirmed"
+    },
+    "suggest": []
+  },
+  "Inner City": {
+    "musicbrainz": "65a8e571-8a08-433f-a5bf-ead38c269ea6",
+    "discogs": 3868,
+    "lastfm": "https://www.last.fm/music/Inner+City",
+    "tags": [
+      "detroit techno"
+    ],
+    "check": {
+      "detroit": "confirmed"
+    },
+    "suggest": []
+  },
+  "Sven Väth": {
+    "musicbrainz": "14008378-5900-4370-831e-3d17f9749caf",
+    "discogs": 1328,
+    "lastfm": "https://www.last.fm/music/Sven+V%C3%A4th",
+    "tags": [
+      "trance"
+    ],
+    "check": {
+      "frankfurt": "related"
+    },
+    "suggest": []
+  },
+  "Jam & Spoon": {
+    "musicbrainz": "a15988bf-2d7d-4576-9405-2352873bc5a4",
+    "discogs": 5886,
+    "lastfm": "https://www.last.fm/music/Jam+%26+Spoon",
+    "tags": [
+      "trance",
+      "ambient"
+    ],
+    "check": {
+      "frankfurt": "related"
+    },
+    "suggest": []
+  },
+  "Resistance D": {
+    "musicbrainz": "0f4af375-81a7-4ce7-8cf5-4840f53e916c",
+    "discogs": 1295,
+    "lastfm": "https://www.last.fm/music/Resistance+D",
+    "tags": [
+      "trance",
+      "acid trance",
+      "hard trance",
+      "tech trance"
+    ],
+    "check": {
+      "frankfurt": "confirmed"
+    },
+    "suggest": []
+  }
+}
