@@ -95,7 +95,7 @@ function EventEditor({ id, onSaved }) {
 
 // Venue-clock times: the API sends "2026-10-24T22:00:00", a datetime-local field wants "2026-10-24T22:00"
 const toField = (value) => (value ? value.slice(0, 16) : '')
-const emptySet = (startsAt = '') => ({ stage: '', artist: '', startsAt, endsAt: '' })
+const emptySet = (startsAt = '') => ({ stage: '', artist: '', startsAt, endsAt: '', genreId: '' })
 
 // The event's timetable: what was read from the line-up, to correct, or a new one written from scratch.
 // Saving makes it hand-set (the line-up no longer changes it); "Back to the line-up" undoes that.
@@ -108,7 +108,7 @@ function TimetableEditor({ id, onSaved }) {
 
     const show = (found) => {
         setTimetable(found)
-        setRows(found.sets.map(s => ({ stage: s.stage || '', artist: s.artist, startsAt: toField(s.startsAt), endsAt: toField(s.endsAt) })))
+        setRows(found.sets.map(s => ({ stage: s.stage || '', artist: s.artist, startsAt: toField(s.startsAt), endsAt: toField(s.endsAt), genreId: s.genreId || '' })))
         setDirty(false)
     }
 
@@ -152,6 +152,7 @@ function TimetableEditor({ id, onSaved }) {
         artist: r.artist.trim(),
         startsAt: r.startsAt || null,
         endsAt: r.endsAt || null,
+        genreId: r.genreId || null,
     }))))
 
     if (error && !timetable) return <p className="notice">{error}</p>
@@ -178,6 +179,16 @@ function TimetableEditor({ id, onSaved }) {
                             <span className="muted">–</span>
                             <input className="field w-auto" type="datetime-local" value={row.endsAt} aria-label="Ends (optional)"
                                 onChange={(e) => change(i, 'endsAt', e.target.value)} />
+                            {/* The set's genre sends its ship of the live fleet to that star */}
+                            <select className="field w-auto" value={row.genreId} aria-label="Genre of the set"
+                                onChange={(e) => change(i, 'genreId', e.target.value)}>
+                                <option value="">Genre: none</option>
+                                {SCENES.map(scene => (
+                                    <optgroup key={scene.name} label={scene.name}>
+                                        {scene.genres.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                                    </optgroup>
+                                ))}
+                            </select>
                             <button className="btn btn--ghost" onClick={() => remove(i)} aria-label={`Remove ${row.artist || 'this set'}`}>✕</button>
                         </div>
                     ))}

@@ -3,6 +3,7 @@ import { Application, BlurFilter, Container, Graphics, Text } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { data, festivals, genreById, genresOfArtist, labels, WORLD, type Genre } from '../data/types';
 import { buildFleets, HARBOUR, type MapEvent } from '../data/events';
+import { shipState, type LiveFleet } from '../data/liveFleet';
 
 interface Props {
   selectedId: string | null;
@@ -33,6 +34,12 @@ interface Props {
   cameraRef?: MutableRefObject<((x: number, y: number) => void) | null>;
   /** Site-wide "reduced motion": everything stands still and the camera jumps instead of flying */
   reducedMotion?: boolean;
+  /** Events with a timetable over several genres: one ship per genre, sailing to its star when the genre plays */
+  liveFleets?: LiveFleet[];
+  /** What time it is on the map, in ms since 1970: the real time, or the time of a fleet preview */
+  clockRef?: MutableRefObject<() => number>;
+  /** A fleet whose night is being previewed: the camera frames its ship and the stars its genre ships sail to */
+  framedFleet?: LiveFleet | null;
 }
 
 /** The visible part of the world, in world coordinates */
@@ -117,7 +124,7 @@ const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -131,6 +138,11 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   const fleetLinesRef = useRef<Graphics | null>(null);
   const harbourRef = useRef<{ node: Container; text: Text } | null>(null);
   const fleetsRef = useRef<Fleet[]>([]);
+  // Genre ships of the live fleets, moved every frame by the map clock
+  const liveShipsRef = useRef<{ fleet: LiveFleet; ship: LiveFleet['ships'][number]; node: Container; body: Graphics; label: Text }[]>([]);
+  const liveLayerRef = useRef<Container | null>(null);
+  const clockRefRef = useRef(clockRef);
+  clockRefRef.current = clockRef;
   const hoverFleetRef = useRef<MapEvent[] | null>(null);
   const selectedFleetRef = useRef(selectedFleet);
   selectedFleetRef.current = selectedFleet;
@@ -283,6 +295,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       harbour.on('pointertap', () => onSelectHarbourRef.current());
       harbour.visible = false;
       eventLayer.addChild(harbour);
+      const liveLayer = new Container();
+      eventLayer.addChild(liveLayer);
+      liveLayerRef.current = liveLayer;
       harbourRef.current = { node: harbour, text: harbourText };
 
       // Record labels: hexagon markers parked near the systems they release
@@ -472,6 +487,18 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
             sat.node.position.set(Math.cos(a) * sat.radius, Math.sin(a) * sat.radius);
           }
         }
+        // Live fleets: each genre ship sails from the event's ship to its star and docks while its genre plays
+        const now = clockRefRef.current?.current() ?? Date.now();
+        for (const live of liveShipsRef.current) {
+          const state = shipState(live.fleet, live.ship, now);
+          live.node.visible = showShips && state.visible;
+          if (!live.node.visible) continue;
+          live.node.position.set(state.x, state.y);
+          live.node.scale.set(Math.max(1, 0.9 / vp.scale.x));
+          live.node.alpha = state.phase === 'done' ? 0.35 : 1;
+          if (state.phase === 'sailing') live.body.rotation = Math.atan2(live.ship.y - live.fleet.port.y, live.ship.x - live.fleet.port.x);
+          live.label.text = state.phase === 'playing' ? `▸ ${genreById[live.ship.genreId].name}` : genreById[live.ship.genreId].name;
+        }
         if (harbourRef.current) harbourRef.current.node.scale.set(stationScale);
         for (const q of particles) {
           q.t = (q.t + dt / 4) % 1;
@@ -490,6 +517,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       // Destroyed with the app; an effect running before the next init must not touch them
       routesRef.current = [];
       fleetsRef.current = [];
+      liveShipsRef.current = [];
+      liveLayerRef.current = null;
       crewRef.current = null;
       eventLayerRef.current = null;
       fleetLinesRef.current = null;
@@ -674,6 +703,52 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   }, [events, ready]);
 
   useEffect(() => drawFleetLines.current(), [selectedFleet, ready]);
+
+  // Previewing a night: frame the event's ship and its genre ships' stars, close enough for ships to show
+  useEffect(() => {
+    const vp = viewportRef.current;
+    if (!vp || !framedFleet) return;
+    const pts = [framedFleet.port, ...framedFleet.ships];
+    const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
+    // Room on the right for the HUD
+    const scale = Math.max(SHIP_ZOOM + 0.05, Math.min(1.4, (vp.screenWidth - 440) / (x1 - x0 + 300), vp.screenHeight / (y1 - y0 + 300)));
+    vp.animate({ position: { x: (x0 + x1) / 2 + 200 / scale, y: (y0 + y1) / 2 }, scale, time: flight(800), ease: 'easeInOutSine' });
+  }, [framedFleet, ready]);
+
+  // The ships of the live fleets, one per genre; the ticker moves them
+  useEffect(() => {
+    const layer = liveLayerRef.current;
+    if (!layer) return;
+    for (const live of liveShipsRef.current) live.node.destroy({ children: true });
+    liveShipsRef.current = [];
+    for (const fleet of liveFleets) {
+      for (const ship of fleet.ships) {
+        const star = genreById[ship.genreId];
+        const color = hex(data.families[star.family].color);
+        const node = new Container();
+        // A ring around the ship sets the fleet apart from the event ships parked near the same star
+        const ring = new Graphics().circle(0, 0, 15).fill({ color, alpha: 0.18 }).stroke({ width: 1.5, color, alpha: 0.9 });
+        const body = new Graphics();
+        drawShip(body, 0, 0, color);
+        body.scale.set(0.8);
+        const label = new Text({
+          text: star.name,
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 10, fill: color },
+        });
+        label.anchor.set(0.5, 0);
+        label.position.set(0, 17);
+        node.addChild(ring, body, label);
+        node.visible = false;
+        node.eventMode = 'static';
+        node.cursor = 'pointer';
+        node.hitArea = { contains: (px: number, py: number) => px * px + py * py < 18 * 18 };
+        node.on('pointertap', () => onSelectFleetRef.current([fleet.eventId]));
+        layer.addChild(node);
+        liveShipsRef.current.push({ fleet, ship, node, body, label });
+      }
+    }
+  }, [liveFleets, ready]);
 
   // Camera flies to the opened ship or fleet, leaving room on the right for the HUD
   useEffect(() => {

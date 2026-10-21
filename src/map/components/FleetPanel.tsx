@@ -3,6 +3,7 @@ import { HudShell } from './Panel';
 import { data, genreById } from '../data/types';
 import { eventDates, type Boarded, type MapEvent } from '../data/events';
 import type { CrewMember } from '../galaxy/Galaxy';
+import { playingNow, type LiveFleet } from '../data/liveFleet';
 
 interface Props {
   /** The events of the fleet (one ship or several), or of the harbour */
@@ -15,6 +16,10 @@ interface Props {
   onSelectCrew: (member: CrewMember) => void;
   onSelect: (genreId: string) => void;
   onClose: () => void;
+  /** The boarded event's fleet when its timetable spans several genres */
+  liveFleet?: LiveFleet | null;
+  previewing?: boolean;
+  onPreview?: () => void;
 }
 
 const SOURCE_TEXT = {
@@ -24,7 +29,7 @@ const SOURCE_TEXT = {
 } as const;
 
 /** HUD for ships: each event with its date, place and the genres its crew plays */
-export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onSelectCrew, onSelect, onClose }: Props) {
+export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onSelectCrew, onSelect, onClose, liveFleet, previewing, onPreview }: Props) {
   const main = events[0]?.genres[0] ? genreById[events[0].genres[0].genreId] : null;
   const color = main ? data.families[main.family].color : '#9a94b8';
   return (
@@ -66,6 +71,9 @@ export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onS
           </li>
         ))}
       </ul>
+      {events.length === 1 && !harbour && liveFleet && (
+        <LiveFleetSection fleet={liveFleet} previewing={!!previewing} onPreview={onPreview} onSelect={onSelect} />
+      )}
       {events.length === 1 && !harbour && (
         <>
           {loadingCrew && <p className="hud__muted">Boarding…</p>}
@@ -98,5 +106,43 @@ export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onS
         </>
       )}
     </HudShell>
+  );
+}
+
+const TIME = new Intl.DateTimeFormat('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+
+/** One ship per genre of the timetable: which sail when, which one is docked at its star right now */
+function LiveFleetSection({ fleet, previewing, onPreview, onSelect }: {
+  fleet: LiveFleet; previewing: boolean; onPreview?: () => void; onSelect: (genreId: string) => void;
+}) {
+  const now = Date.now();
+  const playing = new Set(playingNow(fleet, now).map((s) => s.genreId));
+  const live = now >= fleet.launch && now <= fleet.end;
+  return (
+    <>
+      <div className="hud__label">Fleet · {fleet.ships.length} genres {live && <span className="fleet__live">● live</span>}</div>
+      <ul className="fleet__ships">
+        {fleet.ships.map((ship) => {
+          const genre = genreById[ship.genreId];
+          return (
+            <li key={ship.genreId} style={{ ['--c' as string]: data.families[genre.family].color }}>
+              <button className="hud__chip" onClick={() => onSelect(ship.genreId)}>
+                {playing.has(ship.genreId) ? '▸ ' : ''}{genre.name}
+              </button>
+              <span className="fleet__when">{TIME.format(ship.arrive)}–{TIME.format(ship.leave).split(' ')[1]}</span>
+              <span className="fleet__who">{ship.artists.slice(0, 3).join(', ')}{ship.artists.length > 3 ? '…' : ''}</span>
+            </li>
+          );
+        })}
+      </ul>
+      <p className="hud__muted fleet__hint">
+        {live ? 'Each ship docks at its star while its genre plays.' : 'The fleet sets out an hour before the first set.'} Times in your time zone.
+      </p>
+      {onPreview && (
+        <button className="fleet__board" onClick={onPreview} disabled={previewing}>
+          {previewing ? 'Sailing through the night…' : '▶ Preview the night'}
+        </button>
+      )}
+    </>
   );
 }

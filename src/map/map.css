@@ -479,3 +479,11 @@
 .hud__fix { text-decoration: none; }
 /* While the placements load, before the galaxy is drawn */
 .map-loading { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; font: 12px var(--mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }
+
+/* Live fleet in the ship HUD: one row per genre ship */
+.fleet__ships { list-style: none; padding: 0; margin: 0 0 6px; display: grid; gap: 6px; }
+.fleet__ships li { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; align-items: center; }
+.fleet__ships .hud__chip { border-color: var(--c); }
+.fleet__when { font: 11px var(--mono); color: var(--fg); }
+.fleet__who { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
+.fleet__live { color: #ff6b8b; margin-left: 6px; }

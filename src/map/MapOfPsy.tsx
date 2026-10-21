@@ -17,6 +17,7 @@ import { LabelsMenu } from './components/LabelsMenu';
 import { FleetPanel } from './components/FleetPanel';
 import { loadPlacements, placementsApplied } from './data/placements';
 import { fetchMapEvents, mapArtistBySlug, type Boarded, type EventPeriod, type MapEvent } from './data/events';
+import { buildLiveFleets, fetchMapTimetables, type Timetable } from './data/liveFleet';
 import { usePlaylist } from './hooks/usePlaylist';
 import {
   data, festivalById, genreById, genresOfArtist, genresOfLabel, labels, randomTrack, stopTrack, type Tour, type Track,
@@ -32,11 +33,14 @@ function readUrl() {
   const artist = q.get('artist');
   const festival = q.get('festival');
   const label = q.get('label');
+  const ship = Number(q.get('ship'));
   return {
     genre: genre && genreById[genre] ? genre : null,
     artist: genre && artist && genresOfArtist(artist).some((g) => g.id === genre) ? artist : null,
     festival: festival && festivalById[festival] ? festival : null,
     label: label && labels[label] ? label : null,
+    // ?ship=118452 opens that event's ship once the events are loaded
+    ship: Number.isInteger(ship) && ship > 0 ? ship : null,
   };
 }
 
@@ -72,7 +76,8 @@ function MapOfPsy() {
   const [timeTravel, setTimeTravel] = useState(false);
   const [menu, setMenu] = useState(false);
   // Upcoming events as ships: which period, the events, and the open fleet or harbour
-  const [period, setPeriod] = useState<EventPeriod | null>('WEEK');
+  // A shared ship may sail later than this week, so its link opens the month
+  const [period, setPeriod] = useState<EventPeriod | null>(initial.ship ? 'MONTH' : 'WEEK');
   const [events, setEvents] = useState<MapEvent[] | null>(null);
   const [fleet, setFleet] = useState<number[] | null>(null);
   const [harbour, setHarbour] = useState(false);
@@ -111,6 +116,45 @@ function MapOfPsy() {
     const onMap = member.slug ? mapArtistBySlug(member.slug) : null;
     if (onMap) reveal(onMap.genreId, onMap.name);
     else if (member.slug) navigate(`/artists/${encodeURIComponent(member.slug)}`, { state: { name: member.name } });
+  };
+
+  // A shared ship link: board that ship as soon as its event is on the map
+  const sharedShip = useRef(initial.ship);
+  useEffect(() => {
+    const id = sharedShip.current;
+    if (id === null || !events) return;
+    sharedShip.current = null;
+    if (events.some((e) => e.id === id)) setFleet([id]);
+  }, [events]);
+
+  // Timetables of the period's events: festivals over several genres get a live fleet, one ship per genre
+  const [timetables, setTimetables] = useState<Timetable[]>([]);
+  useEffect(() => {
+    if (!period) { setTimetables([]); return; }
+    let current = true;
+    fetchMapTimetables(period)
+      .then((list) => { if (current) setTimetables(list); })
+      .catch(() => { if (current) setTimetables([]); });
+    return () => { current = false; };
+  }, [period]);
+  // A set's genre is its artist's genre on the map; the map only opens once the placements are loaded (MapHome)
+  const liveFleets = useMemo(() => (events ? buildLiveFleets(events, timetables) : []), [events, timetables]);
+
+  // The map clock: the real time, or a fleet preview that plays a whole night in a few seconds
+  const PREVIEW_MS = 14_000;
+  const [preview, setPreview] = useState<{ eventId: number; startedAt: number; from: number; to: number } | null>(null);
+  const clockRef = useRef<() => number>(() => Date.now());
+  clockRef.current = preview
+    ? () => preview.from + Math.min(1, (Date.now() - preview.startedAt) / PREVIEW_MS) * (preview.to - preview.from)
+    : () => Date.now();
+  useEffect(() => {
+    if (!preview) return;
+    const id = window.setTimeout(() => setPreview(null), PREVIEW_MS + 1500);
+    return () => window.clearTimeout(id);
+  }, [preview]);
+  const startPreview = (eventId: number) => {
+    const live = liveFleets.find((f) => f.eventId === eventId);
+    if (live) setPreview({ eventId, startedAt: Date.now(), from: live.launch, to: live.end });
   };
 
   useEffect(() => {
@@ -155,11 +199,12 @@ function MapOfPsy() {
     if (selectedId && artist) q.set('artist', artist);
     if (festival) q.set('festival', festival);
     if (label) q.set('label', label);
+    if (fleet?.length === 1) q.set('ship', String(fleet[0]));
     const url = q.size ? `?${q}` : window.location.pathname;
     window.history.replaceState(null, '', url);
     const name = artist ?? (festival ? festivalById[festival].name : null) ?? label ?? (selectedId ? genreById[selectedId].name : null);
     document.title = name ? `${name} · Map of Psy` : 'Map of Psy · psy galaxy + event tracker';
-  }, [selectedId, artist, festival, label]);
+  }, [selectedId, artist, festival, label, fleet]);
 
   const clearFocus = () => {
     setFleet(null);
@@ -262,7 +307,9 @@ function MapOfPsy() {
         showLabels={showLabels} onSelectLabel={openLabel}
         events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour}
         crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew}
-        onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion} />
+        onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion}
+        liveFleets={liveFleets} clockRef={clockRef}
+        framedFleet={preview ? liveFleets.find((f) => f.eventId === preview.eventId) ?? null : null} />
 
       <header className="topbar">
         <div className="brand">
@@ -322,6 +369,9 @@ function MapOfPsy() {
         <FleetPanel events={fleetEvents} harbour={harbour} onSelect={select}
           boarded={currentBoarded} loadingCrew={boardedId !== null && !currentBoarded}
           onBoard={(id) => openFleet([id])} onSelectCrew={selectCrew}
+          liveFleet={boardedId !== null ? liveFleets.find((f) => f.eventId === boardedId) ?? null : null}
+          previewing={preview !== null && preview.eventId === boardedId}
+          onPreview={() => boardedId !== null && startPreview(boardedId)}
           onClose={() => { setFleet(null); setHarbour(false); }} />
       ) : (
       <Panel genreId={selectedId} artist={artist} festival={festival} label={label}
