@@ -183,7 +183,7 @@ function sheetHtml(g: Genre, n: ProducerNotes) {
   </div>
 </section>
 
-<footer><span>Map of Psy · psytrance galaxy + event tracker</span><span>Rules of thumb: many great tracks break them.</span></footer>
+<footer><span>Map of Psy · psy galaxy + event tracker</span><span>Rules of thumb: many great tracks break them.</span></footer>
 <script>document.fonts.ready.then(() => setTimeout(() => window.print(), 150));</script>
 </body></html>`;
 }
