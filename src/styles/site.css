@@ -136,7 +136,9 @@ a { color: inherit; }
 .field::placeholder { color: var(--muted); opacity: 0.8; }
 .field:focus { outline: none; border-color: var(--accent); }
 select.field { cursor: pointer; }
-select.field option { background: var(--hud-solid); }
+select.field option { background: var(--hud-solid); color: var(--fg); }
+/* Group labels in a dropdown (the scenes in "+ Add genre"): readable on the dark list */
+select.field optgroup { background: var(--hud-solid); color: var(--accent); font-style: normal; }
 
 .chip {
   font: 12px var(--mono); color: var(--soft); background: transparent; border: 1px solid var(--line);
