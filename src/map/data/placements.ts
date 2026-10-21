@@ -10,10 +10,15 @@ let loading: Promise<void> | null = null;
 
 export const placementsApplied = () => applied;
 
+// The galaxy waits this long at most: a sleeping free-tier backend takes minutes to wake, and the placements in
+// genres.json are close enough for that visit
+const WAIT_MS = 4000;
+
 /** Loads the placements once and puts them into the map data before the galaxy is drawn */
 export function loadPlacements(): Promise<void> {
   if (!loading) {
-    loading = fetchPlacements()
+    // Aborted after WAIT_MS, so a late answer never changes the data under a galaxy that is already drawn
+    loading = fetchPlacements(AbortSignal.timeout(WAIT_MS))
       .then((byGenre: Record<string, string[]>) => {
         for (const genre of data.genres) genre.artists = byGenre[genre.id] ?? [];
         indexMapArtists();

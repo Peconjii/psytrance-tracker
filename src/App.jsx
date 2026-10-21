@@ -21,6 +21,7 @@ import AdminGenres from './pages/AdminGenres'
 import AdminHistory from './pages/AdminHistory'
 import AdminEvents from './pages/AdminEvents'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminRoute from './components/AdminRoute'
 
 // The home page is the galaxy map, which fills the window under the navbar, so it has no footer
 function Shell() {
@@ -61,39 +62,11 @@ function Shell() {
               </ProtectedRoute>
             }
           />
-          {/* For admins; the page and the backend both check it */}
-          <Route
-            path="/admin/feedback"
-            element={
-              <ProtectedRoute>
-                <AdminFeedback />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/genres"
-            element={
-              <ProtectedRoute>
-                <AdminGenres />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/events"
-            element={
-              <ProtectedRoute>
-                <AdminEvents />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/history"
-            element={
-              <ProtectedRoute>
-                <AdminHistory />
-              </ProtectedRoute>
-            }
-          />
+          {/* For admins; the backend checks it again on every request */}
+          <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
+          <Route path="/admin/genres" element={<AdminRoute><AdminGenres /></AdminRoute>} />
+          <Route path="/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />
+          <Route path="/admin/history" element={<AdminRoute><AdminHistory /></AdminRoute>} />
         </Routes>
       </main>
 

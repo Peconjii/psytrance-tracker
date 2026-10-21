@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { sendFeedback } from '../api/backend.js'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { isSitePath } from '../components/sitePath.js'
 
 const KINDS = [
     { value: 'CORRECTION', label: 'Correct the data', hint: 'A genre, artist, festival or event is wrong or missing' },
@@ -20,6 +21,8 @@ function Feedback() {
     usePageMeta({ title: 'Feedback', path: '/feedback', noindex: true })
     const { user } = useAuth()
     const [params] = useSearchParams()
+    // Only a page of this site: the link could come from anywhere, and admins open it from the inbox
+    const from = isSitePath(params.get('from')) ? params.get('from') : null
 
     const initialKind = KINDS.some(k => k.value === params.get('kind')) ? params.get('kind') : 'SUGGESTION'
     const initialAbout = ABOUT_LABELS[params.get('about')] && params.get('ref')
@@ -48,7 +51,7 @@ function Feedback() {
                 kind,
                 aboutType: about?.type || null,
                 aboutRef: about?.ref || null,
-                pageUrl: params.get('from') || null,
+                pageUrl: from,
                 message: message.trim(),
                 email: email.trim() || null,
                 website,
@@ -75,7 +78,7 @@ function Feedback() {
                         before the map changes{email.trim() ? ', and we may write back to you' : ''}.
                     </p>
                     <div className="flex flex-wrap gap-2 mt-4">
-                        {params.get('from') && <Link to={params.get('from')} className="btn">Back where I was</Link>}
+                        {from && <Link to={from} className="btn">Back where I was</Link>}
                         <Link to="/" className="btn btn--ghost">To the galaxy</Link>
                     </div>
                 </div>

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import { fetchFeedback, setFeedbackStatus } from '../api/backend.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import AdminTabs from '../components/AdminTabs'
+import { isSitePath } from '../components/sitePath.js'
 
 const STATUSES = [
     { value: 'NEW', label: 'New' },
@@ -14,18 +14,15 @@ const STATUSES = [
 const KIND_LABELS = { CORRECTION: 'Correction', COMPLAINT: 'Broken', SUGGESTION: 'Improvement', IDEA: 'Idea', OTHER: 'Other' }
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
-// Admins read and sort the feedback here. The backend checks the admin rights on every request;
-// this page only hides itself from everyone else.
+// Admins read and sort the feedback here (the route is admin only, see AdminRoute)
 function AdminFeedback() {
     usePageMeta({ title: 'Feedback inbox', path: '/admin/feedback', noindex: true })
-    const { user } = useAuth()
     const [filter, setFilter] = useState('NEW')
     // Tagged with the filter it belongs to, so switching never shows the old list as the new one
     const [loaded, setLoaded] = useState({ filter: null, items: [], error: null })
     const [saving, setSaving] = useState(null)
 
     useEffect(() => {
-        if (!user?.admin) return
         const controller = new AbortController()
         fetchFeedback(filter || null, controller.signal)
             .then(items => setLoaded({ filter, items, error: null }))
@@ -35,15 +32,7 @@ function AdminFeedback() {
                 }
             })
         return () => controller.abort()
-    }, [filter, user?.admin])
-
-    if (!user?.admin) {
-        return (
-            <div className="page page--narrow">
-                <p className="notice">This page is for admins.</p>
-            </div>
-        )
-    }
+    }, [filter])
 
     const changeStatus = async (item, status) => {
         setSaving(item.id)
@@ -100,7 +89,7 @@ function AdminFeedback() {
                                     {item.username ? `@${item.username}` : 'Guest'}
                                     {item.email && <> · <a className="link" href={`mailto:${item.email}`}>{item.email}</a></>}
                                 </span>
-                                {item.pageUrl && <Link className="link mono text-xs" to={item.pageUrl}>Open the page →</Link>}
+                                {isSitePath(item.pageUrl) && <Link className="link mono text-xs" to={item.pageUrl}>Open the page →</Link>}
                                 {/* Event feedback is about "<name> (#<id>)" */}
                                 {item.aboutType === 'EVENT' && /#(\d+)\)$/.test(item.aboutRef ?? '') && (
                                     <Link className="link mono text-xs"

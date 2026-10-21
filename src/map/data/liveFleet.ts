@@ -54,7 +54,7 @@ export interface LiveFleet {
 }
 
 const HOUR = 3_600_000;
-// A set without an end lasts until the next one, or this long when it is the last one
+// A set without an end lasts until the next one on its stage, or this long when it is the last one
 const LAST_SET = 1.5 * HOUR;
 // Ships dock this far from their star, each fleet at its own angle so two fleets don't sit on each other
 const DOCK_DISTANCE = 110;
@@ -85,7 +85,8 @@ export function buildLiveFleets(events: MapEvent[], timetables: Timetable[]): Li
       const genreId = mapArtistBySlug(set.artistSlug)?.genreId ?? set.genreId ?? undefined;
       if (!genreId || !genreById[genreId]) return;
       const start = times[i];
-      const later = times.filter((t) => t > start);
+      // The next set on the same stage: another floor's set doesn't end this one
+      const later = times.filter((t, j) => t > start && timetable.sets[j].stage === set.stage);
       const end = set.endsAt ? venueTime(set.endsAt, timetable.utcOffsetMinutes)
         : later.length ? Math.min(...later) : start + LAST_SET;
       const ship = genres.get(genreId);

@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import { fetchAdminChanges, undoAdminChange } from '../api/backend.js'
 import { reloadPlacementsLater } from '../map/data/placements'
 import AdminTabs from '../components/AdminTabs'
@@ -21,7 +20,6 @@ const targetLink = (change) => change.kind.startsWith('EVENT_')
 // The backend refuses an undo that would throw away a newer change of the same artist.
 function AdminHistory() {
     usePageMeta({ title: 'Admin history', path: '/admin/history', noindex: true })
-    const { user } = useAuth()
     const [changes, setChanges] = useState(null)
     const [error, setError] = useState('')
     const [undoing, setUndoing] = useState(null)
@@ -31,15 +29,10 @@ function AdminHistory() {
         .catch(err => { if (!signal?.aborted) setError(err.response?.data?.message || 'Could not load the history.') })
 
     useEffect(() => {
-        if (!user?.admin) return
         const controller = new AbortController()
         load(controller.signal)
         return () => controller.abort()
-    }, [user?.admin])
-
-    if (!user?.admin) {
-        return <div className="page page--narrow"><p className="notice">This page is for admins.</p></div>
-    }
+    }, [])
 
     const undo = async (change) => {
         setUndoing(change.id)

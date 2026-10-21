@@ -1,30 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
-import { mergeArtists, searchAdminArtists, setArtistGenres, setArtistHidden, setFeedbackStatus } from '../api/backend.js'
-import { data, genreById } from '../map/data/types'
+import { mergeArtists, searchAdminArtists, setArtistGenres, setArtistHidden } from '../api/backend.js'
 import { reloadPlacementsLater } from '../map/data/placements'
 import AdminTabs from '../components/AdminTabs'
+import { AddGenre, FeedbackBanner, GenreChip } from '../components/AdminParts'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
-
-// Genres grouped by scene, for the "add genre" picker
-const SCENES = Object.entries(data.families).map(([id, family]) => ({
-    name: family.name,
-    genres: data.genres.filter(g => g.family === id),
-}))
-
-function GenreChip({ id, onRemove, disabled }) {
-    const genre = genreById[id]
-    const color = genre ? data.families[genre.family].color : 'var(--muted)'
-    return (
-        <span className="genre-chip inline-flex items-center gap-2" style={{ '--c': color }}>
-            {genre?.name ?? id}
-            <button type="button" onClick={onRemove} disabled={disabled} aria-label={`Remove ${genre?.name ?? id}`}
-                className="bg-transparent border-0 p-0 cursor-pointer" style={{ color }}>✕</button>
-        </span>
-    )
-}
 
 // One artist: their genres, with remove and add. Every change is saved at once and logged on the backend.
 function ArtistRow({ artist, onSaved, onGone }) {
@@ -64,17 +45,8 @@ function ArtistRow({ artist, onSaved, onGone }) {
                     <GenreChip key={id} id={id} disabled={saving}
                         onRemove={() => save(artist.genres.filter(g => g !== id))} />
                 ))}
-                <select className="field admin-artist__add" value="" disabled={saving} aria-label={`Add a genre to ${artist.name}`}
-                    onChange={(e) => e.target.value && save([...artist.genres, e.target.value])}>
-                    <option value="">+ Add genre</option>
-                    {SCENES.map(scene => (
-                        <optgroup key={scene.name} label={scene.name}>
-                            {scene.genres.filter(g => !artist.genres.includes(g.id)).map(g => (
-                                <option key={g.id} value={g.id}>{g.name}</option>
-                            ))}
-                        </optgroup>
-                    ))}
-                </select>
+                <AddGenre exclude={artist.genres} disabled={saving} label={`Add a genre to ${artist.name}`}
+                    onAdd={(id) => save([...artist.genres, id])} />
                 {saving && <span className="mono text-xs muted">Saving…</span>}
             </div>
             {!artist.onMap && <CleanupTools artist={artist} onGone={onGone} />}
@@ -132,7 +104,6 @@ function CleanupTools({ artist, onGone }) {
 // Opened from the feedback inbox as /admin/genres?artist=Fungus%20Funk
 function AdminGenres() {
     usePageMeta({ title: 'Artist genres', path: '/admin/genres', noindex: true })
-    const { user } = useAuth()
     const [params] = useSearchParams()
     const [search, setSearch] = useState(params.get('artist') || '')
     const debounced = useDebouncedValue(search.trim(), 300)
@@ -142,10 +113,9 @@ function AdminGenres() {
     const feedbackId = params.get('feedback')
     const [fixed, setFixed] = useState(false)
     const [note, setNote] = useState('')
-    const [feedbackState, setFeedbackState] = useState('open')
 
     useEffect(() => {
-        if (!user?.admin || debounced.length < 2) return
+        if (debounced.length < 2) return
         const controller = new AbortController()
         searchAdminArtists(debounced, controller.signal)
             .then(artists => setResult({ search: debounced, artists, error: null }))
@@ -155,26 +125,12 @@ function AdminGenres() {
                 }
             })
         return () => controller.abort()
-    }, [debounced, user?.admin])
-
-    if (!user?.admin) {
-        return <div className="page page--narrow"><p className="notice">This page is for admins.</p></div>
-    }
-
-    const markDone = async () => {
-        setFeedbackState('saving')
-        try {
-            await setFeedbackStatus(feedbackId, 'DONE')
-            setFeedbackState('done')
-        } catch {
-            setFeedbackState('error')
-        }
-    }
+    }, [debounced])
 
     const replace = (updated) => {
         setFixed(true)
         setResult(prev => ({
-        ...prev,
+            ...prev,
             artists: prev.artists.map(a => (a.slug === updated.slug ? updated : a)),
         }))
     }
@@ -198,23 +154,7 @@ function AdminGenres() {
             </header>
             <AdminTabs />
 
-            {feedbackId && (
-                <div className="panel mb-6" style={{ '--fam': 'var(--gold)' }}>
-                    {feedbackState === 'done' ? (
-                        <p className="m-0">Feedback #{feedbackId} is marked as done. <Link className="link" to="/admin/feedback">Back to the inbox →</Link></p>
-                    ) : (
-                        <div className="flex flex-wrap items-center gap-3">
-                            <span>{fixed ? 'Saved. Is feedback #' + feedbackId + ' sorted now?' : 'Fixing feedback #' + feedbackId + '.'}</span>
-                            {fixed && (
-                                <button className="btn btn--primary" onClick={markDone} disabled={feedbackState === 'saving'}>
-                                    {feedbackState === 'saving' ? 'Saving…' : 'Mark as done'}
-                                </button>
-                            )}
-                            {feedbackState === 'error' && <span className="notice m-0">Could not change the status. Try again.</span>}
-                        </div>
-                    )}
-                </div>
-            )}
+            {feedbackId && <FeedbackBanner feedbackId={feedbackId} fixed={fixed} />}
 
             <div className="panel mb-6">
                 <label htmlFor="admin-artist-search" className="field-label">Artist</label>
@@ -226,10 +166,10 @@ function AdminGenres() {
 
             {debounced.length < 2 ? (
                 <p className="muted">Type at least two letters.</p>
-            ) : result.error ? (
-                <p className="notice">{result.error}</p>
             ) : result.search !== debounced ? (
                 <p className="mono text-xs muted">Searching…</p>
+            ) : result.error ? (
+                <p className="notice">{result.error}</p>
             ) : result.artists.length === 0 ? (
                 <div className="empty"><p><strong>No artist with that name on the map or in the line-ups.</strong></p></div>
             ) : (
