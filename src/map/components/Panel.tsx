@@ -28,8 +28,9 @@ interface Props {
 }
 
 /** HUD container; on phones it is a bottom sheet that can be folded down to its header */
-export function HudShell({ className, style, children }: { className: string; style?: CSSProperties; children: ReactNode }) {
-  const [folded, setFolded] = useState(false);
+export function HudShell({ className, style, children, foldOnPhone = false }: { className: string; style?: CSSProperties; children: ReactNode; foldOnPhone?: boolean }) {
+  // The help panel starts folded on phones, where open it would cover most of the map
+  const [folded, setFolded] = useState(() => foldOnPhone && window.matchMedia('(max-width: 700px)').matches);
   return (
     <aside className={folded ? `${className} is-folded` : className} style={style}>
       <button className="hud__fold" onClick={() => setFolded((f) => !f)} aria-expanded={!folded}>
@@ -179,7 +180,7 @@ export function Panel({
 
   if (!genreId) {
     return (
-      <HudShell className="hud hud--idle">
+      <HudShell className="hud hud--idle" foldOnPhone>
         <div className="hud__tag">// NAVIGATION</div>
         <p>Drag to move, scroll or pinch to zoom. Click anything on the map to open it here.</p>
         <dl className="hud__specs hud__legend">
@@ -188,7 +189,7 @@ export function Panel({
           <dt>▲3</dt>
           <dd>Events this week (or month) that play the genre. Switch in the ship console, bottom left.</dd>
           <dt>▲ SHIP</dt>
-          <dd>An upcoming party, parked between the stars of the genres its line-up plays. Hover to see its course.</dd>
+          <dd>An upcoming party, parked between the stars of the genres its line-up plays. Hover or tap to see its course.</dd>
           <dt>▲▲ ×4</dt>
           <dd>A fleet: several parties that sound alike.</dd>
           <dt>⚓ HARBOUR</dt>
