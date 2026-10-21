@@ -1,0 +1,20 @@
+{
+  // Type checks the TypeScript part of the site (the Map of Psy code in src/map). Vite only strips the
+  // types when it builds, so `npm run typecheck` is what catches type errors. The rest of the site is JS.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
+    "types": ["vite/client"]
+  },
+  "include": ["src/map"]
+}
