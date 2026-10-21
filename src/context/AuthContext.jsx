@@ -22,9 +22,16 @@ export function AuthProvider({ children }) {
                     const response = await api.get('/api/auth/me')
                     setUser(response.data)
                 } catch (err) {
-                    console.error("Failed to authenticate token, resetting state:", err)
-                    localStorage.removeItem('token')
-                    setToken(null)
+                    const status = err.response?.status
+                    if (status === 401 || status === 403) {
+                        // The token expired or is not valid: log out
+                        console.error("Failed to authenticate token, resetting state:", err)
+                        localStorage.removeItem('token')
+                        setToken(null)
+                    } else {
+                        // The backend is asleep or unreachable: keep the token, the next page load tries again
+                        console.warn("Could not check the saved login, keeping it:", err)
+                    }
                     setUser(null)
                 }
             }
