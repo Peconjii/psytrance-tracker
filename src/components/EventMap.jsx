@@ -1,19 +1,8 @@
 import { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
+import { eventPin } from './mapPins.js'
 import { DARK_TILES_URL, DARK_TILES_ATTRIBUTION, DARK_TILES_MAX_ZOOM } from './mapTiles.js'
-
-import markerIconPng from 'leaflet/dist/images/marker-icon.png'
-import markerShadowPng from 'leaflet/dist/images/marker-shadow.png'
-
-const customIcon = new L.Icon({
-    iconUrl: markerIconPng,
-    shadowUrl: markerShadowPng,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34]
-})
 
 function EventMap({ lat, lon, partyName, locationName }) {
     const [coords, setCoords] = useState(lat && lon ? [parseFloat(lat), parseFloat(lon)] : null)
@@ -70,7 +59,7 @@ function EventMap({ lat, lon, partyName, locationName }) {
                     url={DARK_TILES_URL}
                     maxZoom={DARK_TILES_MAX_ZOOM}
                 />
-                <Marker position={coords} icon={customIcon}>
+                <Marker position={coords} icon={eventPin}>
                     <Popup>
                         <strong>{partyName}</strong><br />
                         <span className="muted">{locationName}</span>

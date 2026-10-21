@@ -248,6 +248,13 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .leaflet-control-attribution a { color: var(--soft) !important; }
 .leaflet-bar a { background: var(--hud-solid); color: var(--fg); border-color: var(--line); }
 .leaflet-bar a:hover { background: #1b1838; color: var(--accent); }
+/* Event pins (components/mapPins.js): a small star with a ring and a soft glow, like the galaxy's stars */
+.leaflet-div-icon.map-pin-wrap { background: none; border: 0; }
+.map-pin { display: block; width: var(--pin-size); height: var(--pin-size); border-radius: 50%; cursor: pointer;
+  background: radial-gradient(circle, #fff 0 18%, var(--pin) 22% 42%, transparent 46%);
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--pin) 55%, transparent), 0 0 12px 2px color-mix(in srgb, var(--pin) 45%, transparent);
+  transition: transform 0.15s; }
+.map-pin:hover { transform: scale(1.35); }
 
 @media (prefers-reduced-motion: reduce) {
   .skeleton { animation: none; }

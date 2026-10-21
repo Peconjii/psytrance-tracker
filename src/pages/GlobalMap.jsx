@@ -3,29 +3,10 @@ import { Link } from 'react-router-dom'
 import { fetchMapEvents } from '../api/backend.js'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-import L from 'leaflet'
+import { eventPin, matchPin } from '../components/mapPins.js'
 import { DARK_TILES_URL, DARK_TILES_ATTRIBUTION, DARK_TILES_MAX_ZOOM } from '../components/mapTiles.js'
 
-import markerIconPng from 'leaflet/dist/images/marker-icon.png'
-import markerShadowPng from 'leaflet/dist/images/marker-shadow.png'
 import usePageMeta from '../hooks/usePageMeta.js'
-
-const defaultIcon = new L.Icon({
-    iconUrl: markerIconPng,
-    shadowUrl: markerShadowPng,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34]
-})
-
-// Orange pin for events that match the search
-const highlightIcon = new L.Icon({
-    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
-    shadowUrl: markerShadowPng,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34]
-})
 
 // Leaflet's map object is only reachable from a child of MapContainer, hence this tiny component
 function MapFlyTo({ targetCoords }) {
@@ -161,7 +142,7 @@ function GlobalMap() {
                                 <Marker
                                     key={event.id}
                                     position={[event.lat, event.lon]}
-                                    icon={highlighted ? highlightIcon : defaultIcon}
+                                    icon={highlighted ? matchPin : eventPin}
                                     opacity={searchTerm.trim() ? (highlighted ? 1.0 : 0.3) : 1.0}
                                 >
                                     <Popup>
