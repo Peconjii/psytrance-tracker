@@ -17,8 +17,9 @@ function Login() {
         try {
             await login(username, password)
             navigate('/events')
-        } catch {
-            setError('Invalid username or password')
+        } catch (err) {
+            // 429: too many wrong passwords for this username, the backend says how long to wait
+            setError(err.response?.status === 429 ? err.response.data?.message : 'Invalid username or password')
         }
     }
 
