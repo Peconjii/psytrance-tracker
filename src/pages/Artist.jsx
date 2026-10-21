@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchArtist, fetchGenresForEvents, fetchGoingForEvents } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import EventTicket from '../components/EventTicket.jsx'
+import FollowButton from '../components/FollowButton.jsx'
 import { TicketSkeletons } from '../components/EventFeed.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -83,7 +84,9 @@ function Artist() {
                         </p>
                     )}
                 </div>
-                <div className="flex gap-2 shrink-0 self-start sm:self-center">
+                <div className="flex flex-wrap gap-2 shrink-0 self-start sm:self-center">
+                    {/* Only artists from the line-ups can be followed: they are the ones with gigs */}
+                    {artist && <FollowButton slug={artist.slug} name={artist.name} />}
                     <Link className="btn btn--ghost" title="Wrong name or not an artist? Tell us"
                         to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'ARTIST', ref: name, from: `/artists/${slug}` })}`}>
                         ✎ Report

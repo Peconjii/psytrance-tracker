@@ -40,6 +40,8 @@ interface Props {
   clockRef?: MutableRefObject<() => number>;
   /** A fleet whose night is being previewed: the camera frames its ship and the stars its genre ships sail to */
   framedFleet?: LiveFleet | null;
+  /** Events where artists the user follows play (event id -> their names): those ships are gold */
+  followedEvents?: ReadonlyMap<number, string[]>;
 }
 
 /** The visible part of the world, in world coordinates */
@@ -102,6 +104,8 @@ interface Fleet {
   particles: { x: number; y: number; vx: number; vy: number; age: number }[];
   spawn: number;
   phase: number;
+  /** Rings around a ship with an artist the user follows, redrawn every frame */
+  halo: Graphics | null;
 }
 
 const hex = (c: string) => parseInt(c.slice(1), 16);
@@ -112,6 +116,25 @@ const STATION_NAME_ZOOM = 0.5;
 const ORBIT_SPEED = 0.05;
 /** Zoom level from which ships are drawn; further out, the stars show how many events they have */
 const SHIP_ZOOM = 0.7;
+/** How long one ring of a followed ship's halo takes to spread out and fade, in seconds */
+const HALO_PERIOD = 2.2;
+
+/**
+ * The halo of a ship with an artist the user follows: two rings in the ship's color keep spreading out from it,
+ * like a sonar ping, around a fixed white ring. `t` (0..1) is how far the first ring has spread.
+ */
+function drawHalo(g: Graphics, color: number, t: number | null) {
+  g.clear();
+  g.circle(0, 0, 15).stroke({ width: 1.2, color: 0xffffff, alpha: 0.55 });
+  // Reduced motion: one still ring a little further out
+  if (t === null) {
+    g.circle(0, 0, 24).stroke({ width: 1.5, color, alpha: 0.5 });
+    return;
+  }
+  for (const p of [t, (t + 0.5) % 1]) {
+    g.circle(0, 0, 15 + p * 24).stroke({ width: 1.5, color, alpha: 0.75 * (1 - p) });
+  }
+}
 
 const shortName = (name: string) => (name.length > 26 ? name.slice(0, 25).trimEnd() + '…' : name);
 
@@ -124,7 +147,7 @@ const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null, followedEvents }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -449,6 +472,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           if (!showShips) continue;
           // Ships float gently, each on its own beat
           f.body.y = Math.sin(time * 1.6 + f.phase) * 2.5;
+          if (f.halo) drawHalo(f.halo, f.color, still ? null : ((time / HALO_PERIOD) + f.phase) % 1);
           if (still) {
             f.particles = [];
             f.trail.clear();
@@ -647,6 +671,13 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       node.position.set(x, y);
       const main = genreById[mainGenre];
       const color = hex(data.families[main.family].color);
+      // A ship with an artist the user follows gets a halo (animated in the ticker)
+      const followed = fleetEvents.some((e) => followedEvents?.has(e.id));
+      const halo = followed ? new Graphics() : null;
+      if (halo) {
+        drawHalo(halo, color, null);
+        node.addChild(halo);
+      }
 
       // The ships point at the star of the main genre: they sail towards their sound.
       // Facing left they are mirrored, so the cockpit stays on top.
@@ -668,7 +699,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       if (fleetEvents.length === 1) {
         addShip(0, 0);
         name = new Text({
-          text: shortName(fleetEvents[0].nameParty),
+          text: (followed ? '★ ' : '') + shortName(fleetEvents[0].nameParty),
           style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xe9e6ff },
         });
         name.anchor.set(0.5, 0);
@@ -696,11 +727,11 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       layer.addChild(node);
       fleetsRef.current.push({
         events: fleetEvents, x, y, node, name, body, trail, color, engines,
-        particles: [], spawn: 0, phase: Math.random() * Math.PI * 2,
+        particles: [], spawn: 0, phase: Math.random() * Math.PI * 2, halo,
       });
     }
     drawFleetLines.current();
-  }, [events, ready]);
+  }, [events, ready, followedEvents]);
 
   useEffect(() => drawFleetLines.current(), [selectedFleet, ready]);
 

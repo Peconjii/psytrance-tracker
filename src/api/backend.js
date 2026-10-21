@@ -256,3 +256,25 @@ export async function handBackTimetable(id) {
     const response = await api.delete(`/api/admin/events/${id}/timetable`)
     return response.data
 }
+
+// Artists the logged-in user follows: [{ slug, name }]
+export async function fetchFollows(signal) {
+    const response = await api.get('/api/me/follows', { signal })
+    return response.data
+}
+
+// Upcoming events where followed artists play: [{ eventId, artists: [names] }]
+export async function fetchFollowedGigs(signal) {
+    const response = await api.get('/api/me/follows/gigs', { signal })
+    return response.data
+}
+
+// Follow an artist from the line-ups (following twice is fine). Throws on failure.
+export async function followArtist(slug) {
+    const response = await api.put(`/api/me/follows/${encodeURIComponent(slug)}`)
+    return response.data
+}
+
+export async function unfollowArtist(slug) {
+    await api.delete(`/api/me/follows/${encodeURIComponent(slug)}`)
+}

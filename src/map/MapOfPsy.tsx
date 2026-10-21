@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useFollows } from '../context/FollowsContext';
 import { setReducedMotion, useReducedMotion } from '../motion.js';
 import { fetchEventDetails } from '../api/backend.js';
 import './map.css';
@@ -88,6 +89,8 @@ function MapOfPsy() {
   const [boarded, setBoarded] = useState<Boarded | null>(null);
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  // Events with artists the user follows: their ships are gold
+  const { gigsByEvent } = useFollows();
   const reducedMotion = useReducedMotion();
   const boardedId = fleet?.length === 1 ? fleet[0] : null;
 
@@ -309,7 +312,8 @@ function MapOfPsy() {
         crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew}
         onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion}
         liveFleets={liveFleets} clockRef={clockRef}
-        framedFleet={preview ? liveFleets.find((f) => f.eventId === preview.eventId) ?? null : null} />
+        framedFleet={preview ? liveFleets.find((f) => f.eventId === preview.eventId) ?? null : null}
+        followedEvents={gigsByEvent} />
 
       <header className="topbar">
         <div className="brand">

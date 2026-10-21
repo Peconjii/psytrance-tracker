@@ -20,7 +20,7 @@ export default defineConfig([
     rules: {
       // Context files export their provider plus a hook/context; that's fine for fast refresh
       'react-refresh/only-export-components': ['error', {
-        allowExportNames: ['useAuth', 'useFavorites', 'FavoritesContext'],
+        allowExportNames: ['useAuth', 'useFavorites', 'FavoritesContext', 'useFollows'],
       }],
     },
   },

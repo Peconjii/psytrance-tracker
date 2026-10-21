@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { FavoritesContext } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
+import { useFollows } from '../context/FollowsContext'
+import FollowButton from '../components/FollowButton.jsx'
 import api, { fetchMyGoing, setEventReminders } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -14,6 +16,7 @@ function todayIso() {
 function Profile() {
     usePageMeta({ title: 'Profile', path: '/profile', noindex: true })
     const { user, updateUser } = useAuth()
+    const { follows } = useFollows()
     const { favorites } = useContext(FavoritesContext)
     const [userReviews, setUserReviews] = useState([])
     const [loadingReviews, setLoadingReviews] = useState(true)
@@ -100,9 +103,9 @@ function Profile() {
 
             <section className="panel flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
-                    <h2 className="panel__label">Email reminders</h2>
+                    <h2 className="panel__label">Emails</h2>
                     <p className={`text-sm m-0 max-w-md ${remindersError ? 'text-[var(--danger)]' : 'muted'}`}>
-                        {remindersError || 'An email 3 days before events you saved or are going to.'}
+                        {remindersError || 'An email 3 days before events you saved or are going to, and when an artist you follow gets a new gig.'}
                     </p>
                 </div>
                 <button
@@ -136,6 +139,25 @@ function Profile() {
                         <span className="stat__label">Top location</span>
                     </div>
                 </div>
+            </section>
+
+            <section className="panel">
+                <h2 className="panel__label">Artists you follow · {follows.length}</h2>
+                {follows.length === 0 ? (
+                    <div className="empty">
+                        <p><strong>You don't follow anyone yet.</strong></p>
+                        <p>Press "☆ Follow" on an <Link to="/artists" className="link">artist's page</Link>: their ships glow gold on the map.</p>
+                    </div>
+                ) : (
+                    <ul className="rows">
+                        {follows.map(f => (
+                            <li key={f.slug} className="rows__item">
+                                <Link to={`/artists/${encodeURIComponent(f.slug)}`} state={{ name: f.name }} className="rows__name link">{f.name}</Link>
+                                <FollowButton slug={f.slug} name={f.name} />
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </section>
 
             <section className="panel">

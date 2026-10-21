@@ -5,6 +5,7 @@ import EventDetails from './pages/EventDetails'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { FavoritesProvider } from './context/FavoritesContext'
+import { FollowsProvider } from './context/FollowsContext'
 import Favorites from './pages/Favorites'
 import { AuthProvider } from './context/AuthContext'
 import Register from './pages/Register'
@@ -79,9 +80,11 @@ function App() {
   return (
     <AuthProvider>
       <FavoritesProvider>
-        <BrowserRouter>
-          <Shell />
-        </BrowserRouter>
+        <FollowsProvider>
+          <BrowserRouter>
+            <Shell />
+          </BrowserRouter>
+        </FollowsProvider>
       </FavoritesProvider>
     </AuthProvider>
   )
