@@ -203,3 +203,15 @@ export async function setArtistGenres(name, genres) {
     const response = await api.put('/api/admin/artists/genres', { name, genres })
     return response.data
 }
+
+// Admin history: the latest changes made in the admin panel, newest first
+export async function fetchAdminChanges(signal) {
+    const response = await api.get('/api/admin/changes', { signal })
+    return response.data
+}
+
+// Puts back what a change replaced; the backend refuses (409) when it was undone already or changed again since
+export async function undoAdminChange(id) {
+    const response = await api.post(`/api/admin/changes/${id}/undo`)
+    return response.data
+}

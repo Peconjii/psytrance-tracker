@@ -102,7 +102,7 @@ function AdminFeedback() {
                                 </span>
                                 {item.pageUrl && <Link className="link mono text-xs" to={item.pageUrl}>Open the page →</Link>}
                                 {item.aboutType === 'ARTIST' && (
-                                    <Link className="link mono text-xs" to={`/admin/genres?artist=${encodeURIComponent(item.aboutRef)}`}>
+                                    <Link className="link mono text-xs" to={`/admin/genres?artist=${encodeURIComponent(item.aboutRef)}&feedback=${item.id}`}>
                                         Fix in the panel →
                                     </Link>
                                 )}

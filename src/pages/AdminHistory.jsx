@@ -1,0 +1,103 @@
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { fetchAdminChanges, undoAdminChange } from '../api/backend.js'
+import { reloadPlacementsLater } from '../map/data/placements'
+import AdminTabs from '../components/AdminTabs'
+import usePageMeta from '../hooks/usePageMeta.js'
+
+const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+const KIND_LABELS = { ARTIST_GENRES: 'Artist genres' }
+
+// Every change made in the admin panel, newest first, with an undo for each one that still stands.
+// The backend refuses an undo that would throw away a newer change of the same artist.
+function AdminHistory() {
+    usePageMeta({ title: 'Admin history', path: '/admin/history', noindex: true })
+    const { user } = useAuth()
+    const [changes, setChanges] = useState(null)
+    const [error, setError] = useState('')
+    const [undoing, setUndoing] = useState(null)
+
+    const load = (signal) => fetchAdminChanges(signal)
+        .then(setChanges)
+        .catch(err => { if (!signal?.aborted) setError(err.response?.data?.message || 'Could not load the history.') })
+
+    useEffect(() => {
+        if (!user?.admin) return
+        const controller = new AbortController()
+        load(controller.signal)
+        return () => controller.abort()
+    }, [user?.admin])
+
+    if (!user?.admin) {
+        return <div className="page page--narrow"><p className="notice">This page is for admins.</p></div>
+    }
+
+    const undo = async (change) => {
+        setUndoing(change.id)
+        setError('')
+        try {
+            await undoAdminChange(change.id)
+            reloadPlacementsLater()
+            await load()
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not undo. Try again.')
+        } finally {
+            setUndoing(null)
+        }
+    }
+
+    return (
+        <div className="page">
+            <header className="page-head">
+                <div className="page-head__tag">// Admin · ship's log</div>
+                <h1 className="page-title">History</h1>
+                <p className="page-head__sub">
+                    Every change made in the admin panel. Undo puts back what a change replaced, as a new change of
+                    its own. If the same artist was changed again later, undo the newer change first.
+                </p>
+            </header>
+            <AdminTabs />
+
+            {error && <p className="notice mb-4">{error}</p>}
+
+            {changes === null ? (
+                <p className="mono text-xs muted">Loading...</p>
+            ) : changes.length === 0 ? (
+                <div className="empty"><p><strong>No changes yet.</strong></p></div>
+            ) : (
+                <ul className="rows">
+                    {changes.map(change => (
+                        <li key={change.id} className="rows__item">
+                            <div className="flex flex-wrap items-center gap-3">
+                                <span className="badge">{KIND_LABELS[change.kind] ?? change.kind}</span>
+                                <Link className="link font-medium" to={`/admin/genres?artist=${encodeURIComponent(change.target)}`}>
+                                    {change.target}
+                                </Link>
+                                {change.undoOf && <span className="badge">Undo of #{change.undoOf}</span>}
+                                {change.undoneBy && <span className="badge">Undone by #{change.undoneBy}</span>}
+                                <span className="mono text-xs muted ml-auto">
+                                    #{change.id} · @{change.username} · {DATE.format(new Date(change.createdAt))}
+                                </span>
+                            </div>
+                            <p className="soft m-0">
+                                <span className="muted">{change.before || 'not on the map'}</span>
+                                {' → '}
+                                <strong>{change.after || 'not on the map'}</strong>
+                            </p>
+                            {!change.undoneBy && (
+                                <div>
+                                    <button className="btn" disabled={undoing !== null} onClick={() => undo(change)}>
+                                        {undoing === change.id ? 'Undoing…' : 'Undo'}
+                                    </button>
+                                </div>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    )
+}
+
+export default AdminHistory

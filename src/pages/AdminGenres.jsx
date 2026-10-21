@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { searchAdminArtists, setArtistGenres } from '../api/backend.js'
+import { searchAdminArtists, setArtistGenres, setFeedbackStatus } from '../api/backend.js'
 import { data, genreById } from '../map/data/types'
 import { reloadPlacementsLater } from '../map/data/placements'
 import AdminTabs from '../components/AdminTabs'
@@ -92,6 +92,10 @@ function AdminGenres() {
     const debounced = useDebouncedValue(search.trim(), 300)
     // Tagged with the search it answers, so a slow old answer never replaces a newer one
     const [result, setResult] = useState({ search: null, artists: [], error: null })
+    // Opened from a feedback message (?feedback=7): once something is saved, offer to close the message
+    const feedbackId = params.get('feedback')
+    const [fixed, setFixed] = useState(false)
+    const [feedbackState, setFeedbackState] = useState('open')
 
     useEffect(() => {
         if (!user?.admin || debounced.length < 2) return
@@ -110,10 +114,23 @@ function AdminGenres() {
         return <div className="page page--narrow"><p className="notice">This page is for admins.</p></div>
     }
 
-    const replace = (updated) => setResult(prev => ({
+    const markDone = async () => {
+        setFeedbackState('saving')
+        try {
+            await setFeedbackStatus(feedbackId, 'DONE')
+            setFeedbackState('done')
+        } catch {
+            setFeedbackState('error')
+        }
+    }
+
+    const replace = (updated) => {
+        setFixed(true)
+        setResult(prev => ({
         ...prev,
-        artists: prev.artists.map(a => (a.slug === updated.slug ? updated : a)),
-    }))
+            artists: prev.artists.map(a => (a.slug === updated.slug ? updated : a)),
+        }))
+    }
 
     return (
         <div className="page">
@@ -126,6 +143,24 @@ function AdminGenres() {
                 </p>
             </header>
             <AdminTabs />
+
+            {feedbackId && (
+                <div className="panel mb-6" style={{ '--fam': 'var(--gold)' }}>
+                    {feedbackState === 'done' ? (
+                        <p className="m-0">Feedback #{feedbackId} is marked as done. <Link className="link" to="/admin/feedback">Back to the inbox →</Link></p>
+                    ) : (
+                        <div className="flex flex-wrap items-center gap-3">
+                            <span>{fixed ? 'Saved. Is feedback #' + feedbackId + ' sorted now?' : 'Fixing feedback #' + feedbackId + '.'}</span>
+                            {fixed && (
+                                <button className="btn btn--primary" onClick={markDone} disabled={feedbackState === 'saving'}>
+                                    {feedbackState === 'saving' ? 'Saving…' : 'Mark as done'}
+                                </button>
+                            )}
+                            {feedbackState === 'error' && <span className="notice m-0">Could not change the status. Try again.</span>}
+                        </div>
+                    )}
+                </div>
+            )}
 
             <div className="panel mb-6">
                 <label htmlFor="admin-artist-search" className="field-label">Artist</label>
