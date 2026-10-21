@@ -17,6 +17,7 @@ import Artists from './pages/Artists'
 import Artist from './pages/Artist'
 import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/AdminFeedback'
+import AdminGenres from './pages/AdminGenres'
 import ProtectedRoute from './components/ProtectedRoute'
 
 // The home page is the galaxy map, which fills the window under the navbar, so it has no footer
@@ -64,6 +65,14 @@ function Shell() {
             element={
               <ProtectedRoute>
                 <AdminFeedback />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/genres"
+            element={
+              <ProtectedRoute>
+                <AdminGenres />
               </ProtectedRoute>
             }
           />

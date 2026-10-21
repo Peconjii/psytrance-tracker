@@ -15,6 +15,7 @@ import { Compare } from './components/Compare';
 import { PlaylistMenu } from './components/Playlist';
 import { LabelsMenu } from './components/LabelsMenu';
 import { FleetPanel } from './components/FleetPanel';
+import { loadPlacements, placementsApplied } from './data/placements';
 import { fetchMapEvents, mapArtistBySlug, type Boarded, type EventPeriod, type MapEvent } from './data/events';
 import { usePlaylist } from './hooks/usePlaylist';
 import {
@@ -39,8 +40,20 @@ function readUrl() {
   };
 }
 
+/** The home page: waits for the artist placements from the backend, then draws the galaxy */
+export default function MapHome() {
+  const [ready, setReady] = useState(placementsApplied);
+  useEffect(() => {
+    if (!ready) loadPlacements().then(() => setReady(true));
+  }, [ready]);
+  if (!ready) {
+    return <div className="psy-map app"><p className="map-loading">Charting the galaxy…</p></div>;
+  }
+  return <MapOfPsy />;
+}
+
 /** Map of Psy, the galaxy of psytrance genres: the home page of the site. */
-export default function MapOfPsy() {
+function MapOfPsy() {
   const [initial] = useState(readUrl);
   const [selectedId, setSelectedId] = useState<string | null>(initial.genre);
   const [year, setYear] = useState(MAX_YEAR);

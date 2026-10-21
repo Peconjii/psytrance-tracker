@@ -185,3 +185,21 @@ export async function setFeedbackStatus(id, status) {
     const response = await api.patch(`/api/admin/feedback/${id}`, { status })
     return response.data
 }
+
+// Which artists orbit which genre on the map: { genreId: [artist names] }
+export async function fetchPlacements(signal) {
+    const response = await api.get('/api/map/placements', { signal })
+    return response.data
+}
+
+// Admin panel: map and line-up artists whose name contains the search, with their map genres
+export async function searchAdminArtists(search, signal) {
+    const response = await api.get('/api/admin/artists', { params: { search }, signal })
+    return response.data
+}
+
+// Admin panel: place an artist in exactly these map genres ([] takes them off the map). Throws on failure.
+export async function setArtistGenres(name, genres) {
+    const response = await api.put('/api/admin/artists/genres', { name, genres })
+    return response.data
+}

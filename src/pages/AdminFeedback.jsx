@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { fetchFeedback, setFeedbackStatus } from '../api/backend.js'
 import usePageMeta from '../hooks/usePageMeta.js'
+import AdminTabs from '../components/AdminTabs'
 
 const STATUSES = [
     { value: 'NEW', label: 'New' },
@@ -67,6 +68,7 @@ function AdminFeedback() {
                 <div className="page-head__tag">// Admin · incoming transmissions</div>
                 <h1 className="page-title">Feedback inbox</h1>
             </header>
+            <AdminTabs />
 
             <div className="flex flex-wrap gap-2 mb-5" role="group" aria-label="Show">
                 {[...STATUSES, { value: '', label: 'All' }].map(s => (
@@ -99,6 +101,11 @@ function AdminFeedback() {
                                     {item.email && <> · <a className="link" href={`mailto:${item.email}`}>{item.email}</a></>}
                                 </span>
                                 {item.pageUrl && <Link className="link mono text-xs" to={item.pageUrl}>Open the page →</Link>}
+                                {item.aboutType === 'ARTIST' && (
+                                    <Link className="link mono text-xs" to={`/admin/genres?artist=${encodeURIComponent(item.aboutRef)}`}>
+                                        Fix in the panel →
+                                    </Link>
+                                )}
                                 <label className="ml-auto flex items-center gap-2">
                                     <span className="field-label m-0">Status</span>
                                     <select className="field w-auto py-1" value={item.status} disabled={saving === item.id}

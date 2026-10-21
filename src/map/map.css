@@ -477,3 +477,5 @@
 
 /* "✎ Fix" in the HUD footers opens the feedback form about what is shown */
 .hud__fix { text-decoration: none; }
+/* While the placements load, before the galaxy is drawn */
+.map-loading { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; font: 12px var(--mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); }

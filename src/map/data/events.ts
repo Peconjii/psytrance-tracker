@@ -65,9 +65,14 @@ export function artistSlug(name: string): string {
   return name.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
 }
 
-// Map artists by slug, so a line-up name finds its satellite however the organizer wrote it
+// Map artists by slug, so a line-up name finds its satellite however the organizer wrote it.
+// Rebuilt when the placements come from the backend (see placements.ts).
 const bySlug = new Map<string, { name: string; genreId: string }>();
-for (const g of data.genres) for (const name of g.artists) if (!bySlug.has(artistSlug(name))) bySlug.set(artistSlug(name), { name, genreId: g.id });
+export function indexMapArtists() {
+  bySlug.clear();
+  for (const g of data.genres) for (const name of g.artists) if (!bySlug.has(artistSlug(name))) bySlug.set(artistSlug(name), { name, genreId: g.id });
+}
+indexMapArtists();
 
 /** The map artist with this slug and the first genre they are placed in, or null when they aren't on the map */
 export function mapArtistBySlug(slug: string): { name: string; genreId: string } | null {

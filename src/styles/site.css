@@ -259,3 +259,7 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
   transition-duration: 0.01ms !important;
   scroll-behavior: auto !important;
 }
+
+/* Admin panel: one artist per row, name and links on top, genres below */
+.admin-artist { flex-direction: column; align-items: stretch; gap: 8px; }
+.admin-artist__add { width: auto; padding: 4px 8px; font-size: 12px; }
