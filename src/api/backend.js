@@ -215,3 +215,15 @@ export async function undoAdminChange(id) {
     const response = await api.post(`/api/admin/changes/${id}/undo`)
     return response.data
 }
+
+// Admin panel: an event's map genres and whether an admin set them by hand
+export async function fetchAdminEventGenres(id, signal) {
+    const response = await api.get(`/api/admin/events/${id}/genres`, { signal })
+    return response.data
+}
+
+// Admin panel: set an event's genres by hand ([] hands it back to its line-up). Throws on failure.
+export async function setAdminEventGenres(id, genres) {
+    const response = await api.put(`/api/admin/events/${id}/genres`, { genres })
+    return response.data
+}

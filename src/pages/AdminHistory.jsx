@@ -7,7 +7,13 @@ import AdminTabs from '../components/AdminTabs'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-const KIND_LABELS = { ARTIST_GENRES: 'Artist genres' }
+const KIND_LABELS = { ARTIST_GENRES: 'Artist genres', EVENT_GENRES: 'Event genres' }
+// An empty value means: the artist isn't on the map, or the event's genres come from its line-up
+const EMPTY = { ARTIST_GENRES: 'not on the map', EVENT_GENRES: 'from the line-up' }
+// Event changes are about "<id> · <name>"
+const targetLink = (change) => change.kind === 'EVENT_GENRES'
+    ? `/admin/events?id=${change.target.split(' ')[0]}`
+    : `/admin/genres?artist=${encodeURIComponent(change.target)}`
 
 // Every change made in the admin panel, newest first, with an undo for each one that still stands.
 // The backend refuses an undo that would throw away a newer change of the same artist.
@@ -71,7 +77,7 @@ function AdminHistory() {
                         <li key={change.id} className="rows__item">
                             <div className="flex flex-wrap items-center gap-3">
                                 <span className="badge">{KIND_LABELS[change.kind] ?? change.kind}</span>
-                                <Link className="link font-medium" to={`/admin/genres?artist=${encodeURIComponent(change.target)}`}>
+                                <Link className="link font-medium" to={targetLink(change)}>
                                     {change.target}
                                 </Link>
                                 {change.undoOf && <span className="badge">Undo of #{change.undoOf}</span>}
@@ -81,9 +87,9 @@ function AdminHistory() {
                                 </span>
                             </div>
                             <p className="soft m-0">
-                                <span className="muted">{change.before || 'not on the map'}</span>
+                                <span className="muted">{change.before || EMPTY[change.kind]}</span>
                                 {' → '}
-                                <strong>{change.after || 'not on the map'}</strong>
+                                <strong>{change.after || EMPTY[change.kind]}</strong>
                             </p>
                             {!change.undoneBy && (
                                 <div>

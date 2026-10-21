@@ -19,6 +19,7 @@ import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/AdminFeedback'
 import AdminGenres from './pages/AdminGenres'
 import AdminHistory from './pages/AdminHistory'
+import AdminEvents from './pages/AdminEvents'
 import ProtectedRoute from './components/ProtectedRoute'
 
 // The home page is the galaxy map, which fills the window under the navbar, so it has no footer
@@ -74,6 +75,14 @@ function Shell() {
             element={
               <ProtectedRoute>
                 <AdminGenres />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/events"
+            element={
+              <ProtectedRoute>
+                <AdminEvents />
               </ProtectedRoute>
             }
           />

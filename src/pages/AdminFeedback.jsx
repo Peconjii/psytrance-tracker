@@ -101,6 +101,13 @@ function AdminFeedback() {
                                     {item.email && <> · <a className="link" href={`mailto:${item.email}`}>{item.email}</a></>}
                                 </span>
                                 {item.pageUrl && <Link className="link mono text-xs" to={item.pageUrl}>Open the page →</Link>}
+                                {/* Event feedback is about "<name> (#<id>)" */}
+                                {item.aboutType === 'EVENT' && /#(\d+)\)$/.test(item.aboutRef ?? '') && (
+                                    <Link className="link mono text-xs"
+                                        to={`/admin/events?id=${item.aboutRef.match(/#(\d+)\)$/)[1]}&feedback=${item.id}`}>
+                                        Fix in the panel →
+                                    </Link>
+                                )}
                                 {item.aboutType === 'ARTIST' && (
                                     <Link className="link mono text-xs" to={`/admin/genres?artist=${encodeURIComponent(item.aboutRef)}&feedback=${item.id}`}>
                                         Fix in the panel →

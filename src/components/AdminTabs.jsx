@@ -7,6 +7,7 @@ function AdminTabs() {
         <nav className="flex flex-wrap gap-2 mb-6" aria-label="Admin">
             <NavLink to="/admin/feedback" className={tab}>Feedback inbox</NavLink>
             <NavLink to="/admin/genres" className={tab}>Artist genres</NavLink>
+            <NavLink to="/admin/events" className={tab}>Event genres</NavLink>
             <NavLink to="/admin/history" className={tab}>History</NavLink>
         </nav>
     )
