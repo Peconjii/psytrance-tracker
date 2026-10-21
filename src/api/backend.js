@@ -237,3 +237,22 @@ export async function setArtistHidden(name, hidden) {
 export async function mergeArtists(from, into) {
     await api.post('/api/admin/artists/merge', { from, into })
 }
+
+// An event's timetable: { eventId, manual, utcOffsetMinutes, sets: [{ stage, artist, artistSlug, startsAt, endsAt }] },
+// times on the venue clock ("2026-10-24T22:00:00"); no sets when the line-up has no set times
+export async function fetchTimetable(id, signal) {
+    const response = await api.get(`/api/events/${id}/timetable`, { signal })
+    return response.data
+}
+
+// Admin panel: an event's timetable set by hand (sets with venue-clock times). Throws on failure.
+export async function setAdminTimetable(id, sets) {
+    const response = await api.put(`/api/admin/events/${id}/timetable`, { sets })
+    return response.data
+}
+
+// Admin panel: back to the set times written in the line-up
+export async function handBackTimetable(id) {
+    const response = await api.delete(`/api/admin/events/${id}/timetable`)
+    return response.data
+}

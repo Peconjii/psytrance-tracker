@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
-import { fetchEventDetails, fetchAftermovie, fetchGoing } from '../api/backend.js'
+import { fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
@@ -29,6 +29,50 @@ function Section({ title, children }) {
             <h2 className="panel__label">{title}</h2>
             {children}
         </section>
+    )
+}
+
+const SET_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short' })
+// "Sat 22:00" from a venue-clock time ("2026-10-24T22:00:00"), read as written so it stays the venue's time
+const setTime = (value) => {
+    const [date, time] = value.split('T')
+    const [year, month, day] = date.split('-').map(Number)
+    return `${SET_DAY.format(new Date(year, month - 1, day))} ${time.slice(0, 5)}`
+}
+
+// The timetable, one list per stage, in the order the organizer (or an admin) wrote it
+function Timetable({ timetable }) {
+    const stages = []
+    for (const set of timetable.sets) {
+        const name = set.stage || ''
+        let stage = stages.find(s => s.name === name)
+        if (!stage) stages.push(stage = { name, sets: [] })
+        stage.sets.push(set)
+    }
+    return (
+        <div className="grid gap-4">
+            {stages.map(stage => (
+                <div key={stage.name}>
+                    {stage.name && <div className="field-label">{stage.name}</div>}
+                    <ul className="list-none p-0 m-0 text-sm">
+                        {stage.sets.map((set, i) => (
+                            <li key={i} className="flex gap-4 py-1 border-b border-dashed border-[var(--line)]">
+                                <span className="mono muted shrink-0 w-36">
+                                    {setTime(set.startsAt)}{set.endsAt && ` – ${set.endsAt.split('T')[1].slice(0, 5)}`}
+                                </span>
+                                <Link to={`/artists/${encodeURIComponent(set.artistSlug)}`} state={{ name: set.artist }}
+                                    className="text-[var(--fg)] underline decoration-[var(--line)] underline-offset-4 hover:text-[var(--accent)]">
+                                    {set.artist}
+                                </Link>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
+            <p className="muted text-xs m-0">
+                Times at the venue. {timetable.manual ? 'Checked by the Map of Psy crew.' : 'Read from the line-up; it can change.'}
+            </p>
+        </div>
     )
 }
 
@@ -97,6 +141,7 @@ function EventDetails() {
     const [weather, setWeather] = useState({ id: null, value: null })
     const [aftermovie, setAftermovie] = useState({ id: null, value: null })
     const [going, setGoing] = useState({ id: null, value: null })
+    const [timetable, setTimetable] = useState({ id: null, value: null })
     const [attempt, setAttempt] = useState(0)
 
     const details = loaded.id === id ? loaded.details : null
@@ -105,6 +150,7 @@ function EventDetails() {
     const currentWeather = weather.id === id ? weather.value : null
     const currentAftermovie = aftermovie.id === id ? aftermovie.value : null
     const currentGoing = going.id === id ? going.value : null
+    const currentTimetable = timetable.id === id ? timetable.value : null
 
     const place = event ? [event.nameTown, event.nameCountry].filter(Boolean).join(', ') : ''
     usePageMeta({
@@ -125,6 +171,10 @@ function EventDetails() {
         fetchGoing(id, controller.signal).then(status => {
             if (!controller.signal.aborted) setGoing({ id, value: status })
         })
+        // Most events have no set times; then the section stays away
+        fetchTimetable(id, controller.signal)
+            .then(found => { if (!controller.signal.aborted) setTimetable({ id, value: found }) })
+            .catch(() => {})
         return () => controller.abort()
     }, [id])
 
@@ -286,6 +336,11 @@ function EventDetails() {
                                     className="w-full h-full"
                                 />
                             </div>
+                        </Section>
+                    )}
+                    {currentTimetable?.sets.length > 0 && (
+                        <Section title="Timetable">
+                            <Timetable timetable={currentTimetable} />
                         </Section>
                     )}
                     {details?.lineUp.length > 0 && (

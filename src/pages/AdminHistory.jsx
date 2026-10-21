@@ -7,11 +7,13 @@ import AdminTabs from '../components/AdminTabs'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-const KIND_LABELS = { ARTIST_GENRES: 'Artist genres', EVENT_GENRES: 'Event genres', ARTIST_HIDDEN: 'Not an artist', ARTIST_MERGED: 'Merged' }
+const KIND_LABELS = { ARTIST_GENRES: 'Artist genres', EVENT_GENRES: 'Event genres', ARTIST_HIDDEN: 'Not an artist', ARTIST_MERGED: 'Merged', EVENT_TIMETABLE: 'Timetable' }
+// Merges move events between artists, and a timetable is too long to keep a copy of: neither can be undone
+const NO_UNDO = ['ARTIST_MERGED', 'EVENT_TIMETABLE']
 // An empty value means: the artist isn't on the map, or the event's genres come from its line-up
 const EMPTY = { ARTIST_GENRES: 'not on the map', EVENT_GENRES: 'from the line-up' }
 // Event changes are about "<id> · <name>"
-const targetLink = (change) => change.kind === 'EVENT_GENRES'
+const targetLink = (change) => change.kind.startsWith('EVENT_')
     ? `/admin/events?id=${change.target.split(' ')[0]}`
     : `/admin/genres?artist=${encodeURIComponent(change.target)}`
 
@@ -92,7 +94,7 @@ function AdminHistory() {
                                 <strong>{change.after || EMPTY[change.kind]}</strong>
                             </p>
                             {/* Merges move events between artists and can't be taken apart again */}
-                            {!change.undoneBy && change.kind !== 'ARTIST_MERGED' && (
+                            {!change.undoneBy && !NO_UNDO.includes(change.kind) && (
                                 <div>
                                     <button className="btn" disabled={undoing !== null} onClick={() => undo(change)}>
                                         {undoing === change.id ? 'Undoing…' : 'Undo'}
