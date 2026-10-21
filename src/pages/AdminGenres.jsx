@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { searchAdminArtists, setArtistGenres, setFeedbackStatus } from '../api/backend.js'
+import { mergeArtists, searchAdminArtists, setArtistGenres, setArtistHidden, setFeedbackStatus } from '../api/backend.js'
 import { data, genreById } from '../map/data/types'
 import { reloadPlacementsLater } from '../map/data/placements'
 import AdminTabs from '../components/AdminTabs'
@@ -27,7 +27,7 @@ function GenreChip({ id, onRemove, disabled }) {
 }
 
 // One artist: their genres, with remove and add. Every change is saved at once and logged on the backend.
-function ArtistRow({ artist, onSaved }) {
+function ArtistRow({ artist, onSaved, onGone }) {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
 
@@ -77,8 +77,54 @@ function ArtistRow({ artist, onSaved }) {
                 </select>
                 {saving && <span className="mono text-xs muted">Saving…</span>}
             </div>
+            {!artist.onMap && <CleanupTools artist={artist} onGone={onGone} />}
             {error && <p className="notice m-0">{error}</p>}
         </li>
+    )
+}
+
+// For words found in line-ups: "not an artist" (skipped from now on, undo in the history) or a merge into
+// the artist's other spelling (can't be undone). Either way the row leaves the list.
+function CleanupTools({ artist, onGone }) {
+    const [merging, setMerging] = useState(false)
+    const [into, setInto] = useState('')
+    const [busy, setBusy] = useState(false)
+    const [error, setError] = useState('')
+
+    const run = async (action, message) => {
+        setBusy(true)
+        setError('')
+        try {
+            await action()
+            onGone(artist.slug, message)
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not save. Try again.')
+            setBusy(false)
+        }
+    }
+
+    return (
+        <div className="flex flex-wrap items-center gap-2">
+            <button className="btn btn--ghost" disabled={busy}
+                onClick={() => run(() => setArtistHidden(artist.name, true), `${artist.name} is hidden: not an artist. Undo it in the history.`)}>
+                Not an artist
+            </button>
+            {merging ? (
+                <>
+                    <input className="field w-auto" value={into} onChange={(e) => setInto(e.target.value)} autoFocus
+                        placeholder="The right spelling" aria-label={`Merge ${artist.name} into`} />
+                    <button className="btn" disabled={busy || !into.trim()}
+                        onClick={() => window.confirm(`Merge "${artist.name}" into "${into.trim()}"? This can't be undone.`)
+                            && run(() => mergeArtists(artist.name, into.trim()), `${artist.name} is merged into ${into.trim()}.`)}>
+                        Merge
+                    </button>
+                    <button className="btn btn--ghost" disabled={busy} onClick={() => setMerging(false)}>Cancel</button>
+                </>
+            ) : (
+                <button className="btn btn--ghost" disabled={busy} onClick={() => setMerging(true)}>Merge into…</button>
+            )}
+            {error && <span className="notice m-0">{error}</span>}
+        </div>
     )
 }
 
@@ -95,6 +141,7 @@ function AdminGenres() {
     // Opened from a feedback message (?feedback=7): once something is saved, offer to close the message
     const feedbackId = params.get('feedback')
     const [fixed, setFixed] = useState(false)
+    const [note, setNote] = useState('')
     const [feedbackState, setFeedbackState] = useState('open')
 
     useEffect(() => {
@@ -130,6 +177,13 @@ function AdminGenres() {
         ...prev,
             artists: prev.artists.map(a => (a.slug === updated.slug ? updated : a)),
         }))
+    }
+
+    // Hidden or merged: the row leaves the list, with a note of what happened
+    const remove = (slug, message) => {
+        setFixed(true)
+        setNote(message)
+        setResult(prev => ({ ...prev, artists: prev.artists.filter(a => a.slug !== slug) }))
     }
 
     return (
@@ -168,6 +222,8 @@ function AdminGenres() {
                     placeholder="Fungus Funk, Ajja..." onChange={(e) => setSearch(e.target.value)} />
             </div>
 
+            {note && <p className="panel mb-4" role="status">{note}</p>}
+
             {debounced.length < 2 ? (
                 <p className="muted">Type at least two letters.</p>
             ) : result.error ? (
@@ -178,7 +234,7 @@ function AdminGenres() {
                 <div className="empty"><p><strong>No artist with that name on the map or in the line-ups.</strong></p></div>
             ) : (
                 <ul className="rows">
-                    {result.artists.map(artist => <ArtistRow key={artist.slug} artist={artist} onSaved={replace} />)}
+                    {result.artists.map(artist => <ArtistRow key={artist.slug} artist={artist} onSaved={replace} onGone={remove} />)}
                 </ul>
             )}
         </div>

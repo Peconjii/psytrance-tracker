@@ -227,3 +227,13 @@ export async function setAdminEventGenres(id, genres) {
     const response = await api.put(`/api/admin/events/${id}/genres`, { genres })
     return response.data
 }
+
+// Admin panel: mark a line-up word as "not an artist" (hidden: true), or show it again. Throws on failure.
+export async function setArtistHidden(name, hidden) {
+    await api.post('/api/admin/artists/hidden', { name, hidden })
+}
+
+// Admin panel: merge the artist `from` into `into` (two spellings of one artist). Can't be undone.
+export async function mergeArtists(from, into) {
+    await api.post('/api/admin/artists/merge', { from, into })
+}
