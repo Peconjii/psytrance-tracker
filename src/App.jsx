@@ -42,6 +42,7 @@ const AdminReviews = lazy(() => import('./pages/AdminReviews'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AddEvent = lazy(() => import('./pages/AddEvent'))
 const NewPage = lazy(() => import('./pages/NewPage'))
+const Search = lazy(() => import('./pages/Search'))
 const ArtistEdit = lazy(() => import('./pages/ArtistEdit'))
 
 // The home page is the galaxy map, which fills the window under the navbar, so it has no footer
@@ -73,6 +74,7 @@ function Shell() {
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/new-page" element={<NewPage />} />
+          <Route path="/search" element={<Search />} />
 
           {/* Only for logged-in users; guests are redirected to /login */}
           <Route 

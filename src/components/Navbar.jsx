@@ -26,6 +26,7 @@ function Navbar() {
         { path: '/events', label: 'Events' },
         { path: '/map', label: 'World map' },
         { path: '/artists', label: 'Artists' },
+        { path: '/search', label: 'Search' },
         { path: '/feedback', label: 'Feedback' },
         // Profile is the username button on the right
         ...(user ? [{ path: '/favorites', label: 'Favorites' }] : []),

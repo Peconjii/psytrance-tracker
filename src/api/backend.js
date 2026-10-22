@@ -204,6 +204,12 @@ export async function fetchPlacements(signal) {
     return response.data
 }
 
+// The site's search box: { artists, organizers, events, labels, festivals } whose name has the words in it
+export async function searchSite(q, signal) {
+    const response = await api.get('/api/search', { params: { q }, signal })
+    return response.data
+}
+
 // The labels and festivals admins added to the map: { labels: [{ name, country, since, genres, x, y }], festivals: [...] }
 export async function fetchMapExtras(signal) {
     const response = await api.get('/api/map/extras', { signal })
