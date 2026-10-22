@@ -4,7 +4,7 @@ import { FavoritesContext } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
 import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
-import api, { fetchMyArtists, fetchMyGoing, setEventReminders } from '../api/backend'
+import api, { fetchMyArtists, fetchMyGoing, fetchMyOrganizers, setEventReminders } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 // "2026-10-14" in the browser's time zone, to compare with the dates the backend sends
@@ -19,9 +19,12 @@ function Profile() {
     const { follows } = useFollows()
     // Artist profiles this account owns (an admin linked them)
     const [myArtists, setMyArtists] = useState([])
+    // Organizer pages this account owns
+    const [myOrganizers, setMyOrganizers] = useState([])
     useEffect(() => {
         const controller = new AbortController()
         fetchMyArtists(controller.signal).then(setMyArtists).catch(() => {})
+        fetchMyOrganizers(controller.signal).then(setMyOrganizers).catch(() => {})
         return () => controller.abort()
     }, [])
     const { favorites } = useContext(FavoritesContext)
@@ -156,6 +159,20 @@ function Profile() {
                             <li key={a.slug} className="rows__item">
                                 <Link className="rows__name link" to={`/artists/${encodeURIComponent(a.slug)}`}>{a.name}</Link>
                                 <Link className="btn" to={`/artists/${encodeURIComponent(a.slug)}/edit`}>✎ Edit profile</Link>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
+
+            {myOrganizers.length > 0 && (
+                <section className="panel">
+                    <h2 className="panel__label">Your organizer page</h2>
+                    <ul className="rows">
+                        {myOrganizers.map(o => (
+                            <li key={o.slug} className="rows__item">
+                                <Link className="rows__name link" to={`/organizers/${encodeURIComponent(o.slug)}`}>{o.name}</Link>
+                                <Link className="btn" to={`/organizers/${encodeURIComponent(o.slug)}/edit`}>✎ Edit page</Link>
                             </li>
                         ))}
                     </ul>

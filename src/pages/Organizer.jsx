@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { fetchOrganizer } from '../api/backend.js'
+import { fetchMyOrganizers, fetchOrganizer } from '../api/backend.js'
+import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
@@ -16,6 +17,18 @@ function Organizer() {
     const organizer = loaded.slug === slug ? loaded.organizer : null
     const error = loaded.slug === slug ? loaded.error : null
     const name = organizer?.name || location.state?.name || slug
+    const profile = organizer?.profile
+    const { user } = useAuth()
+    // Organizer pages this account owns (an admin linked them), for "Edit page"
+    const [mine, setMine] = useState([])
+    const canEdit = Boolean(organizer && (user?.admin || mine.some(o => o.slug === organizer.slug)))
+
+    useEffect(() => {
+        if (!user) return
+        const controller = new AbortController()
+        fetchMyOrganizers(controller.signal).then(setMine).catch(() => {})
+        return () => controller.abort()
+    }, [user])
 
     usePageMeta({
         title: `${name} – Psytrance Organizer`,
@@ -39,15 +52,33 @@ function Organizer() {
     return (
         <div className="page">
             <button onClick={goBack} className="back-link">← Back</button>
-            <div className="panel mb-4">
-                <div className="page-head__tag">// Captain · organizer</div>
-                <h1 className="page-title">{name}</h1>
-                {organizer?.url && (
-                    <a className="link mono text-xs" href={organizer.url} target="_blank" rel="noopener noreferrer">
-                        {organizer.url.replace(/^https?:\/\//, '')} ↗
-                    </a>
+            <div className="panel mb-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="artist-head min-w-0">
+                    {profile?.photoUrl && (
+                        <img className="artist-head__photo" src={profile.photoUrl} alt={name} loading="lazy" referrerPolicy="no-referrer" />
+                    )}
+                    <div className="min-w-0">
+                        <div className="page-head__tag">// Captain · organizer</div>
+                        <h1 className="page-title">{name}</h1>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 mono text-xs">
+                            {[profile?.websiteUrl || organizer?.url, profile?.instagramUrl].filter(Boolean).map(link => (
+                                <a key={link} className="link" href={link} target="_blank" rel="noopener noreferrer">
+                                    {link.replace(/^https?:\/\//, '')} ↗
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                {canEdit && (
+                    <Link className="btn btn--ghost shrink-0" to={`/organizers/${encodeURIComponent(organizer.slug)}/edit`}>✎ Edit page</Link>
                 )}
             </div>
+            {profile?.bio && (
+                <section className="panel mb-4">
+                    <h2 className="panel__label">About</h2>
+                    <p className="soft whitespace-pre-line m-0 max-w-3xl">{profile.bio}</p>
+                </section>
+            )}
 
             {error === 'notFound' ? (
                 <div className="empty">

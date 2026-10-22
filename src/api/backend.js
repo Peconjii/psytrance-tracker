@@ -362,3 +362,41 @@ export async function markAsOrganizer(name) {
     const response = await api.post('/api/admin/artists/organizer', { name })
     return response.data
 }
+
+// Editing an organizer (their owner or an admin): { slug, name, photoUrl, bio, instagramUrl, websiteUrl, events, owner }
+export async function fetchOrganizerEdit(slug, signal) {
+    const response = await api.get(`/api/organizers/${encodeURIComponent(slug)}/edit`, { signal })
+    return response.data
+}
+
+export async function saveOrganizerProfile(slug, profile) {
+    const response = await api.put(`/api/organizers/${encodeURIComponent(slug)}/profile`, profile)
+    return response.data
+}
+
+// The organizer's timetable for one of their own events, and back to the line-up's set times
+export async function setOrganizerTimetable(slug, eventId, sets) {
+    const response = await api.put(`/api/organizers/${encodeURIComponent(slug)}/events/${eventId}/timetable`, { sets })
+    return response.data
+}
+
+export async function handBackOrganizerTimetable(slug, eventId) {
+    const response = await api.delete(`/api/organizers/${encodeURIComponent(slug)}/events/${eventId}/timetable`)
+    return response.data
+}
+
+// The organizers whose page this account owns: [{ slug, name }]
+export async function fetchMyOrganizers(signal) {
+    const response = await api.get('/api/me/organizers', { signal })
+    return response.data
+}
+
+// Admin panel: link an account to an organizer as its owner, or unlink it
+export async function setOrganizerOwner(slug, username) {
+    const response = await api.put(`/api/admin/organizers/${encodeURIComponent(slug)}/owner`, { username })
+    return response.data
+}
+
+export async function removeOrganizerOwner(slug) {
+    await api.delete(`/api/admin/organizers/${encodeURIComponent(slug)}/owner`)
+}

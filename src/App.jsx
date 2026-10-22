@@ -18,6 +18,7 @@ import Artists from './pages/Artists'
 import Artist from './pages/Artist'
 import Organizers from './pages/Organizers'
 import Organizer from './pages/Organizer'
+import OrganizerEdit from './pages/OrganizerEdit'
 import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/AdminFeedback'
 import AdminGenres from './pages/AdminGenres'
@@ -77,6 +78,7 @@ function Shell() {
           <Route path="/admin/requests" element={<AdminRoute><AdminRequests /></AdminRoute>} />
           {/* The artist's owner or an admin; the backend says who may */}
           <Route path="/artists/:slug/edit" element={<ProtectedRoute><ArtistEdit /></ProtectedRoute>} />
+          <Route path="/organizers/:slug/edit" element={<ProtectedRoute><OrganizerEdit /></ProtectedRoute>} />
         </Routes>
       </main>
 
