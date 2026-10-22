@@ -566,3 +566,9 @@ export async function fetchLabelStats(label, signal) {
     const response = await api.get('/api/labels/stats', { params: { label }, signal })
     return response.data
 }
+
+// A festival of the map: { editions: [events named like it, with going and saved], byGenre, topArtists, reportedByYear }
+export async function fetchFestivalStats(match, signal) {
+    const response = await api.get('/api/festivals/stats', { params: { match }, signal })
+    return response.data
+}

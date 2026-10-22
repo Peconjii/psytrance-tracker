@@ -140,6 +140,7 @@ export function Panel({
           <a className="hud__ext" href={youtube(`${f.name} full set`)} target="_blank" rel="noopener noreferrer">Sets on YouTube ↗</a>
           <FixLink about="FESTIVAL" name={f.name} />
           <ShareButton />
+          <Link className="hud__ext" to={`/festivals/${encodeURIComponent(f.id)}`}>Festival page →</Link>
         </div>
       </HudShell>
     );

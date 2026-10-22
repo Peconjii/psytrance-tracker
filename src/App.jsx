@@ -20,6 +20,7 @@ import Artist from './pages/Artist'
 import Organizers from './pages/Organizers'
 import Organizer from './pages/Organizer'
 import Label from './pages/Label'
+import Festival from './pages/Festival'
 import OrganizerEdit from './pages/OrganizerEdit'
 import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/AdminFeedback'
@@ -55,6 +56,7 @@ function Shell() {
           <Route path="/organizers" element={<Organizers />} />
           <Route path="/organizers/:slug" element={<Organizer />} />
           <Route path="/labels/:name" element={<Label />} />
+          <Route path="/festivals/:id" element={<Festival />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
