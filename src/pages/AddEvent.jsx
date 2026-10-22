@@ -176,7 +176,7 @@ function AddEvent() {
             ) : !user?.emailVerified && !user?.admin ? (
                 <VerifyEmailNotice reason="Only accounts with a confirmed email can add events, so the map stays free of spam." />
             ) : (
-                <form className="grid gap-4" onSubmit={submit}>
+                <form className="grid grid-cols-1 gap-4" onSubmit={submit}>
                     <section className="panel grid gap-3">
                         <h2 className="panel__label m-0">The event</h2>
                         <div>
@@ -237,7 +237,7 @@ function AddEvent() {
                         </div>
                     </section>
 
-                    <section className="panel grid gap-3">
+                    <section className="panel grid grid-cols-1 gap-3">
                         <h2 className="panel__label m-0">Sound</h2>
                         <div className="flex flex-wrap items-center gap-2">
                             {genres.map(id => (

@@ -14,6 +14,8 @@ Every genre is a star, artists orbit their genres as satellites, and every upcom
 This repository is the **React frontend**.
 **Backend (Java / Spring Boot):** [Peconjii/psytrance-tracker-backend](https://github.com/Peconjii/psytrance-tracker-backend)
 
+![The galaxy: genres as stars, this week's parties as ships, the cockpit with the next departures](docs/screenshots/galaxy.png)
+
 ## The idea
 
 | On the map | What it is |
@@ -30,6 +32,26 @@ This repository is the **React frontend**.
 How a party gets its genres (worked out by the backend): artists on the map in its line-up first, then
 genres named in its stage headers ("DARKPSY / FOREST STAGE"), and only when the line-up says nothing the
 genres the organizer ticked on Goabase. Admins can correct it by hand.
+
+## Screenshots
+
+| | |
+|---|---|
+| ![A genre's system: Full-on with its artists orbiting, its labels and the genre panel](docs/screenshots/genre-system.png) | ![An event: flyer, weather, timetable per stage, venue and organizer](docs/screenshots/event.png) |
+| **A genre's system**: artists orbit their star (12 at most, the rest one click away) | **An event**: timetable per stage, venue, organizer, "I'm going", calendar |
+| ![All upcoming events grouped by day with their map genres and the weather](docs/screenshots/events.png) | ![An artist's page: sound, labels, festivals, next gigs and numbers](docs/screenshots/artist.png) |
+| **Upcoming events** by day, with map genres and the weather at the venue | **An artist**: sound, labels, festivals played, next gigs, numbers |
+| ![A label's page: its crew and where the crew plays next](docs/screenshots/label.png) | ![A festival's page: what it sounds like and its sets on video](docs/screenshots/festival.png) |
+| **A label**: its crew and the label's "tour" (where the crew plays next) | **A festival**: its sound, editions in the event lists, sets on video |
+
+<p>
+  <img src="docs/screenshots/mobile.jpg" alt="The galaxy on a phone" width="260">
+  &nbsp;
+  <img src="docs/screenshots/stage-cards.jpg" alt="Adding an event: the line-up as stage cards with set times" width="260">
+</p>
+
+On a phone, and adding an event: the line-up as stage cards (stage genre, day, start, end, live), with the artists
+the site knows offered while typing.
 
 ## Features
 
@@ -52,25 +74,41 @@ genres the organizer ticked on Goabase. Admins can correct it by hand.
 - Event page: line-up with a link to every artist, **timetable per stage**, venue, entry, description,
   organizer, map, aftermovie, reviews.
 - World map of every party (Leaflet), with star pins in the site's style.
-- Artists: everyone in the upcoming line-ups, and each artist's page with their gigs.
+- Artists (DJ, producer, live act) and organizers: everyone in the upcoming line-ups, each with a page.
+- **"+ Calendar"** (.ics) on every event; filters by map genre.
+
+**Artists, organizers, labels and festivals**
+- Artist pages: photo, bio, links (a SoundCloud search until the artist adds their own), tracks, festivals
+  played, next gigs and numbers (where they play, the sound of their events, followers), as a list or a chart.
+- **Label pages** (`/labels/<name>`): the crew and where it plays next; follow a label.
+  **Festival pages** (`/festivals/<id>`): sound, editions found in the event lists, sets on video.
+- **Owners**: an artist, organizer, label or festival edits its own page and sees numbers only it sees.
+  "Is this you? **Claim this page**": an email on the page's official website makes it yours at once,
+  otherwise an admin checks the link you send. **"Not on the map yet?"** asks for a page the site doesn't have.
 
 **Accounts**
-- Register, log in (JWT), reset a forgotten password by email.
+- Register (the email is confirmed with a link), log in (JWT), reset a forgotten password by email.
 - Favorites, "I'm going", reviews, reminder emails before saved events.
 - **Follow artists** (☆ Follow): their ships get a spreading halo on the map, and an email arrives when they
   are added to a new line-up. The profile lists who you follow.
+- **Add an event** that isn't on Goabase: the line-up as **stage cards** (stage genre, set times, live) that
+  the backend reads like any line-up. An admin approves it; an organizer's own events go on the map at once.
 
-**Admin panel** (for the usernames in the backend's `ADMIN_USERNAMES`)
-- **Feedback inbox** with statuses, and "Fix in the panel →" straight from a message.
+**Admin panel**
+- Two roles: **admin** (everything) and **editor** (the content: events, artist genres, added events,
+  reviews). Admins give roles in Users; the ones in the backend's `ADMIN_USERNAMES` always stay admins.
+- **Dashboard** of what waits, **Feedback inbox** with replies by email, **Requests** (genre and name changes,
+  label crews, page claims, new pages), **Users**, **Reviews** moderation.
 - **Artist genres**: place an artist in genres (the map changes at once, events are worked out again), hide
   words that aren't artists, merge two spellings of one artist.
-- **Events**: set an event's genres by hand, correct or write its timetable.
+- **Events**: the harbour queue, genres by hand, the timetable by stage, read the line-up again, hide an event,
+  feature up to three on the map.
 - **History** of every change, with undo.
 
 **Everywhere**
 - One look for the whole site, the HUD style of the map (`src/styles/site.css`, `src/map/map.css`).
 - **Motion on/off**: a site-wide reduced motion switch that starts from the system setting.
-- Works on phones (one menu, folded panels).
+- Works on phones (one menu, folded panels), and installs as an app (PWA, with an offline page).
 
 ## Tech stack
 

@@ -18,7 +18,7 @@ function StageCards({ stages, onChange, days }) {
     const removeSet = (i, k) => changeStage(i, { sets: stages[i].sets.length > 1 ? stages[i].sets.filter((_, l) => l !== k) : [emptySet()] })
 
     return (
-        <div className="grid gap-3">
+        <div className="grid grid-cols-1 gap-3">
             {stages.map((stage, i) => (
                 <div key={i} className="stage-card">
                     <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -35,7 +35,7 @@ function StageCards({ stages, onChange, days }) {
                                 aria-label={`Remove stage ${stage.name || i + 1}`}>✕ Stage</button>
                         )}
                     </div>
-                    <div className="grid gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                         {stage.sets.map((set, k) => (
                             <div key={k} className="stage-set">
                                 {days.length > 0 && (
@@ -45,11 +45,13 @@ function StageCards({ stages, onChange, days }) {
                                         {days.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                                     </select>
                                 )}
-                                <input className="field w-auto" type="time" aria-label="Starts" value={set.start}
-                                    onChange={(e) => changeSet(i, k, { start: e.target.value, day: set.day || days[0]?.value || '' })} />
-                                <span className="muted">–</span>
-                                <input className="field w-auto" type="time" aria-label="Ends (optional)" value={set.end}
-                                    onChange={(e) => changeSet(i, k, { end: e.target.value })} />
+                                <span className="stage-set__time">
+                                    <input className="field w-auto" type="time" aria-label="Starts" value={set.start}
+                                        onChange={(e) => changeSet(i, k, { start: e.target.value, day: set.day || days[0]?.value || '' })} />
+                                    <span className="muted">–</span>
+                                    <input className="field w-auto" type="time" aria-label="Ends (optional)" value={set.end}
+                                        onChange={(e) => changeSet(i, k, { end: e.target.value })} />
+                                </span>
                                 <span className="stage-set__artist">
                                     <ArtistInput aria-label="Artist" placeholder="Artist" maxLength={100}
                                         value={set.artist} onChange={(artist) => changeSet(i, k, { artist })} />

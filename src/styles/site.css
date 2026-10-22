@@ -109,7 +109,8 @@ a { color: inherit; }
 /* A set: day, start – end on one line, the artist after (on the next line when the form is narrow) */
 .stage-set { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .stage-set .field { width: auto; padding: 8px 10px; }
-.stage-set__artist { flex: 1 1 12rem; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.stage-set__time { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.stage-set__artist { flex: 1 1 18rem; display: flex; align-items: center; gap: 8px; min-width: 0; }
 .stage-set__artist .field { flex: 1; min-width: 0; }
 .panel__label { font: 10px var(--mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; font-weight: 400; }
 .panel__title { font-family: var(--display); font-weight: 500; font-size: 18px; margin: 0 0 12px; }
