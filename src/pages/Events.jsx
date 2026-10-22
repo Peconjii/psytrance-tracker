@@ -58,10 +58,31 @@ function Events() {
         updateParams({ search: debouncedSearch, country: debouncedCountry })
     }, [debouncedSearch, debouncedCountry]) // eslint-disable-line react-hooks/exhaustive-deps
 
-    // A new key for every filter combination makes React start a fresh EventFeed from page 0
-    const feedKey = [debouncedSearch, debouncedCountry, genre, timeline].join('|')
+    // "Near me": the browser's position, rounded to about a kilometre; kept only on this page, never in the URL
+    const [near, setNear] = useState(null)
+    const [locating, setLocating] = useState(false)
+    const [nearError, setNearError] = useState('')
+    const findMe = () => {
+        if (!navigator.geolocation) return setNearError('This browser can’t tell where you are.')
+        setLocating(true)
+        setNearError('')
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const round = (x) => Math.round(x * 100) / 100
+                setNear({ lat: round(position.coords.latitude), lon: round(position.coords.longitude), km: near?.km ?? 100 })
+                setLocating(false)
+            },
+            () => {
+                setNearError('No location: allow it in the browser to see events near you.')
+                setLocating(false)
+            },
+            { maximumAge: 10 * 60 * 1000, timeout: 15000 })
+    }
 
-    const filtered = search || country || (genre && genre !== 'All') || timeline !== 'ALL'
+    // A new key for every filter combination makes React start a fresh EventFeed from page 0
+    const feedKey = [debouncedSearch, debouncedCountry, genre, timeline, near ? `${near.lat},${near.lon},${near.km}` : ''].join('|')
+
+    const filtered = search || country || (genre && genre !== 'All') || timeline !== 'ALL' || near
 
     return (
         <div className="page page--wide">
@@ -117,14 +138,34 @@ function Events() {
                     </div>
                 </div>
 
-                <label htmlFor="event-genre" className="field-label">Sound on the map</label>
-                <div className="flex flex-wrap items-center gap-2">
-                    {genre !== 'All' && <GenreChip id={genre} onRemove={() => setGenre('All')} />}
-                    <select id="event-genre" className="field max-w-xs" value={genre === 'All' ? '' : genre}
-                        onChange={(e) => setGenre(e.target.value || 'All')}>
-                        <option value="">Any genre</option>
-                        <GenreOptions />
-                    </select>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label htmlFor="event-genre" className="field-label">Sound on the map</label>
+                        <div className="flex flex-wrap items-center gap-2">
+                            {genre !== 'All' && <GenreChip id={genre} onRemove={() => setGenre('All')} />}
+                            <select id="event-genre" className="field max-w-xs" value={genre === 'All' ? '' : genre}
+                                onChange={(e) => setGenre(e.target.value || 'All')}>
+                                <option value="">Any genre</option>
+                                <GenreOptions />
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <span className="field-label">Near me</span>
+                        <div className="flex flex-wrap items-center gap-2">
+                            <button type="button" className={`chip${near ? ' is-on' : ''}`} aria-pressed={Boolean(near)} disabled={locating}
+                                onClick={() => (near ? setNear(null) : findMe())}>
+                                {locating ? 'Finding you…' : near ? '◎ Near me ✕' : '◎ Near me'}
+                            </button>
+                            {near && (
+                                <select className="field" style={{ width: 'auto' }} aria-label="How far" value={near.km}
+                                    onChange={(e) => setNear(n => ({ ...n, km: Number(e.target.value) }))}>
+                                    {[50, 100, 300, 1000].map(km => <option key={km} value={km}>within {km} km</option>)}
+                                </select>
+                            )}
+                        </div>
+                        {nearError && <p className="mono text-xs muted mt-2 mb-0">{nearError}</p>}
+                    </div>
                 </div>
 
                 {filtered && (
@@ -133,6 +174,7 @@ function Events() {
                             onClick={() => {
                                 setSearch('')
                                 setCountry('')
+                                setNear(null)
                                 // One update: two in a row would both start from the same old URL
                                 updateParams({ genre: 'All', timeline: 'ALL' })
                             }}
@@ -150,6 +192,7 @@ function Events() {
                 country={debouncedCountry}
                 genre={genre}
                 timeline={timeline}
+                near={near}
             />
         </div>
     )

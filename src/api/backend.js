@@ -18,9 +18,11 @@ api.interceptors.request.use(config => {
 
 // One page of events, filtered and paged by the backend. Throws on failure so the
 // caller can show an error; pass an AbortSignal to cancel it when filters change.
-export async function fetchEventsPage({ page, size, search, country, genre, timeline }, signal) {
+// near: { lat, lon, km } for "Near me", or null
+export async function fetchEventsPage({ page, size, search, country, genre, timeline, near }, signal) {
     const response = await api.get('/api/events', {
         params: {
+            ...(near ? { lat: near.lat, lon: near.lon, km: near.km } : {}),
             page,
             size,
             search: search || undefined,

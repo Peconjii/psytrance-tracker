@@ -15,8 +15,8 @@ let savedFeed = null
 
 // Infinite list of events for one set of filters. The parent gives it a `key` built from
 // the filters, so React throws this component away and starts fresh whenever they change.
-function EventFeed({ search, country, genre, timeline }) {
-    const filtersKey = [search, country, genre, timeline].join('|')
+function EventFeed({ search, country, genre, timeline, near }) {
+    const filtersKey = [search, country, genre, timeline, near ? [near.lat, near.lon, near.km].join(',') : ''].join('|')
     const navigationType = useNavigationType()
     // Only Back/Forward ('POP') restores; clicking "Events" in the navbar should give a fresh list
     const [restored] = useState(() =>
@@ -67,7 +67,7 @@ function EventFeed({ search, country, genre, timeline }) {
         if (error || pagesLoaded >= pagesWanted) return
 
         const controller = new AbortController()
-        fetchEventsPage({ page: pagesLoaded, size: PAGE_SIZE, search, country, genre, timeline }, controller.signal)
+        fetchEventsPage({ page: pagesLoaded, size: PAGE_SIZE, search, country, genre, timeline, near }, controller.signal)
             .then(data => {
                 setEvents(prev => [...prev, ...data.content])
                 setHasMore(data.hasNext)
@@ -91,7 +91,7 @@ function EventFeed({ search, country, genre, timeline }) {
             })
 
         return () => controller.abort()
-    }, [pagesWanted, pagesLoaded, error, search, country, genre, timeline])
+    }, [pagesWanted, pagesLoaded, error, search, country, genre, timeline, near])
 
     // Ask for another page once the user has scrolled past PREFETCH_AT of the list, marked by an
     // invisible sentinel inside the grid, so slow connections have time to load before the end.
