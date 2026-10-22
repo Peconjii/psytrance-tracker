@@ -4,6 +4,7 @@ import { FavoritesContext } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
 import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
+import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import api, { fetchMyArtists, fetchMyGoing, fetchMyOrganizers, setEventReminders } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -110,6 +111,8 @@ function Profile() {
                 <h1 className="page-title">{user?.username || 'Profile'}</h1>
                 <p className="page-head__sub">{user?.email || 'No email associated'}</p>
             </header>
+
+            <VerifyEmailNotice />
 
             <section className="panel flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>

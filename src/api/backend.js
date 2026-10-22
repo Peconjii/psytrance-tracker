@@ -168,6 +168,18 @@ export async function resetPassword(token, newPassword) {
     return response.data
 }
 
+// The link from the verification email: { username, message }. Throws (400) for a used or expired link.
+export async function verifyEmail(token) {
+    const response = await api.post('/api/auth/verify-email', { token })
+    return response.data
+}
+
+// "Send the link again" for the logged-in account: { message }. 429 when a link was just sent.
+export async function resendVerification() {
+    const response = await api.post('/api/auth/resend-verification')
+    return response.data
+}
+
 export default api
 // Feedback form. Throws on failure; the backend's { message } (and { errors } for invalid fields) is in err.response.data
 export async function sendFeedback(feedback) {

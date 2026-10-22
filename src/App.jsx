@@ -12,6 +12,7 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import ForgotPassword from './pages/ForgotPassword'
 import ResetPassword from './pages/ResetPassword'
+import VerifyEmail from './pages/VerifyEmail'
 import Profile from './pages/Profile'
 import GlobalMap from './pages/GlobalMap'
 import Artists from './pages/Artists'
@@ -51,6 +52,7 @@ function Shell() {
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/feedback" element={<Feedback />} />
 
           {/* Only for logged-in users; guests are redirected to /login */}

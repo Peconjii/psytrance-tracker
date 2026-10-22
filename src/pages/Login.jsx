@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
-import { useNavigate } from 'react-router-dom'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 function Login() {
@@ -11,6 +10,8 @@ function Login() {
     const [error, setError] = useState('')
     const { login } = useAuth()
     const navigate = useNavigate()
+    // Right after registering: the email the confirmation link went to
+    const registered = useLocation().state?.registered
 
     async function handleSubmit(e) {
         e.preventDefault()
@@ -28,6 +29,12 @@ function Login() {
             <div className="panel">
                 <div className="page-head__tag">// Crew access</div>
                 <h1 className="page-title">Log in</h1>
+                {registered && !error && (
+                    <p className="notice notice--ok mt-4 mb-4">
+                        Account created. We sent a link to {registered}: open it to confirm your email (needed to add
+                        events). You can log in already.
+                    </p>
+                )}
                 {error && <p className="notice mb-4">{error}</p>}
                 <form onSubmit={handleSubmit} className="grid gap-4 mt-4">
                     <div>

@@ -17,7 +17,7 @@ function Register() {
         e.preventDefault()
         try {
             await register(username, email, password)
-            navigate('/login')
+            navigate('/login', { state: { registered: email } })
         } catch (err) {
             // Backend sends { message } and, for validation errors, { errors: { field: reason } }
             const data = err.response?.data
