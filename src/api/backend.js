@@ -468,8 +468,16 @@ export async function rejectOurEvent(id, reason) {
 }
 
 // Admins: { total, verified, newThisWeek, users: [newest first, with what they use] }; search by name or email
-export async function fetchAdminUsers(search, signal) {
-    const response = await api.get('/api/admin/users', { params: search ? { search } : {}, signal })
+// team: only the admins and editors
+export async function fetchAdminUsers(search, team, signal) {
+    const params = { ...(search ? { search } : {}), ...(team ? { team: true } : {}) }
+    const response = await api.get('/api/admin/users', { params, signal })
+    return response.data
+}
+
+// role: 'ADMIN', 'EDITOR' or null (a user again)
+export async function setUserRole(username, role) {
+    const response = await api.put('/api/admin/users/' + encodeURIComponent(username) + '/role', { role })
     return response.data
 }
 

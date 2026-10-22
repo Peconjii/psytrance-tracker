@@ -86,15 +86,15 @@ function Shell() {
             }
           />
           {/* For admins; the backend checks it again on every request */}
-          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+          <Route path="/admin" element={<AdminRoute editors><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
-          <Route path="/admin/genres" element={<AdminRoute><AdminGenres /></AdminRoute>} />
-          <Route path="/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />
+          <Route path="/admin/genres" element={<AdminRoute editors><AdminGenres /></AdminRoute>} />
+          <Route path="/admin/events" element={<AdminRoute editors><AdminEvents /></AdminRoute>} />
           <Route path="/admin/history" element={<AdminRoute><AdminHistory /></AdminRoute>} />
           <Route path="/admin/requests" element={<AdminRoute><AdminRequests /></AdminRoute>} />
-          <Route path="/admin/our-events" element={<AdminRoute><AdminOurEvents /></AdminRoute>} />
+          <Route path="/admin/our-events" element={<AdminRoute editors><AdminOurEvents /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-          <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
+          <Route path="/admin/reviews" element={<AdminRoute editors><AdminReviews /></AdminRoute>} />
           {/* The artist's owner or an admin; the backend says who may */}
           <Route path="/artists/:slug/edit" element={<ProtectedRoute><ArtistEdit /></ProtectedRoute>} />
           <Route path="/events/new" element={<ProtectedRoute><AddEvent /></ProtectedRoute>} />

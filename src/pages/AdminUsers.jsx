@@ -1,18 +1,29 @@
 import { useEffect, useState } from 'react'
-import { fetchAdminUsers } from '../api/backend.js'
+import { fetchAdminUsers, setUserRole } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
+import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+const ROLES = [
+    { id: '', label: 'User' },
+    { id: 'EDITOR', label: 'Editor' },
+    { id: 'ADMIN', label: 'Admin' },
+]
 
-// Admin panel: who has an account, newest first, and what they use (follows, saved events, "I'm going"...)
+// Admin panel: who has an account, newest first, what they use (follows, saved events, "I'm going"...) and their role.
+// An editor fixes the content (events, genres, added events, reviews); an admin may do everything.
 function AdminUsers() {
     usePageMeta({ title: 'Users', path: '/admin/users', noindex: true })
+    const { user } = useAuth()
     const [search, setSearch] = useState('')
     const [query, setQuery] = useState('')
-    const [loaded, setLoaded] = useState({ query: null, data: null })
+    const [team, setTeam] = useState(false)
+    const [loaded, setLoaded] = useState({ key: null, data: null })
     const [error, setError] = useState('')
-    const data = loaded.query === query ? loaded.data : null
+    const [saving, setSaving] = useState(null)
+    const key = query + '|' + team
+    const data = loaded.key === key ? loaded.data : null
 
     // A short pause after typing, so not every key is a request
     useEffect(() => {
@@ -22,11 +33,24 @@ function AdminUsers() {
 
     useEffect(() => {
         const controller = new AbortController()
-        fetchAdminUsers(query, controller.signal)
-            .then(found => setLoaded({ query, data: found }))
+        fetchAdminUsers(query, team, controller.signal)
+            .then(found => setLoaded({ key: query + '|' + team, data: found }))
             .catch(err => { if (!controller.signal.aborted) setError(err.response?.data?.message || 'Could not load the users.') })
         return () => controller.abort()
-    }, [query])
+    }, [query, team])
+
+    const changeRole = async (u, role) => {
+        setSaving(u.username)
+        setError('')
+        try {
+            const saved = await setUserRole(u.username, role || null)
+            setLoaded(l => ({ ...l, data: { ...l.data, users: l.data.users.map(x => (x.id === u.id ? { ...x, role: saved.role } : x)) } }))
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not change the role.')
+        } finally {
+            setSaving(null)
+        }
+    }
 
     const usage = (u) => [
         u.follows && `${u.follows} artists`,
@@ -45,7 +69,7 @@ function AdminUsers() {
                 <h1 className="page-title">Users</h1>
             </header>
             {error && <p className="notice">{error}</p>}
-            {data && (
+            {data && !team && (
                 <div className="grid grid-cols-3 gap-3 mb-4">
                     <div className="stat"><span className="stat__value">{data.total}</span><span className="stat__label">Accounts</span></div>
                     <div className="stat"><span className="stat__value">{data.newThisWeek}</span><span className="stat__label">New this week</span></div>
@@ -53,30 +77,49 @@ function AdminUsers() {
                 </div>
             )}
             <section className="panel">
-                <input className="field mb-3" aria-label="Search users" placeholder="Name or email…" value={search}
-                    onChange={(e) => setSearch(e.target.value)} />
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                    <input className="field flex-1 min-w-48" aria-label="Search users" placeholder="Name or email…" value={search}
+                        onChange={(e) => setSearch(e.target.value)} />
+                    <button type="button" className={'chip' + (team ? ' is-on' : '')} aria-pressed={team} onClick={() => setTeam(t => !t)}>
+                        Team only
+                    </button>
+                </div>
+                <p className="mono text-xs muted mt-0 mb-3">
+                    Editor: events, their genres and timetables, artist genres, added events, reviews. Admin: everything,
+                    also the inbox, accounts, requests, history and roles.
+                </p>
                 {!data ? (
                     <p className="mono text-xs muted m-0">Loading…</p>
                 ) : data.users.length === 0 ? (
-                    <p className="muted text-sm m-0">Nobody found.</p>
+                    <p className="muted text-sm m-0">{team ? 'No admins or editors found.' : 'Nobody found.'}</p>
                 ) : (
                     <ul className="rows">
                         {data.users.map(u => (
-                            <li key={u.id} className="rows__item">
+                            <li key={u.id} className="rows__item flex-wrap gap-2">
                                 <span className="rows__name">
                                     {u.username}
-                                    {u.admin && <span className="badge ml-2">admin</span>}
+                                    {u.role && <span className="badge ml-2">{u.role.toLowerCase()}</span>}
                                     <span className="block mono text-xs muted">{u.email || 'no email'}{!u.emailVerified && ' · not confirmed'}</span>
                                 </span>
                                 <span className="rows__meta">
                                     {usage(u) || 'nothing yet'}
                                     <span className="block">{u.createdAt ? `joined ${DAY.format(new Date(u.createdAt))}` : 'join date not recorded'}</span>
                                 </span>
+                                {u.roleOnServer ? (
+                                    <span className="mono text-xs muted shrink-0" title="Set in ADMIN_USERNAMES on the server">admin on the server</span>
+                                ) : u.username === user?.username ? (
+                                    <span className="mono text-xs muted shrink-0">you</span>
+                                ) : (
+                                    <select className="field shrink-0" style={{ width: 'auto', minWidth: '8rem' }} aria-label={`Role of ${u.username}`} value={u.role ?? ''}
+                                        disabled={saving !== null} onChange={(e) => changeRole(u, e.target.value)}>
+                                        {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+                                    </select>
+                                )}
                             </li>
                         ))}
                     </ul>
                 )}
-                {data && data.users.length < data.total && !query && (
+                {data && !team && data.users.length < data.total && !query && (
                     <p className="mono text-xs muted mt-3 mb-0">The newest {data.users.length} are shown; search to find the others.</p>
                 )}
             </section>

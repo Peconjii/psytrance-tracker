@@ -9,17 +9,17 @@ function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const location = useLocation()
     const reducedMotion = useReducedMotion()
-    // For admins: how many things wait for them (new messages, events, requests), next to "Admin"
+    // For admins and editors: how many things wait for them (an editor: only the events), next to "Admin"
     const [waiting, setWaiting] = useState({ userId: null, total: 0 })
     const checkedAt = useRef(0)
     useEffect(() => {
-        if (!user?.admin) return
+        if (!user?.editor) return
         // Asked again when moving between pages, at most once a minute
         if (Date.now() - checkedAt.current < 60_000 && waiting.userId === user.id) return
         checkedAt.current = Date.now()
-        fetchAdminWaiting().then(w => setWaiting({ userId: user.id, total: w.total })).catch(() => {})
+        fetchAdminWaiting().then(w => setWaiting({ userId: user.id, total: user.admin ? w.total : w.events })).catch(() => {})
     }, [user, location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
-    const waitingCount = user?.admin && waiting.userId === user.id ? waiting.total : 0
+    const waitingCount = user?.editor && waiting.userId === user.id ? waiting.total : 0
 
     const navLinks = [
         { path: '/', label: 'Galaxy' },
@@ -29,8 +29,8 @@ function Navbar() {
         { path: '/feedback', label: 'Feedback' },
         // Profile is the username button on the right
         ...(user ? [{ path: '/favorites', label: 'Favorites' }] : []),
-        // Only admins see the admin panel (the backend checks it again)
-        ...(user?.admin ? [{ path: '/admin', label: 'Admin', count: waitingCount }] : [])
+        // Admins and editors see the admin panel (the backend checks it again)
+        ...(user?.editor ? [{ path: '/admin', label: 'Admin', count: waitingCount }] : [])
     ]
 
     // An event or artist page counts as its section, so /events/123 still lights up "Events"

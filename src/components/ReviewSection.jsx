@@ -108,7 +108,7 @@ function ReviewSection({ eventId }) {
                                 <span className="mono text-xs soft">{'★'.repeat(rev.rating)}{'☆'.repeat(5 - rev.rating)}</span>
                             </div>
                             {rev.comment && <p className="soft text-sm m-0">{rev.comment}</p>}
-                            {user && (user.admin || rev.username === user.username) && (
+                            {user && (user.editor || rev.username === user.username) && (
                                 <button type="button" className="link mono text-xs self-end bg-transparent border-0 p-0 cursor-pointer"
                                     onClick={() => handleDelete(rev)}>Delete</button>
                             )}
