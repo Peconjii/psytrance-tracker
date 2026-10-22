@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom'
 import { fetchOurEvent, submitOurEvent, updateOurEvent } from '../api/backend.js'
 import { searchPlaces } from '../api/places.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
+import StageCards from '../components/StageCards.jsx'
+import { emptyStage, eventDays, lineUpOf, stagesOf } from '../components/stageText.js'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -46,6 +48,24 @@ function AddEvent() {
     const [error, setError] = useState('')
     const [sent, setSent] = useState(null)
     const [loaded, setLoaded] = useState(!editId)
+    // The line-up as stage cards, or as text (pasted, or a line-up the cards can't show)
+    const [stages, setStages] = useState(() => [emptyStage()])
+    const [asText, setAsText] = useState(false)
+    const [textNote, setTextNote] = useState('')
+    const days = eventDays(form.startsAt, form.endsAt)
+    const lineUp = asText ? form.lineUp : lineUpOf(stages, days)
+
+    const showCards = () => {
+        const found = form.lineUp.trim() ? stagesOf(form.lineUp) : [emptyStage()]
+        if (!found) return setTextNote('This text has more than names and set times, so it stays text. Clear it to start with cards.')
+        setStages(found)
+        setAsText(false)
+        setTextNote('')
+    }
+    const showText = () => {
+        setForm(f => ({ ...f, lineUp: lineUpOf(stages, days) }))
+        setAsText(true)
+    }
 
     // Editing: the form starts with the event as it is
     useEffect(() => {
@@ -56,6 +76,10 @@ function AddEvent() {
                 setForm(Object.fromEntries(Object.keys(EMPTY).map(key => [key,
                     key === 'startsAt' || key === 'endsAt' ? toField(ev[key]) : (ev[key] ?? '')])))
                 setGenres(ev.genres)
+                // A line-up the cards wrote opens as cards again; any other text stays text
+                const found = ev.lineUp?.trim() ? stagesOf(ev.lineUp) : [emptyStage()]
+                if (found) setStages(found)
+                setAsText(!found)
                 setPlace({ name: ev.town, region: '', country: ev.country, lat: ev.lat, lon: ev.lon, timeZone: ev.timeZone })
                 setLoaded(true)
             })
@@ -88,6 +112,7 @@ function AddEvent() {
             const save = editId ? (event) => updateOurEvent(editId, event) : submitOurEvent
             setSent(await save({
                 ...trimmed,
+                lineUp: lineUp.trim(),
                 // datetime-local gives "2026-11-14T22:00"; the backend wants seconds too
                 startsAt: trimmed.startsAt.length === 16 ? trimmed.startsAt + ':00' : trimmed.startsAt,
                 endsAt: trimmed.endsAt ? (trimmed.endsAt.length === 16 ? trimmed.endsAt + ':00' : trimmed.endsAt) : null,
@@ -224,9 +249,28 @@ function AddEvent() {
                         </div>
                         <p className="muted text-sm m-0">Up to {MAX_GENRES} genres: they decide where the ship flies.</p>
                         <div>
-                            <label htmlFor="ev-lineup" className="field-label">Line-up</label>
-                            <textarea id="ev-lineup" className="field mono text-sm" rows={8} maxLength={10000} value={form.lineUp} onChange={set('lineUp')}
-                                placeholder={'One artist per line. Stage names, days and set times are understood:\n\nMAIN STAGE\nSat 22:00 Ajja (live)\nSun 00:00 Tristan\n\nCHILL OUT\nSun 14:00 Kaya Project'} />
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                <span className="field-label m-0">Line-up and timetable</span>
+                                <button type="button" className="link mono text-xs bg-transparent border-0 p-0 cursor-pointer"
+                                    onClick={asText ? showCards : showText}>
+                                    {asText ? 'Use stage cards →' : 'Paste or write as text →'}
+                                </button>
+                            </div>
+                            {asText ? (
+                                <textarea id="ev-lineup" aria-label="Line-up" className="field mono text-sm" rows={8} maxLength={10000} value={form.lineUp} onChange={set('lineUp')}
+                                    placeholder={'One artist per line. Stage names, days and set times are understood:\n\nMAIN STAGE\nSat 22:00 Ajja (live)\nSun 00:00 Tristan\n\nCHILL OUT\nSun 14:00 Kaya Project'} />
+                            ) : (
+                                <>
+                                    <StageCards stages={stages} onChange={setStages} days={days} />
+                                    <p className="muted text-sm mt-2 mb-0">
+                                        {days.length ? 'Times on the clock at the venue; the end is optional. A set without a time just lists the artist.'
+                                            : 'Pick when the event starts (above) to give the sets their days.'}
+                                        {' '}“✓ page”: the artist is on the site and the set links to their page.
+                                    </p>
+                                </>
+                            )}
+                            {textNote && <p className="notice mt-2 mb-0">{textNote}</p>}
+                            {lineUp.length > 10000 && <p className="notice mt-2 mb-0">The line-up is too long (10 000 characters at most).</p>}
                         </div>
                     </section>
 
