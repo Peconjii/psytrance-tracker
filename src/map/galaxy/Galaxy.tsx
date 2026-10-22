@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type MutableRefObject } from 'react';
 import { Application, BlurFilter, Container, Graphics, Text } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
 import { data, festivals, genreById, genresOfArtist, labels, WORLD, type Genre } from '../data/types';
-import { buildFleets, HARBOUR, type MapEvent } from '../data/events';
+import { artistSlug, buildFleets, HARBOUR, type MapEvent } from '../data/events';
 import { shipState, type LiveFleet } from '../data/liveFleet';
 
 interface Props {
@@ -42,6 +42,8 @@ interface Props {
   framedFleet?: LiveFleet | null;
   /** Events where artists the user follows play (event id -> their names): those ships are gold */
   followedEvents?: ReadonlyMap<number, string[]>;
+  /** Slugs of the artists the user follows: they get a place on their stars' orbits first */
+  followedArtists?: ReadonlySet<string>;
 }
 
 /** The visible part of the world, in world coordinates */
@@ -83,6 +85,8 @@ interface StarNode {
   /** Artist satellites, in their own layer so the star's hit area doesn't swallow their clicks */
   orbit: Container;
   sats: Satellite[];
+  /** "+8 more" under the orbit when not every artist fits on it */
+  more: Text;
   /** Number of upcoming events playing this genre, shown next to the star */
   count: Text;
 }
@@ -109,6 +113,33 @@ interface Fleet {
 }
 
 const hex = (c: string) => parseInt(c.slice(1), 16);
+/** At most this many artists orbit a star, so a busy genre stays readable; the genre's panel lists them all */
+const MAX_SATELLITES = 12;
+
+/**
+ * Which artists get a place on a star's orbit: the selected artist, then the ones the user follows, then the rest in
+ * the map's order (its key artists come first). The others are listed in the genre's panel.
+ */
+function pickSatellites(names: string[], selectedArtist: string | null, followed: ReadonlySet<string> | undefined): Set<string> {
+  const first = names.filter((n) => n === selectedArtist);
+  const liked = names.filter((n) => n !== selectedArtist && followed?.has(artistSlug(n)));
+  const rest = names.filter((n) => n !== selectedArtist && !followed?.has(artistSlug(n)));
+  return new Set([...first, ...liked, ...rest].slice(0, MAX_SATELLITES));
+}
+
+/** Puts the picked satellites evenly on the two orbits and hides the others */
+function layoutSatellites(star: StarNode, shown: Set<string>) {
+  const visible = star.sats.filter((sat) => shown.has(sat.name));
+  const inner = star.sats[0]?.radius !== undefined ? Math.min(...star.sats.map((sat) => sat.radius)) : 0;
+  star.sats.forEach((sat) => { sat.node.visible = shown.has(sat.name); });
+  visible.forEach((sat, i) => {
+    sat.radius = inner + (i % 2) * 26;
+    sat.phase = (i / visible.length) * Math.PI * 2;
+  });
+  const hidden = star.sats.length - visible.length;
+  star.more.text = hidden > 0 ? `+${hidden} more · open the system` : '';
+}
+
 /** Zoom level from which every star shows its satellites, not just the selected one */
 const SAT_ZOOM = 1.6;
 /** Festival names appear from this zoom; in the full overview they crowd the centre of the map */
@@ -152,7 +183,7 @@ const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null, followedEvents }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null, followedEvents, followedArtists }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -430,8 +461,17 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           orbit.addChild(node);
           return { name, node, dot, radius: inner + (i % 2) * 26, phase: (i / g.artists.length) * Math.PI * 2 };
         });
+        // Under the orbit: how many artists of the genre don't fit on it
+        const more = new Text({
+          text: '',
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: color, letterSpacing: 1 },
+        });
+        more.anchor.set(0.5, 0);
+        more.position.set(0, inner + 46);
+        orbit.addChild(more);
         satLayer.addChild(orbit);
-        starsRef.current[g.id] = { genre: g, root, halo, label, orbit, sats, count };
+        starsRef.current[g.id] = { genre: g, root, halo, label, orbit, sats, more, count };
+        layoutSatellites(starsRef.current[g.id], pickSatellites(g.artists, null, undefined));
       }
 
       // Animation: pulse on the beat (one pulse per bar), particles, orbiting satellites
@@ -621,6 +661,14 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       fl.stroke({ width: 3, color: 0xffffff, alpha: 0.75 });
     }
   }, [selectedId, artist, year, ready, focus]);
+
+  // The artists on each orbit: the selected one and the ones the user follows get a place first
+  useEffect(() => {
+    if (!ready) return;
+    for (const s of Object.values(starsRef.current)) {
+      layoutSatellites(s, pickSatellites(s.genre.artists, s.genre.id === selectedId ? artist : null, followedArtists));
+    }
+  }, [selectedId, artist, followedArtists, ready]);
 
   useEffect(() => {
     if (stationLayerRef.current) stationLayerRef.current.visible = showStations;

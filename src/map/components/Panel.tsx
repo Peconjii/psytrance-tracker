@@ -351,7 +351,8 @@ export function Panel({
 
       {g.tracks.length > 0 && (<><div className="hud__label">Key tracks</div>{trackList(g.tracks)}</>)}
 
-      <div className="hud__label">Artists</div>
+      {/* All of them here; the orbit on the map shows 12 at most (followed ones first) */}
+      <div className="hud__label">Artists · {g.artists.length}</div>
       <div className="hud__chips">
         {g.artists.map((a) => (
           <button key={a} className="hud__chip" onClick={() => onSelectArtist(a)}>

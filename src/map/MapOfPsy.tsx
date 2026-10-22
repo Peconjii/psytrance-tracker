@@ -90,7 +90,9 @@ function MapOfPsy() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   // Events with artists the user follows: their ships are gold
-  const { gigsByEvent } = useFollows();
+  const { gigsByEvent, follows } = useFollows();
+  // Followed artists get a place on their stars' orbits first
+  const followedArtists = useMemo(() => new Set<string>(follows.map((f: { slug: string }) => f.slug)), [follows]);
   const reducedMotion = useReducedMotion();
   const boardedId = fleet?.length === 1 ? fleet[0] : null;
 
@@ -313,7 +315,7 @@ function MapOfPsy() {
         onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion}
         liveFleets={liveFleets} clockRef={clockRef}
         framedFleet={preview ? liveFleets.find((f) => f.eventId === preview.eventId) ?? null : null}
-        followedEvents={gigsByEvent} />
+        followedEvents={gigsByEvent} followedArtists={followedArtists} />
 
       <header className="topbar">
         <div className="brand">
