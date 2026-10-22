@@ -5,7 +5,9 @@ import {
 } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import { AddGenre, FeedbackBanner, GenreChip } from '../components/AdminParts'
+import EventAdminTools from '../components/EventAdminTools.jsx'
 import HarbourQueue from '../components/HarbourQueue.jsx'
+import HiddenEvents from '../components/HiddenEvents.jsx'
 import TimetableEditor from '../components/TimetableEditor.jsx'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -90,6 +92,8 @@ function AdminEvents() {
     const [result, setResult] = useState({ search: null, events: [], error: null })
     // The event something was saved for: picking another event starts over
     const [savedFor, setSavedFor] = useState(null)
+    // Bumped when an event is hidden, so the harbour and the hidden list load again
+    const [hiddenVersion, setHiddenVersion] = useState(0)
 
     useEffect(() => {
         if (debounced.length < 2) return
@@ -119,6 +123,8 @@ function AdminEvents() {
             {selected && <EventEditor key={selected} id={selected} onSaved={() => setSavedFor(selected)} />}
             {selected && <TimetableEditor key={'tt' + selected} id={selected} save={setAdminTimetable} handBack={handBackTimetable}
                 onSaved={() => setSavedFor(selected)} />}
+            {selected && <EventAdminTools key={'tools' + selected} id={selected}
+                onHidden={() => { setParams({}); setHiddenVersion(v => v + 1) }} />}
 
             <div className="panel mb-6">
                 <label htmlFor="admin-event-search" className="field-label">Find another event</label>
@@ -147,8 +153,10 @@ function AdminEvents() {
 
             {/* The work list when nothing is being searched: ships whose genre isn't known */}
             {debounced.length < 2 && (
-                <HarbourQueue onOpen={(id) => { setParams(feedbackId ? { id, feedback: feedbackId } : { id: String(id) }); window.scrollTo(0, 0) }} />
+                <HarbourQueue key={hiddenVersion} onHidden={() => setHiddenVersion(v => v + 1)}
+                    onOpen={(id) => { setParams(feedbackId ? { id, feedback: feedbackId } : { id: String(id) }); window.scrollTo(0, 0) }} />
             )}
+            <HiddenEvents version={hiddenVersion} />
         </div>
     )
 }

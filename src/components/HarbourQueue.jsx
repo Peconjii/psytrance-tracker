@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { setAdminEventGenres } from '../api/backend.js'
+import { hideEvent, setAdminEventGenres } from '../api/backend.js'
 import { fetchMapEvents } from '../map/data/events'
 import { AddGenre } from './AdminParts'
 
 const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 
 // The harbour as a work list for admins: the next 30 days' events whose genre isn't known, soonest first. Picking a
-// genre sets it by hand and the ship flies off the list; "More" opens the event in the editor above.
-function HarbourQueue({ onOpen }) {
+// genre sets it by hand and the ship flies off the list; "More" opens the event in the editor above, and "Hide" takes
+// it off the site (events that aren't psytrance end up in the harbour).
+function HarbourQueue({ onOpen, onHidden }) {
     const [events, setEvents] = useState(null)
     const [error, setError] = useState('')
     const [saving, setSaving] = useState(null)
@@ -29,6 +30,22 @@ function HarbourQueue({ onOpen }) {
             setEvents(list => list.filter(e => e.id !== event.id))
         } catch (err) {
             setError(err.response?.data?.message || 'Could not save. Try again.')
+        } finally {
+            setSaving(null)
+        }
+    }
+
+    const hide = async (event) => {
+        const reason = window.prompt(`Hide "${event.nameParty}" from the site? Why:`, 'Not psytrance')
+        if (reason === null) return
+        setSaving(event.id)
+        setError('')
+        try {
+            await hideEvent(event.id, reason.trim() || null)
+            setEvents(list => list.filter(e => e.id !== event.id))
+            onHidden?.()
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not hide it. Try again.')
         } finally {
             setSaving(null)
         }
@@ -58,6 +75,8 @@ function HarbourQueue({ onOpen }) {
                             <AddGenre exclude={[]} disabled={saving === e.id} label={`Genre of ${e.nameParty}`}
                                 onAdd={(genreId) => setGenre(e, genreId)} />
                             <button type="button" className="btn btn--ghost" onClick={() => onOpen(e.id)}>More</button>
+                            <button type="button" className="btn btn--ghost btn--danger" disabled={saving === e.id}
+                                onClick={() => hide(e)}>Hide</button>
                         </li>
                     ))}
                 </ul>

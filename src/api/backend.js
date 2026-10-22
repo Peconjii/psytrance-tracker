@@ -498,3 +498,25 @@ export async function fetchAdminDashboard(signal) {
     const response = await api.get('/api/admin/dashboard', { signal })
     return response.data
 }
+
+// Admins: reads an event's line-up right away: { artists: [names found] }
+export async function rereadLineUp(id) {
+    const response = await api.post(`/api/admin/events/${id}/reread`)
+    return response.data
+}
+
+// Admins: hides an event from the whole site (lists, map, artist index, reminders), with an optional reason
+export async function hideEvent(id, reason) {
+    const response = await api.put(`/api/admin/events/${id}/hidden`, { reason })
+    return response.data
+}
+
+export async function showEvent(id) {
+    await api.delete(`/api/admin/events/${id}/hidden`)
+}
+
+// Admins: the hidden events, newest first: [{ eventId, name, reason, hiddenBy, hiddenAt }]
+export async function fetchHiddenEvents(signal) {
+    const response = await api.get('/api/admin/events/hidden', { signal })
+    return response.data
+}
