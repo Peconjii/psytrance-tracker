@@ -196,7 +196,7 @@ function AddEvent() {
                         <div>
                             <label htmlFor="ev-lineup" className="field-label">Line-up</label>
                             <textarea id="ev-lineup" className="field mono text-sm" rows={8} maxLength={10000} value={form.lineUp} onChange={set('lineUp')}
-                                placeholder={'One artist per line. Stage names and set times are understood (a time earlier than the one before is the next day):\n\nMAIN STAGE\n22:00 Ajja (live)\n00:00 Tristan\n\nCHILL OUT\n14:00 Kaya Project'} />
+                                placeholder={'One artist per line. Stage names, days and set times are understood:\n\nMAIN STAGE\nSat 22:00 Ajja (live)\nSun 00:00 Tristan\n\nCHILL OUT\nSun 14:00 Kaya Project'} />
                         </div>
                     </section>
 
