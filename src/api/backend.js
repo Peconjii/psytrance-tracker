@@ -486,3 +486,15 @@ export async function fetchNewestReviews(signal) {
     const response = await api.get('/api/admin/reviews', { signal })
     return response.data
 }
+
+// Admins: what waits for them { feedback, events, artistRequests, total }, for the number next to "Admin"
+export async function fetchAdminWaiting(signal) {
+    const response = await api.get('/api/admin/waiting', { signal })
+    return response.data
+}
+
+// Admins: the dashboard { waiting, users, newUsersThisWeek, ships, harbour, index, mostFollowed }
+export async function fetchAdminDashboard(signal) {
+    const response = await api.get('/api/admin/dashboard', { signal })
+    return response.data
+}

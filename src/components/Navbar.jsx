@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { fetchAdminWaiting } from '../api/backend.js'
 import { setReducedMotion, useReducedMotion } from '../motion.js'
 
 function Navbar() {
@@ -8,6 +9,17 @@ function Navbar() {
     const [isOpen, setIsOpen] = useState(false)
     const location = useLocation()
     const reducedMotion = useReducedMotion()
+    // For admins: how many things wait for them (new messages, events, requests), next to "Admin"
+    const [waiting, setWaiting] = useState({ userId: null, total: 0 })
+    const checkedAt = useRef(0)
+    useEffect(() => {
+        if (!user?.admin) return
+        // Asked again when moving between pages, at most once a minute
+        if (Date.now() - checkedAt.current < 60_000 && waiting.userId === user.id) return
+        checkedAt.current = Date.now()
+        fetchAdminWaiting().then(w => setWaiting({ userId: user.id, total: w.total })).catch(() => {})
+    }, [user, location.pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+    const waitingCount = user?.admin && waiting.userId === user.id ? waiting.total : 0
 
     const navLinks = [
         { path: '/', label: 'Galaxy' },
@@ -18,7 +30,7 @@ function Navbar() {
         // Profile is the username button on the right
         ...(user ? [{ path: '/favorites', label: 'Favorites' }] : []),
         // Only admins see the admin panel (the backend checks it again)
-        ...(user?.admin ? [{ path: '/admin/feedback', label: 'Admin' }] : [])
+        ...(user?.admin ? [{ path: '/admin', label: 'Admin', count: waitingCount }] : [])
     ]
 
     // An event or artist page counts as its section, so /events/123 still lights up "Events"
@@ -57,7 +69,7 @@ function Navbar() {
                     {navLinks.map(link => (
                         <Link key={link.path} to={link.path} className={linkClass(link.path)}
                             aria-current={isActive(link.path) ? 'page' : undefined}>
-                            {link.label}
+                            {link.label}{link.count > 0 && <span className="site-nav__count" title={`${link.count} waiting for you`}>{link.count}</span>}
                         </Link>
                     ))}
                 </div>
@@ -78,7 +90,7 @@ function Navbar() {
                 <div id="site-nav-mobile" className="site-nav__mobile">
                     {navLinks.map(link => (
                         <Link key={link.path} to={link.path} onClick={() => setIsOpen(false)} className={linkClass(link.path)}>
-                            {link.label}
+                            {link.label}{link.count > 0 && <span className="site-nav__count">{link.count}</span>}
                         </Link>
                     ))}
                     <div className="flex flex-wrap gap-2 pt-3">{motionButton}{authLinks}</div>

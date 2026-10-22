@@ -66,6 +66,9 @@ a { color: inherit; }
   font: 12px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; color: var(--muted);
   padding: 8px 10px; border-bottom: 2px solid transparent;
 }
+/* How many things wait for an admin, next to "Admin" */
+.site-nav__count { display: inline-block; margin-left: 6px; padding: 0 5px; min-width: 16px; text-align: center;
+  font: 600 10px/16px var(--mono); letter-spacing: 0; color: var(--bg, #05040d); background: var(--accent); }
 .site-nav__link:hover, .site-nav__link:focus-visible { color: var(--fg); outline: none; }
 .site-nav__link.is-active { color: var(--fg); border-bottom-color: var(--accent); }
 .site-nav__auth { display: flex; align-items: center; gap: 8px; }

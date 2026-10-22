@@ -29,6 +29,7 @@ import AdminRequests from './pages/AdminRequests'
 import AdminOurEvents from './pages/AdminOurEvents'
 import AdminUsers from './pages/AdminUsers'
 import AdminReviews from './pages/AdminReviews'
+import AdminDashboard from './pages/AdminDashboard'
 import AddEvent from './pages/AddEvent'
 import ArtistEdit from './pages/ArtistEdit'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -77,6 +78,7 @@ function Shell() {
             }
           />
           {/* For admins; the backend checks it again on every request */}
+          <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
           <Route path="/admin/feedback" element={<AdminRoute><AdminFeedback /></AdminRoute>} />
           <Route path="/admin/genres" element={<AdminRoute><AdminGenres /></AdminRoute>} />
           <Route path="/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />

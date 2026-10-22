@@ -5,6 +5,7 @@ function AdminTabs() {
     const tab = ({ isActive }) => `chip no-underline${isActive ? ' is-on' : ''}`
     return (
         <nav className="flex flex-wrap gap-2 mb-6" aria-label="Admin">
+            <NavLink to="/admin" end className={tab}>Dashboard</NavLink>
             <NavLink to="/admin/feedback" className={tab}>Feedback inbox</NavLink>
             <NavLink to="/admin/genres" className={tab}>Artist genres</NavLink>
             <NavLink to="/admin/events" className={tab}>Events</NavLink>
