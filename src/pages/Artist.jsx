@@ -147,7 +147,7 @@ function Artist() {
                         {(genres.length > 0 || role) && (
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {role && (
-                                    <span className="badge" title={role.guessed ? 'Guessed from the line-ups and the map' : 'Picked by the artist'}>
+                                    <span className="badge" title={role.guessed ? 'Guessed from the line-ups' : 'Picked by the artist'}>
                                         {ROLE_LABELS[role.role]}
                                     </span>
                                 )}

@@ -171,7 +171,7 @@ function ArtistEdit() {
                 saving={roleSave.saving} status={roleSave.status}
                 onSave={() => roleSave.run(() => setArtistRole(slug, role || null))}>
                 <select className="field" aria-label="Main role" value={role} onChange={(e) => setRole(e.target.value)}>
-                    <option value="">Let the site guess</option>
+                    <option value="">Let the site guess (DJ, or Live act if most line-ups say "live")</option>
                     {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
                 </select>
             </Part>
