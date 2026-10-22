@@ -50,6 +50,7 @@ export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onS
         {events.map((e) => (
           <li key={e.id}>
             {(events.length > 1 || harbour) && <b className="fleet__name">{e.nameParty}</b>}
+            {e.featured && <div className="fleet__featured">◆ Featured{e.featuredNote ? ` · ${e.featuredNote}` : ''}</div>}
             <div className="fleet__meta">
               <span>{eventDates(e)}</span>
               <span>{[e.nameTown, e.nameCountry].filter(Boolean).join(', ')}</span>

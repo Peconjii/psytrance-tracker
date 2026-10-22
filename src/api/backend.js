@@ -538,3 +538,19 @@ export async function replyToFeedback(id, text) {
     const response = await api.post(`/api/admin/feedback/${id}/reply`, { text })
     return response.data
 }
+
+// Admins: features an event on the map (3 at a time, 409 past that), with an optional short note
+export async function featureEvent(id, note) {
+    const response = await api.put(`/api/admin/events/${id}/featured`, { note })
+    return response.data
+}
+
+export async function unfeatureEvent(id) {
+    await api.delete(`/api/admin/events/${id}/featured`)
+}
+
+// Admins: the featured events, newest first: [{ eventId, name, note, featuredBy, featuredAt, upcoming }]
+export async function fetchFeaturedEvents(signal) {
+    const response = await api.get('/api/admin/events/featured', { signal })
+    return response.data
+}

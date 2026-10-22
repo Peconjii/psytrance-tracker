@@ -50,10 +50,12 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
   const fleets = useMemo(() => buildFleets(events ?? []), [events]);
   const shipCount = fleets.reduce((n, f) => n + f.events.length, 0);
   const inHarbour = (events ?? []).filter((e) => e.lineUpRead && !e.genres.length).length;
-  // The clicked ship (or the ships of a clicked fleet) first, then the soonest of the rest
+  // The clicked ship (or the ships of a clicked fleet) first, then the featured ones, then the soonest of the rest
   const ships = (events ?? []).filter((e) => e.genres.length);
   const pickedShips = picked ? ships.filter((e) => picked.includes(e.id)) : [];
-  const departures = [...pickedShips, ...ships.filter((e) => !pickedShips.includes(e))].slice(0, Math.max(DEPARTURES, pickedShips.length));
+  const featuredShips = ships.filter((e) => e.featured && !pickedShips.includes(e));
+  const first = [...pickedShips, ...featuredShips];
+  const departures = [...first, ...ships.filter((e) => !first.includes(e))].slice(0, Math.max(DEPARTURES, first.length));
   const boardedId = picked?.length === 1 ? picked[0] : null;
 
   // A ship clicked on the map opens the console, so its departure is in view
@@ -143,7 +145,8 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
                           {followed && <span className="cockpit__star" aria-label="You follow someone who plays here">★ </span>}
                           {e.nameParty}
                         </b>
-                        <span>{e.nameTown} · <i style={{ color: data.families[genre.family].color }}>{genre.name}</i></span>
+                        <span>{e.nameTown} · <i style={{ color: data.families[genre.family].color }}>{genre.name}</i>
+                          {e.featured && <span className="cockpit__featured" title={e.featuredNote ?? 'Featured by Map of Psy'}> · ◆ featured</span>}</span>
                       </span>
                       {e.id === boardedId
                         ? <span className="cockpit__board is-aboard">Aboard ✓</span>

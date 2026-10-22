@@ -138,6 +138,11 @@ function drawHalo(g: Graphics, color: number, t: number | null) {
 
 const shortName = (name: string) => (name.length > 26 ? name.slice(0, 25).trimEnd() + '…' : name);
 
+/** The mark of a featured ship: a still diamond in the site's accent color around it */
+function drawFeatured(g: Graphics) {
+  g.poly([0, -21, 21, 0, 0, 21, -21, 0]).stroke({ width: 1.5, color: 0x3ee6c4, alpha: 0.9 });
+}
+
 /** A small arrow-shaped ship pointing right, in the color of its main genre */
 function drawShip(g: Graphics, x: number, y: number, color: number) {
   g.poly([x - 7, y - 9, x + 11, y, x - 7, y + 9, x - 3, y]).fill(color).stroke({ width: 1.5, color: 0xffffff, alpha: 0.7 });
@@ -678,6 +683,13 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         drawHalo(halo, color, null);
         node.addChild(halo);
       }
+      // A ship an admin features gets a diamond around it
+      const featured = fleetEvents.some((e) => e.featured);
+      if (featured) {
+        const mark = new Graphics();
+        drawFeatured(mark);
+        node.addChild(mark);
+      }
 
       // The ships point at the star of the main genre: they sail towards their sound.
       // Facing left they are mirrored, so the cockpit stays on top.
@@ -699,7 +711,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       if (fleetEvents.length === 1) {
         addShip(0, 0);
         name = new Text({
-          text: (followed ? '★ ' : '') + shortName(fleetEvents[0].nameParty),
+          text: (featured ? '◆ ' : '') + (followed ? '★ ' : '') + shortName(fleetEvents[0].nameParty),
           style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xe9e6ff },
         });
         name.anchor.set(0.5, 0);

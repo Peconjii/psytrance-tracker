@@ -1,13 +1,14 @@
 import { useState } from 'react'
-import { hideEvent, rereadLineUp } from '../api/backend.js'
+import { featureEvent, hideEvent, rereadLineUp } from '../api/backend.js'
 
-// Admin tools for one event: read its line-up again now (instead of waiting up to two days for its turn), or hide
-// it from the whole site when it doesn't belong (not psytrance, a duplicate)
-function EventAdminTools({ id, onHidden }) {
+// Admin tools for one event: read its line-up again now (instead of waiting up to two days for its turn), hide it
+// from the whole site when it does not belong (not psytrance, a duplicate), or feature it on the map
+function EventAdminTools({ id, onHidden, onFeatured }) {
     const [busy, setBusy] = useState(null)
     const [message, setMessage] = useState('')
     const [error, setError] = useState('')
     const [reason, setReason] = useState('')
+    const [note, setNote] = useState('')
 
     const run = async (what, action) => {
         setBusy(what)
@@ -26,6 +27,12 @@ function EventAdminTools({ id, onHidden }) {
         const { artists } = await rereadLineUp(id)
         setMessage(artists.length ? `Read again: ${artists.length} artists (${artists.slice(0, 6).join(', ')}${artists.length > 6 ? '…' : ''})`
             : 'Read again: no artists in the line-up.')
+    })
+
+    const feature = () => run('feature', async () => {
+        await featureEvent(id, note.trim() || null)
+        setMessage('Featured on the map.')
+        onFeatured?.()
     })
 
     const hide = () => {
@@ -49,6 +56,13 @@ function EventAdminTools({ id, onHidden }) {
                     placeholder="Why (e.g. not psytrance, duplicate of #118537)" onChange={(e) => setReason(e.target.value)} />
                 <button type="button" className="btn btn--ghost btn--danger" disabled={busy !== null} onClick={hide}>
                     {busy === 'hide' ? 'Hiding…' : 'Hide from the site'}
+                </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+                <input className="field flex-1 min-w-48" aria-label="Note for the featured event" maxLength={200} value={note}
+                    placeholder="Note on the map (optional, e.g. tickets almost gone)" onChange={(e) => setNote(e.target.value)} />
+                <button type="button" className="btn" disabled={busy !== null} onClick={feature}>
+                    {busy === 'feature' ? 'Featuring…' : '◆ Feature on the map'}
                 </button>
             </div>
             {message && <p className="mono text-xs soft m-0" role="status">{message}</p>}

@@ -23,6 +23,9 @@ export interface MapEvent {
   /** False until the backend has read the line-up; then an empty genre list means "not known yet" */
   lineUpRead: boolean;
   genres: GenreShare[];
+  /** An admin features it: a mark on the map and first in the departures, with an optional note */
+  featured: boolean;
+  featuredNote: string | null;
 }
 
 export async function fetchMapEvents(period: EventPeriod): Promise<MapEvent[]> {

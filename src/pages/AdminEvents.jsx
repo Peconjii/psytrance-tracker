@@ -8,6 +8,7 @@ import { AddGenre, FeedbackBanner, GenreChip } from '../components/AdminParts'
 import EventAdminTools from '../components/EventAdminTools.jsx'
 import HarbourQueue from '../components/HarbourQueue.jsx'
 import HiddenEvents from '../components/HiddenEvents.jsx'
+import FeaturedEvents from '../components/FeaturedEvents.jsx'
 import TimetableEditor from '../components/TimetableEditor.jsx'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -94,6 +95,8 @@ function AdminEvents() {
     const [savedFor, setSavedFor] = useState(null)
     // Bumped when an event is hidden, so the harbour and the hidden list load again
     const [hiddenVersion, setHiddenVersion] = useState(0)
+    // Bumped when an event is featured, so the featured list loads again
+    const [featuredVersion, setFeaturedVersion] = useState(0)
 
     useEffect(() => {
         if (debounced.length < 2) return
@@ -124,7 +127,8 @@ function AdminEvents() {
             {selected && <TimetableEditor key={'tt' + selected} id={selected} save={setAdminTimetable} handBack={handBackTimetable}
                 onSaved={() => setSavedFor(selected)} />}
             {selected && <EventAdminTools key={'tools' + selected} id={selected}
-                onHidden={() => { setParams({}); setHiddenVersion(v => v + 1) }} />}
+                onHidden={() => { setParams({}); setHiddenVersion(v => v + 1) }}
+                onFeatured={() => setFeaturedVersion(v => v + 1)} />}
 
             <div className="panel mb-6">
                 <label htmlFor="admin-event-search" className="field-label">Find another event</label>
@@ -156,6 +160,7 @@ function AdminEvents() {
                 <HarbourQueue key={hiddenVersion} onHidden={() => setHiddenVersion(v => v + 1)}
                     onOpen={(id) => { setParams(feedbackId ? { id, feedback: feedbackId } : { id: String(id) }); window.scrollTo(0, 0) }} />
             )}
+            <FeaturedEvents version={featuredVersion} />
             <HiddenEvents version={hiddenVersion} />
         </div>
     )
