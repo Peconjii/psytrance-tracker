@@ -344,3 +344,21 @@ export async function setArtistRole(slug, role) {
     const response = await api.put(`/api/artists/${encodeURIComponent(slug)}/role`, { role })
     return response.data
 }
+
+// Organizers with upcoming events, busiest first: [{ slug, name, upcomingEvents }]
+export async function fetchOrganizers(search, signal) {
+    const response = await api.get('/api/organizers', { params: { search: search || undefined }, signal })
+    return response.data
+}
+
+// An organizer's page: { slug, name, url, upcomingEvents, pastEvents }
+export async function fetchOrganizer(slug, signal) {
+    const response = await api.get(`/api/organizers/${encodeURIComponent(slug)}`, { signal })
+    return response.data
+}
+
+// Admin panel: a line-up name that is really the organizer leaves the artists and gets an organizer page
+export async function markAsOrganizer(name) {
+    const response = await api.post('/api/admin/artists/organizer', { name })
+    return response.data
+}

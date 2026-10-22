@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { fetchArtists } from '../api/backend.js'
 import { ROLES, ROLE_LABELS, roleOf } from '../components/artistRole.js'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
+import CrewTabs from '../components/CrewTabs.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 // Artists found in the line-ups of upcoming events, busiest first. The backend reads line-ups
@@ -47,6 +48,7 @@ function Artists() {
                 <h1 className="page-title">Artists</h1>
                 <p className="page-head__sub">Who plays the upcoming events, busiest first. Find out where they play next.</p>
             </header>
+            <CrewTabs />
 
             <div className="panel mb-6">
                 <label htmlFor="artist-search" className="field-label">Search artist</label>

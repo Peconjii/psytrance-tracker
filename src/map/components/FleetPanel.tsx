@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { HudShell } from './Panel';
 import { data, genreById } from '../data/types';
-import { eventDates, type Boarded, type MapEvent } from '../data/events';
+import { artistSlug, eventDates, type Boarded, type MapEvent } from '../data/events';
 import type { CrewMember } from '../galaxy/Galaxy';
 import { playingNow, type LiveFleet } from '../data/liveFleet';
 
@@ -81,9 +81,13 @@ export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onS
             <>
               <div className="hud__label">Captain</div>
               <p className="fleet__captain">
-                {boarded.captainUrl
-                  ? <a href={boarded.captainUrl} target="_blank" rel="noopener noreferrer">{boarded.captain} ↗</a>
-                  : boarded.captain}
+                {/* The captain's page: the events they run, next and before */}
+                <Link to={`/organizers/${encodeURIComponent(artistSlug(boarded.captain))}`} state={{ name: boarded.captain }}>
+                  {boarded.captain} →
+                </Link>
+                {boarded.captainUrl && (
+                  <> <a href={boarded.captainUrl} target="_blank" rel="noopener noreferrer" aria-label={`${boarded.captain} website`}>↗</a></>
+                )}
               </p>
             </>
           )}

@@ -8,6 +8,7 @@ import FavoriteButton from '../components/FavoriteButton.jsx'
 import GoingButton from '../components/GoingButton.jsx'
 import ShareLinks from '../components/ShareLinks.jsx'
 import usePageMeta, { SITE_URL } from '../hooks/usePageMeta.js'
+import { artistSlug } from '../map/data/events'
 
 const FALLBACK_IMAGE = 'https://placehold.co/800x400/05040d/8f88c4?text=No+flyer'
 
@@ -416,7 +417,14 @@ function EventDetails() {
 
                     {(details?.organizer || details?.organizerUrl) && (
                         <Section title="Organizer · captain">
-                            {details.organizer && <p className="text-sm font-medium mt-0 mb-1">{details.organizer}</p>}
+                            {details.organizer && (
+                                <p className="text-sm font-medium mt-0 mb-1">
+                                    <Link className="link" to={`/organizers/${encodeURIComponent(artistSlug(details.organizer))}`}
+                                        state={{ name: details.organizer }}>
+                                        {details.organizer} →
+                                    </Link>
+                                </p>
+                            )}
                             {details.organizerUrl && (
                                 <a href={details.organizerUrl} target="_blank" rel="noreferrer" className="link text-sm break-all">
                                     {details.organizerUrl.replace(/^https?:\/\//, '')} ↗

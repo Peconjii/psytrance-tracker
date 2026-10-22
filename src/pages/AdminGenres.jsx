@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { mergeArtists, searchAdminArtists, setArtistGenres, setArtistHidden } from '../api/backend.js'
+import { markAsOrganizer, mergeArtists, searchAdminArtists, setArtistGenres, setArtistHidden } from '../api/backend.js'
 import { reloadPlacementsLater } from '../map/data/placements'
 import AdminTabs from '../components/AdminTabs'
 import { AddGenre, FeedbackBanner, GenreChip } from '../components/AdminParts'
@@ -81,6 +81,10 @@ function CleanupTools({ artist, onGone }) {
             <button className="btn btn--ghost" disabled={busy}
                 onClick={() => run(() => setArtistHidden(artist.name, true), `${artist.name} is hidden: not an artist. Undo it in the history.`)}>
                 Not an artist
+            </button>
+            <button className="btn btn--ghost" disabled={busy}
+                onClick={() => run(() => markAsOrganizer(artist.name), `${artist.name} is an organizer now: hidden from the artists, with an organizer page.`)}>
+                This is an organizer
             </button>
             {merging ? (
                 <>

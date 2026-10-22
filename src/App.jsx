@@ -16,6 +16,8 @@ import Profile from './pages/Profile'
 import GlobalMap from './pages/GlobalMap'
 import Artists from './pages/Artists'
 import Artist from './pages/Artist'
+import Organizers from './pages/Organizers'
+import Organizer from './pages/Organizer'
 import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/AdminFeedback'
 import AdminGenres from './pages/AdminGenres'
@@ -42,6 +44,8 @@ function Shell() {
           <Route path="/map" element={<GlobalMap />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/artists/:slug" element={<Artist />} />
+          <Route path="/organizers" element={<Organizers />} />
+          <Route path="/organizers/:slug" element={<Organizer />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
