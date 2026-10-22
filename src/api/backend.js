@@ -466,3 +466,9 @@ export async function rejectOurEvent(id, reason) {
     const response = await api.post(`/api/admin/our-events/${id}/reject`, { reason })
     return response.data
 }
+
+// Admins: { total, verified, newThisWeek, users: [newest first, with what they use] }; search by name or email
+export async function fetchAdminUsers(search, signal) {
+    const response = await api.get('/api/admin/users', { params: search ? { search } : {}, signal })
+    return response.data
+}

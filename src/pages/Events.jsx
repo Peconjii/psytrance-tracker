@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
+import { GenreChip, GenreOptions } from '../components/AdminParts'
+import { genreById } from '../map/data/types'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 
-const GENRES = ['All', 'Psytrance', 'Progressive', 'Full On', 'Dark', 'Forest', 'Goa', 'Hi-Tech', 'Zenonesque']
+// The genre filter uses the map's genres (?genre=forest). Links from before (?genre=Dark) still work.
+const OLD_GENRES = { Progressive: 'prog', 'Full On': 'fullon', Dark: 'dark', Forest: 'forest', Goa: 'goa', 'Hi-Tech': 'hitech', Zenonesque: 'zenon' }
+const genreOf = (value) => (genreById[value] ? value : OLD_GENRES[value] ?? 'All')
 // value = what the backend expects (EventTimeline enum), label = what the user sees
 const TIMELINES = [
     { value: 'ALL', label: 'Any time' },
     { value: 'THIS_WEEKEND', label: 'This weekend' }
 ]
 
-// Filters live in the URL (?search=boom&genre=Dark...), so going back from an event page, reloading
+// Filters live in the URL (?search=boom&genre=dark...), so going back from an event page, reloading
 // or sharing the link brings back the same list. Defaults are left out to keep the URL short.
 const DEFAULTS = { search: '', country: '', genre: 'All', timeline: 'ALL' }
 
@@ -23,7 +27,7 @@ function Events() {
     })
     const [searchParams, setSearchParams] = useSearchParams()
 
-    const genre = GENRES.includes(searchParams.get('genre')) ? searchParams.get('genre') : 'All'
+    const genre = genreOf(searchParams.get('genre'))
     const timeline = TIMELINES.some(t => t.value === searchParams.get('timeline')) ? searchParams.get('timeline') : 'ALL'
 
     // What the user is typing; it goes into the URL once it's debounced
@@ -113,18 +117,14 @@ function Events() {
                     </div>
                 </div>
 
-                <span className="field-label">Subgenre</span>
-                <div className="flex flex-wrap gap-2">
-                    {GENRES.map(g => (
-                        <button
-                            key={g}
-                            onClick={() => setGenre(g)}
-                            className={`chip${genre === g ? ' is-on' : ''}`}
-                            aria-pressed={genre === g}
-                        >
-                            {g}
-                        </button>
-                    ))}
+                <label htmlFor="event-genre" className="field-label">Sound on the map</label>
+                <div className="flex flex-wrap items-center gap-2">
+                    {genre !== 'All' && <GenreChip id={genre} onRemove={() => setGenre('All')} />}
+                    <select id="event-genre" className="field max-w-xs" value={genre === 'All' ? '' : genre}
+                        onChange={(e) => setGenre(e.target.value || 'All')}>
+                        <option value="">Any genre</option>
+                        <GenreOptions />
+                    </select>
                 </div>
 
                 {filtered && (
