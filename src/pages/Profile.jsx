@@ -5,7 +5,9 @@ import { useAuth } from '../context/AuthContext'
 import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
-import api, { fetchMyArtists, fetchMyGoing, fetchMyOrganizers, setEventReminders } from '../api/backend'
+import api, {
+    fetchMyArtists, fetchMyGoing, fetchMyOrganizers, fetchMyOurEvents, setEventReminders, withdrawOurEvent,
+} from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 // "2026-10-14" in the browser's time zone, to compare with the dates the backend sends
@@ -13,6 +15,8 @@ function todayIso() {
     const now = new Date()
     return new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10)
 }
+
+const EVENT_STATUS = { PENDING: 'Waiting for an admin', APPROVED: 'On the map', REJECTED: 'Not accepted' }
 
 function Profile() {
     usePageMeta({ title: 'Profile', path: '/profile', noindex: true })
@@ -22,10 +26,13 @@ function Profile() {
     const [myArtists, setMyArtists] = useState([])
     // Organizer pages this account owns
     const [myOrganizers, setMyOrganizers] = useState([])
+    // Events this account added on our site, with their status
+    const [myEvents, setMyEvents] = useState([])
     useEffect(() => {
         const controller = new AbortController()
         fetchMyArtists(controller.signal).then(setMyArtists).catch(() => {})
         fetchMyOrganizers(controller.signal).then(setMyOrganizers).catch(() => {})
+        fetchMyOurEvents(controller.signal).then(setMyEvents).catch(() => {})
         return () => controller.abort()
     }, [])
     const { favorites } = useContext(FavoritesContext)
@@ -165,6 +172,31 @@ function Profile() {
                             </li>
                         ))}
                     </ul>
+                </section>
+            )}
+
+            {myEvents.length > 0 && (
+                <section className="panel">
+                    <h2 className="panel__label">Events you added · {myEvents.length}</h2>
+                    <ul className="rows">
+                        {myEvents.map(ev => (
+                            <li key={ev.id} className="rows__item">
+                                {ev.eventId
+                                    ? <Link className="rows__name link" to={`/events/${ev.eventId}`}>{ev.name}</Link>
+                                    : <span className="rows__name">{ev.name}</span>}
+                                <span className="rows__meta">
+                                    {EVENT_STATUS[ev.status]}{ev.rejectReason && `: ${ev.rejectReason}`}
+                                </span>
+                                {ev.status === 'PENDING' && (
+                                    <button type="button" className="btn btn--ghost" onClick={async () => {
+                                        await withdrawOurEvent(ev.id).catch(() => {})
+                                        setMyEvents(list => list.filter(x => x.id !== ev.id))
+                                    }}>Take back</button>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                    <Link className="link text-sm" to="/events/new">+ Add an event</Link>
                 </section>
             )}
 

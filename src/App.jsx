@@ -26,6 +26,8 @@ import AdminGenres from './pages/AdminGenres'
 import AdminHistory from './pages/AdminHistory'
 import AdminEvents from './pages/AdminEvents'
 import AdminRequests from './pages/AdminRequests'
+import AdminOurEvents from './pages/AdminOurEvents'
+import AddEvent from './pages/AddEvent'
 import ArtistEdit from './pages/ArtistEdit'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
@@ -78,8 +80,10 @@ function Shell() {
           <Route path="/admin/events" element={<AdminRoute><AdminEvents /></AdminRoute>} />
           <Route path="/admin/history" element={<AdminRoute><AdminHistory /></AdminRoute>} />
           <Route path="/admin/requests" element={<AdminRoute><AdminRequests /></AdminRoute>} />
+          <Route path="/admin/our-events" element={<AdminRoute><AdminOurEvents /></AdminRoute>} />
           {/* The artist's owner or an admin; the backend says who may */}
           <Route path="/artists/:slug/edit" element={<ProtectedRoute><ArtistEdit /></ProtectedRoute>} />
+          <Route path="/events/new" element={<ProtectedRoute><AddEvent /></ProtectedRoute>} />
           <Route path="/organizers/:slug/edit" element={<ProtectedRoute><OrganizerEdit /></ProtectedRoute>} />
         </Routes>
       </main>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -61,10 +61,13 @@ function Events() {
 
     return (
         <div className="page page--wide">
-            <header className="page-head">
-                <div className="page-head__tag">// Departures · Goabase</div>
-                <h1 className="page-title">Upcoming events</h1>
-                <p className="page-head__sub">Psytrance festivals and parties worldwide, soonest first.</p>
+            <header className="page-head flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+                <div>
+                    <div className="page-head__tag">// Departures · Goabase + Map of Psy</div>
+                    <h1 className="page-title">Upcoming events</h1>
+                    <p className="page-head__sub">Psytrance festivals and parties worldwide, soonest first.</p>
+                </div>
+                <Link className="btn shrink-0" to="/events/new">+ Add an event</Link>
             </header>
 
             <section className="panel mb-6" aria-label="Filters">

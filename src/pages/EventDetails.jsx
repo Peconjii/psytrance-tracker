@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
-import { fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable } from '../api/backend.js'
+import { fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
@@ -193,7 +193,7 @@ function EventDetails() {
             .catch(err => {
                 if (controller.signal.aborted) return
                 const message = err.response?.status === 404
-                    ? 'This event does not exist or was removed from Goabase.'
+                    ? (isOurEvent(id) ? 'This event was taken down or is still waiting for an admin.' : 'This event does not exist or was removed from Goabase.')
                     : err.response?.data?.message || 'Could not load this event. Is the backend running?'
                 setLoaded({ id, details: null, error: message })
             })
@@ -295,7 +295,7 @@ function EventDetails() {
                         <GoingButton eventId={id} status={currentGoing} onChange={status => setGoing({ id, value: status })} />
                         {event.urlPartyHtml && (
                             <a href={event.urlPartyHtml} target="_blank" rel="noreferrer" className="btn">
-                                Goabase ↗
+                                {isOurEvent(id) ? 'Tickets ↗' : 'Goabase ↗'}
                             </a>
                         )}
                         <Link className="btn btn--ghost" title="Wrong date, place or line-up? Tell us"

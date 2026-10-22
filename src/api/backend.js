@@ -428,3 +428,41 @@ export async function setOrganizerOwner(slug, username) {
 export async function removeOrganizerOwner(slug) {
     await api.delete(`/api/admin/organizers/${encodeURIComponent(slug)}/owner`)
 }
+
+// Events added on our site. Ours have ids from OUR_EVENT_IDS up (Goabase's are far below).
+export const OUR_EVENT_IDS = 1_000_000_000
+export const isOurEvent = (id) => Number(id) > OUR_EVENT_IDS
+
+// Adds an event (needs a confirmed email): { id, status: PENDING | APPROVED, eventId (once approved), ... }
+export async function submitOurEvent(event) {
+    const response = await api.post('/api/our-events', event)
+    return response.data
+}
+
+// The events this account added, newest first, with their status and an admin's reason when rejected
+export async function fetchMyOurEvents(signal) {
+    const response = await api.get('/api/our-events/mine', { signal })
+    return response.data
+}
+
+// Takes back an event that is still waiting for an admin
+export async function withdrawOurEvent(id) {
+    await api.delete(`/api/our-events/${id}`)
+}
+
+// Admins: added events with this status (PENDING, APPROVED, REJECTED), with Goabase events that may be the same
+export async function fetchOurEventsForAdmin(status, signal) {
+    const response = await api.get('/api/admin/our-events', { params: { status }, signal })
+    return response.data
+}
+
+export async function approveOurEvent(id) {
+    const response = await api.post(`/api/admin/our-events/${id}/approve`)
+    return response.data
+}
+
+// Rejects a waiting event or takes down an approved one; the reason is shown to the account that sent it
+export async function rejectOurEvent(id, reason) {
+    const response = await api.post(`/api/admin/our-events/${id}/reject`, { reason })
+    return response.data
+}
