@@ -25,6 +25,12 @@ const PROFILE_LINKS = [
     ['websiteUrl', 'Website'],
 ]
 
+// Until the artist writes their own, a search for them there (like the SoundCloud links of an event's line-up)
+const SEARCH_LINKS = [
+    ['soundcloudUrl', 'SoundCloud', (name) => `https://soundcloud.com/search/people?q=${encodeURIComponent(name)}`],
+    ['bandcampUrl', 'Bandcamp', (name) => `https://bandcamp.com/search?q=${encodeURIComponent(name)}&item_type=b`],
+]
+
 const youtubeLink = (track) => track.youtube
     ? `https://www.youtube.com/watch?v=${track.youtube}`
     : `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.artist} ${track.title}`)}`
@@ -129,6 +135,7 @@ function Artist() {
     const loading = !artist && !error
     const unknown = error === 'notFound' && !onMap
     const links = profile ? PROFILE_LINKS.filter(([key]) => profile[key]) : []
+    const searches = SEARCH_LINKS.filter(([key]) => !profile?.[key])
     const firstGenre = genres[0]?.id
 
     return (
@@ -164,10 +171,14 @@ function Artist() {
                         {artist?.followers > 0 && (
                             <p className="mono text-xs muted mt-2 mb-0">★ {artist.followers} {artist.followers === 1 ? 'follower' : 'followers'}</p>
                         )}
-                        {(links.length > 0 || profile?.bookingEmail) && (
+                        {(links.length > 0 || searches.length > 0 || profile?.bookingEmail) && (
                             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 mono text-xs">
                                 {links.map(([key, label]) => (
                                     <a key={key} className="link" href={profile[key]} target="_blank" rel="noopener noreferrer">{label} ↗</a>
+                                ))}
+                                {searches.map(([key, label, url]) => (
+                                    <a key={key} className="link" href={url(name)} target="_blank" rel="noopener noreferrer"
+                                        title={`Find ${name} on ${label}`}>{label} ↗</a>
                                 ))}
                                 {profile?.bookingEmail && (
                                     <a className="link" href={`mailto:${profile.bookingEmail}?subject=${encodeURIComponent(`Booking: ${name}`)}`}>✉ Booking</a>
