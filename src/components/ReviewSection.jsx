@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { fetchEventReviews, submitEventReview } from '../api/backend'
+import { deleteReview, fetchEventReviews, submitEventReview } from '../api/backend'
 import { useAuth } from '../context/AuthContext'
 
 function ReviewSection({ eventId }) {
@@ -36,6 +36,17 @@ function ReviewSection({ eventId }) {
             console.error("Failed to submit review:", err)
         } finally {
             setSubmitting(false)
+        }
+    }
+
+    // The author deletes their own review, admins anyone's (spam, insults)
+    async function handleDelete(review) {
+        if (!window.confirm(review.username === user?.username ? 'Delete your review?' : 'Delete this review by @' + review.username + '?')) return
+        try {
+            await deleteReview(review.id)
+            setReviews(prev => prev.filter(r => r.id !== review.id))
+        } catch (err) {
+            console.error("Failed to delete review:", err)
         }
     }
 
@@ -97,6 +108,10 @@ function ReviewSection({ eventId }) {
                                 <span className="mono text-xs soft">{'★'.repeat(rev.rating)}{'☆'.repeat(5 - rev.rating)}</span>
                             </div>
                             {rev.comment && <p className="soft text-sm m-0">{rev.comment}</p>}
+                            {user && (user.admin || rev.username === user.username) && (
+                                <button type="button" className="link mono text-xs self-end bg-transparent border-0 p-0 cursor-pointer"
+                                    onClick={() => handleDelete(rev)}>Delete</button>
+                            )}
                         </li>
                     ))}
                 </ul>

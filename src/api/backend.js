@@ -475,3 +475,14 @@ export async function fetchAdminUsers(search, signal) {
 
 // "Add to calendar": the event as a .ics file, which phones and calendar apps open
 export const calendarUrl = (id) => `${api.defaults.baseURL}/api/events/${id}/calendar.ics`
+
+// Deletes a review: its author, or an admin (kept in the history)
+export async function deleteReview(id) {
+    await api.delete(`/api/reviews/${id}`)
+}
+
+// Admins: the newest 100 reviews of the whole site
+export async function fetchNewestReviews(signal) {
+    const response = await api.get('/api/admin/reviews', { signal })
+    return response.data
+}

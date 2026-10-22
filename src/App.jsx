@@ -28,6 +28,7 @@ import AdminEvents from './pages/AdminEvents'
 import AdminRequests from './pages/AdminRequests'
 import AdminOurEvents from './pages/AdminOurEvents'
 import AdminUsers from './pages/AdminUsers'
+import AdminReviews from './pages/AdminReviews'
 import AddEvent from './pages/AddEvent'
 import ArtistEdit from './pages/ArtistEdit'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -83,6 +84,7 @@ function Shell() {
           <Route path="/admin/requests" element={<AdminRoute><AdminRequests /></AdminRoute>} />
           <Route path="/admin/our-events" element={<AdminRoute><AdminOurEvents /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
+          <Route path="/admin/reviews" element={<AdminRoute><AdminReviews /></AdminRoute>} />
           {/* The artist's owner or an admin; the backend says who may */}
           <Route path="/artists/:slug/edit" element={<ProtectedRoute><ArtistEdit /></ProtectedRoute>} />
           <Route path="/events/new" element={<ProtectedRoute><AddEvent /></ProtectedRoute>} />
