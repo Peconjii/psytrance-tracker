@@ -424,6 +424,7 @@
 .cockpit__departures { list-style: none; margin: 0; padding: 0; }
 .cockpit__departures li { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 6px 0; border-top: 1px dashed var(--line); }
 .cockpit__when { font: 10px var(--mono); letter-spacing: 0.08em; color: var(--muted); }
+.cockpit__star { color: var(--accent); }
 .cockpit__when.is-now { color: var(--accent); }
 .cockpit__event { min-width: 0; display: grid; font-size: 12px; line-height: 1.35; }
 .cockpit__event b { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

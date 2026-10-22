@@ -4,6 +4,7 @@ import { data, genreById } from '../data/types';
 import { artistSlug, eventDates, type Boarded, type MapEvent } from '../data/events';
 import type { CrewMember } from '../galaxy/Galaxy';
 import { playingNow, type LiveFleet } from '../data/liveFleet';
+import { useFollows } from '../../context/FollowsContext';
 
 interface Props {
   /** The events of the fleet (one ship or several), or of the harbour */
@@ -32,6 +33,9 @@ const SOURCE_TEXT = {
 export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onSelectCrew, onSelect, onClose, liveFleet, previewing, onPreview }: Props) {
   const main = events[0]?.genres[0] ? genreById[events[0].genres[0].genreId] : null;
   const color = main ? data.families[main.family].color : '#9a94b8';
+  // The crew the user follows (by name or through a label), for a ★ on their names
+  const { gigsByEvent } = useFollows();
+  const followedSlugs = new Set<string>((boarded ? gigsByEvent.get(boarded.id) ?? [] : []).map((name: string) => artistSlug(name)));
   return (
     <HudShell className="hud" style={{ ['--fam' as string]: color }}>
       <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
@@ -95,13 +99,16 @@ export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onS
             <>
               <div className="hud__label">Crew · {boarded.crew.length} on board</div>
               <div className="hud__chips">
-                {boarded.crew.map((m) => (
-                  <button key={m.slug ?? m.name} className="hud__chip" onClick={() => onSelectCrew(m)}
-                    style={m.color ? { borderColor: m.color } : undefined}
-                    title={m.color ? 'On the map: open their satellite' : 'Where else do they play?'}>
-                    {m.name}
-                  </button>
-                ))}
+                {boarded.crew.map((m) => {
+                  const isFollowed = followedSlugs.has(artistSlug(m.name));
+                  return (
+                    <button key={m.slug ?? m.name} className="hud__chip" onClick={() => onSelectCrew(m)}
+                      style={m.color ? { borderColor: m.color } : undefined}
+                      title={(isFollowed ? 'You follow them. ' : '') + (m.color ? 'On the map: open their satellite' : 'Where else do they play?')}>
+                      {isFollowed && '★ '}{m.name}
+                    </button>
+                  );
+                })}
               </div>
               <p className="hud__muted fleet__hint">The crew orbits the ship. Colored names are on the map.</p>
             </>

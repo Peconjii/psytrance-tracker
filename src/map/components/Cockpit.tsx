@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type MouseEvent } from 'react';
 import { data, genreById, WORLD } from '../data/types';
 import { buildFleets, HARBOUR, type EventPeriod, type MapEvent } from '../data/events';
 import type { ViewBounds } from '../galaxy/Galaxy';
+import { useFollows } from '../../context/FollowsContext';
 
 interface Props {
   period: EventPeriod | null;
@@ -45,6 +46,7 @@ function departureLabel(dateStart: string | null): string {
 export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHarbour, picked }: Props) {
   // Phones start with the console folded, so it doesn't cover the map
   const [open, setOpen] = useState(() => !window.matchMedia('(max-width: 700px)').matches);
+  const { gigsByEvent } = useFollows();
   const fleets = useMemo(() => buildFleets(events ?? []), [events]);
   const shipCount = fleets.reduce((n, f) => n + f.events.length, 0);
   const inHarbour = (events ?? []).filter((e) => e.lineUpRead && !e.genres.length).length;
@@ -131,11 +133,16 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
                 {departures.map((e) => {
                   const genre = genreById[e.genres[0].genreId];
                   const label = departureLabel(e.dateStart);
+                  // Artists the user follows (or whose label they follow) who play this one
+                  const followed: string[] | undefined = gigsByEvent.get(e.id);
                   return (
                     <li key={e.id} className={pickedShips.includes(e) ? 'is-picked' : undefined}>
                       <span className={label === 'TONIGHT' ? 'cockpit__when is-now' : 'cockpit__when'}>{label}</span>
                       <span className="cockpit__event">
-                        <b title={e.nameParty}>{e.nameParty}</b>
+                        <b title={followed ? `${e.nameParty} · you follow ${followed.join(', ')}` : e.nameParty}>
+                          {followed && <span className="cockpit__star" aria-label="You follow someone who plays here">★ </span>}
+                          {e.nameParty}
+                        </b>
                         <span>{e.nameTown} · <i style={{ color: data.families[genre.family].color }}>{genre.name}</i></span>
                       </span>
                       {e.id === boardedId
