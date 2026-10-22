@@ -279,6 +279,22 @@ export async function unfollowArtist(slug) {
     await api.delete(`/api/me/follows/${encodeURIComponent(slug)}`)
 }
 
+// Labels of the map the logged-in user follows: [names]. Their artists' gigs join the followed gigs.
+export async function fetchLabelFollows(signal) {
+    const response = await api.get('/api/me/label-follows', { signal })
+    return response.data
+}
+
+// Follow a label of the map (following twice is fine). Throws on failure.
+export async function followLabel(label) {
+    const response = await api.put('/api/me/label-follows', null, { params: { label } })
+    return response.data
+}
+
+export async function unfollowLabel(label) {
+    await api.delete('/api/me/label-follows', { params: { label } })
+}
+
 // Editing an artist (their owner or an admin): everything the editor shows
 // { slug, name, profile, tracks, festivals, genres, pendingRequests, owner (admins only) }
 export async function fetchArtistEdit(slug, signal) {

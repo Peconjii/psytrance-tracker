@@ -16,7 +16,7 @@ function todayIso() {
 function Profile() {
     usePageMeta({ title: 'Profile', path: '/profile', noindex: true })
     const { user, updateUser } = useAuth()
-    const { follows } = useFollows()
+    const { follows, labels } = useFollows()
     // Artist profiles this account owns (an admin linked them)
     const [myArtists, setMyArtists] = useState([])
     // Organizer pages this account owns
@@ -197,6 +197,21 @@ function Profile() {
                     </ul>
                 )}
             </section>
+
+            {labels.length > 0 && (
+                <section className="panel">
+                    <h2 className="panel__label">Labels you follow · {labels.length}</h2>
+                    <p className="muted text-sm mt-0">The gigs of every artist on these labels count as followed.</p>
+                    <ul className="rows">
+                        {labels.map(label => (
+                            <li key={label} className="rows__item">
+                                <Link to={`/?label=${encodeURIComponent(label)}`} className="rows__name link">{label}</Link>
+                                <FollowButton label={label} name={label} />
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
 
             <section className="panel">
                 <h2 className="panel__label">You're going to · {upcomingGoing.length}</h2>

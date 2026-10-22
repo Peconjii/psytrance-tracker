@@ -4,6 +4,7 @@ import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
 import { FixLink } from './FixLink';
 import { HeartButton } from './Playlist';
+import FollowButton from '../../components/FollowButton.jsx';
 import type { PlaylistApi } from '../hooks/usePlaylist';
 import { artistSlug } from '../data/events';
 import {
@@ -175,6 +176,7 @@ export function Panel({
           <a className="hud__ext" href={youtube(label)} target="_blank" rel="noopener noreferrer">Search on YouTube ↗</a>
           <FixLink about="LABEL" name={label} />
           <ShareButton />
+          <FollowButton label={label} name={label} className="hud__share" />
         </div>
       </HudShell>
     );
