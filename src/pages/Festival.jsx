@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { fetchFestivalStats } from '../api/backend.js'
+import { fetchFestivalPage, fetchFestivalStats, fetchMyFestivals } from '../api/backend.js'
 import { GenreChip } from '../components/AdminParts'
 import StatView, { StatViewToggle } from '../components/StatView.jsx'
+import { useOwnedPage } from '../components/ownedPage.js'
 import { useStatsView } from '../components/statsView.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
@@ -30,6 +31,9 @@ function Festival() {
     const [view, toggleView] = useStatsView()
     const [loaded, setLoaded] = useState({ match: null, stats: null })
     const stats = loaded.match === match ? loaded.stats : null
+    // What the festival's owner wrote: their words, links and the organizer who runs it
+    const { page, canEdit } = useOwnedPage(fetchFestivalPage, fetchMyFestivals, id, own => own.id === id)
+    const profile = page?.profile
 
     useEffect(() => {
         if (match.length < 3) return
@@ -58,13 +62,33 @@ function Festival() {
                     <h1 className="page-title">{festival.name}</h1>
                     <p className="mono text-xs muted mt-2 mb-0">{[festival.country, festival.since && `since ${festival.since}`].filter(Boolean).join(' · ')}</p>
                 </div>
-                <Link className="btn btn--ghost shrink-0" to={`/?festival=${encodeURIComponent(id)}`}>On the map →</Link>
+                <div className="flex flex-wrap gap-2 shrink-0">
+                    <Link className="btn btn--ghost" to={`/?festival=${encodeURIComponent(id)}`}>On the map →</Link>
+                    {canEdit && <Link className="btn btn--ghost" to={`/festivals/${encodeURIComponent(id)}/edit`}>✎ Edit page</Link>}
+                </div>
             </div>
 
             <section className="panel mb-4">
                 <h2 className="panel__label">About</h2>
                 <p className="soft m-0 max-w-3xl">{festival.description}</p>
+                {profile?.description && (
+                    <>
+                        <h3 className="field-label mt-4">From the festival</h3>
+                        <p className="soft whitespace-pre-line m-0 max-w-3xl">{profile.description}</p>
+                    </>
+                )}
                 <div className="flex flex-wrap gap-2 mt-3">{festival.genres.map(g => <GenreChip key={g} id={g} />)}</div>
+                {(page?.organizer || profile?.websiteUrl || profile?.ticketUrl || profile?.instagramUrl) && (
+                    <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 mono text-xs">
+                        {page?.organizer && (
+                            <Link className="link" to={`/organizers/${encodeURIComponent(page.organizer.slug)}`}>Organized by {page.organizer.name} →</Link>
+                        )}
+                        {[['Tickets', profile?.ticketUrl], ['Website', profile?.websiteUrl], ['Instagram', profile?.instagramUrl]]
+                            .filter(([, link]) => link).map(([label, link]) => (
+                                <a key={label} className="link" href={link} target="_blank" rel="noopener noreferrer">{label} ↗</a>
+                            ))}
+                    </div>
+                )}
             </section>
 
             {!stats ? (

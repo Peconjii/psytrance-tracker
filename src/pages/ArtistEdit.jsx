@@ -148,7 +148,7 @@ function ArtistEdit() {
                 </p>
             </header>
 
-            <OwnerNumbers kind="artist" slug={slug} />
+            <OwnerNumbers kind="artist" id={slug} />
 
             <Part label="Profile" saving={profileSave.saving} status={profileSave.status}
                 onSave={() => profileSave.run(() => saveArtistProfile(slug, Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, trim(v)]))))}>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { fetchLabelStats } from '../api/backend.js'
+import { fetchLabelPage, fetchLabelStats, fetchMyLabels } from '../api/backend.js'
 import FollowButton from '../components/FollowButton.jsx'
 import GigStats from '../components/GigStats.jsx'
+import { useOwnedPage } from '../components/ownedPage.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { labels } from '../map/data/types'
@@ -20,6 +21,10 @@ function Label() {
     })
     const [loaded, setLoaded] = useState({ name: null, stats: null, error: null })
     const stats = loaded.name === name ? loaded.stats : null
+    // What the label's owner wrote, and the crew with the changes admins approved (the map's until it loads)
+    const { page, canEdit } = useOwnedPage(fetchLabelPage, fetchMyLabels, name, own => own.name === name)
+    const crew = page?.crew ?? label?.artists ?? []
+    const profile = page?.profile
     const error = loaded.name === name ? loaded.error : null
 
     useEffect(() => {
@@ -47,19 +52,35 @@ function Label() {
                     <div className="page-head__tag">// Constellation · label</div>
                     <h1 className="page-title">{name}</h1>
                     <p className="mono text-xs muted mt-2 mb-0">
-                        {[label.country, label.since && `since ${label.since}`, `${label.artists.length} artists on the map`].filter(Boolean).join(' · ')}
+                        {[label.country, label.since && `since ${label.since}`, `${crew.length} artists`].filter(Boolean).join(' · ')}
                     </p>
                 </div>
                 <div className="flex flex-wrap gap-2 shrink-0">
                     <FollowButton label={name} name={name} />
                     <Link className="btn btn--ghost" to={`/?label=${encodeURIComponent(name)}`}>On the map →</Link>
+                    {canEdit && <Link className="btn btn--ghost" to={`/labels/${encodeURIComponent(name)}/edit`}>✎ Edit page</Link>}
                 </div>
             </div>
 
+            {profile && (
+                <section className="panel mb-4 flex flex-col sm:flex-row gap-4">
+                    {profile.logoUrl && <img className="artist-head__photo" src={profile.logoUrl} alt={name} loading="lazy" referrerPolicy="no-referrer" />}
+                    <div className="min-w-0">
+                        <h2 className="panel__label">About</h2>
+                        {profile.description && <p className="soft whitespace-pre-line m-0 max-w-3xl">{profile.description}</p>}
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2 mono text-xs">
+                            {[profile.websiteUrl, profile.bandcampUrl, profile.instagramUrl].filter(Boolean).map(link => (
+                                <a key={link} className="link" href={link} target="_blank" rel="noopener noreferrer">{link.replace(/^https:\/\//, '')} ↗</a>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            )}
+
             <section className="panel mb-4">
-                <h2 className="panel__label">Crew · {label.artists.length}</h2>
+                <h2 className="panel__label">Crew · {crew.length}</h2>
                 <div className="flex flex-wrap gap-2">
-                    {label.artists.map(a => (
+                    {crew.map(a => (
                         <Link key={a} className="chip no-underline" to={`/artists/${encodeURIComponent(artistSlug(a))}`}>{a}</Link>
                     ))}
                 </div>

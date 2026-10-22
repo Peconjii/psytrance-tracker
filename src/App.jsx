@@ -21,6 +21,8 @@ import Organizers from './pages/Organizers'
 import Organizer from './pages/Organizer'
 import Label from './pages/Label'
 import Festival from './pages/Festival'
+import LabelEdit from './pages/LabelEdit'
+import FestivalEdit from './pages/FestivalEdit'
 import OrganizerEdit from './pages/OrganizerEdit'
 import Feedback from './pages/Feedback'
 import AdminFeedback from './pages/AdminFeedback'
@@ -96,6 +98,8 @@ function Shell() {
           <Route path="/events/new" element={<ProtectedRoute><AddEvent /></ProtectedRoute>} />
           <Route path="/events/added/:id/edit" element={<ProtectedRoute><AddEvent key="edit" /></ProtectedRoute>} />
           <Route path="/organizers/:slug/edit" element={<ProtectedRoute><OrganizerEdit /></ProtectedRoute>} />
+          <Route path="/labels/:name/edit" element={<ProtectedRoute><LabelEdit /></ProtectedRoute>} />
+          <Route path="/festivals/:id/edit" element={<ProtectedRoute><FestivalEdit /></ProtectedRoute>} />
         </Routes>
       </main>
 

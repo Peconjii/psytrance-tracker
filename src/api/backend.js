@@ -584,3 +584,91 @@ export async function fetchOrganizerOwnerStats(slug, signal) {
     const response = await api.get(`/api/organizers/${encodeURIComponent(slug)}/owner-stats`, { signal })
     return response.data
 }
+
+// ---- Labels and festivals with owners ----
+
+// A label's page: { name, profile: { description, logoUrl, websiteUrl, bandcampUrl, instagramUrl } | null, crew: [names] }
+export async function fetchLabelPage(label, signal) {
+    const response = await api.get('/api/labels/page', { params: { label }, signal })
+    return response.data
+}
+
+// The label's edit page (owner or admin): page + pending crew requests + owner (admins only)
+export async function fetchLabelEdit(label, signal) {
+    const response = await api.get('/api/labels/edit', { params: { label }, signal })
+    return response.data
+}
+
+export async function saveLabelProfile(label, profile) {
+    const response = await api.put('/api/labels/profile', profile, { params: { label } })
+    return response.data
+}
+
+// kind ADD or REMOVE; an admin decides (an admin's own is done at once). Returns the crew as it is now
+export async function requestLabelCrew(label, kind, artistName) {
+    const response = await api.post('/api/labels/requests', { kind, artistName }, { params: { label } })
+    return response.data
+}
+
+export async function fetchLabelOwnerStats(label, signal) {
+    const response = await api.get('/api/labels/owner-stats', { params: { label }, signal })
+    return response.data
+}
+
+export async function fetchMyLabels(signal) {
+    const response = await api.get('/api/me/labels', { signal })
+    return response.data
+}
+
+// A festival's page: { id, name, profile: { description, websiteUrl, ticketUrl, instagramUrl, organizerSlug } | null, organizer }
+export async function fetchFestivalPage(id, signal) {
+    const response = await api.get('/api/festivals/page', { params: { id }, signal })
+    return response.data
+}
+
+export async function fetchFestivalEdit(id, signal) {
+    const response = await api.get('/api/festivals/edit', { params: { id }, signal })
+    return response.data
+}
+
+export async function saveFestivalProfile(id, profile) {
+    const response = await api.put('/api/festivals/profile', profile, { params: { id } })
+    return response.data
+}
+
+export async function fetchFestivalOwnerStats(id, signal) {
+    const response = await api.get('/api/festivals/owner-stats', { params: { id }, signal })
+    return response.data
+}
+
+export async function fetchMyFestivals(signal) {
+    const response = await api.get('/api/me/festivals', { signal })
+    return response.data
+}
+
+// Admins: link or unlink the owner of a label or a festival
+export async function setLabelOwner(label, username) {
+    await api.put('/api/admin/labels/owner', { username }, { params: { label } })
+}
+
+export async function removeLabelOwner(label) {
+    await api.delete('/api/admin/labels/owner', { params: { label } })
+}
+
+export async function setFestivalOwner(id, username) {
+    await api.put('/api/admin/festivals/owner', { username }, { params: { id } })
+}
+
+export async function removeFestivalOwner(id) {
+    await api.delete('/api/admin/festivals/owner', { params: { id } })
+}
+
+// Admins: the label owners' waiting crew requests, and deciding one
+export async function fetchLabelRequests(signal) {
+    const response = await api.get('/api/admin/labels/requests', { signal })
+    return response.data
+}
+
+export async function decideLabelRequest(id, approve) {
+    await api.post(`/api/admin/labels/requests/${id}`, { approve })
+}

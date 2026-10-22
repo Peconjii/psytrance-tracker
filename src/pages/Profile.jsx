@@ -6,7 +6,8 @@ import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import api, {
-    fetchMyArtists, fetchMyGoing, fetchMyOrganizers, fetchMyOurEvents, setEventReminders, withdrawOurEvent,
+    fetchMyArtists, fetchMyFestivals, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders,
+    withdrawOurEvent,
 } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -26,12 +27,17 @@ function Profile() {
     const [myArtists, setMyArtists] = useState([])
     // Organizer pages this account owns
     const [myOrganizers, setMyOrganizers] = useState([])
+    // Label and festival pages this account owns
+    const [myLabels, setMyLabels] = useState([])
+    const [myFestivals, setMyFestivals] = useState([])
     // Events this account added on our site, with their status
     const [myEvents, setMyEvents] = useState([])
     useEffect(() => {
         const controller = new AbortController()
         fetchMyArtists(controller.signal).then(setMyArtists).catch(() => {})
         fetchMyOrganizers(controller.signal).then(setMyOrganizers).catch(() => {})
+        fetchMyLabels(controller.signal).then(setMyLabels).catch(() => {})
+        fetchMyFestivals(controller.signal).then(setMyFestivals).catch(() => {})
         fetchMyOurEvents(controller.signal).then(setMyEvents).catch(() => {})
         return () => controller.abort()
     }, [])
@@ -200,6 +206,26 @@ function Profile() {
                         ))}
                     </ul>
                     <Link className="link text-sm" to="/events/new">+ Add an event</Link>
+                </section>
+            )}
+
+            {(myLabels.length > 0 || myFestivals.length > 0) && (
+                <section className="panel">
+                    <h2 className="panel__label">Your label and festival pages</h2>
+                    <ul className="rows">
+                        {myLabels.map(l => (
+                            <li key={'label:' + l.name} className="rows__item">
+                                <Link className="rows__name link" to={'/labels/' + encodeURIComponent(l.name)}>{l.name}</Link>
+                                <Link className="btn" to={'/labels/' + encodeURIComponent(l.name) + '/edit'}>✎ Edit page</Link>
+                            </li>
+                        ))}
+                        {myFestivals.map(f => (
+                            <li key={'festival:' + f.id} className="rows__item">
+                                <Link className="rows__name link" to={'/festivals/' + encodeURIComponent(f.id)}>{f.name}</Link>
+                                <Link className="btn" to={'/festivals/' + encodeURIComponent(f.id) + '/edit'}>✎ Edit page</Link>
+                            </li>
+                        ))}
+                    </ul>
                 </section>
             )}
 

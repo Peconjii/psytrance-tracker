@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { decideArtistRequest, fetchArtistRequests } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import { GenreChip } from '../components/AdminParts'
+import LabelRequests from '../components/LabelRequests.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -78,6 +79,7 @@ function AdminRequests() {
                     ))}
                 </ul>
             )}
+            <LabelRequests />
         </div>
     )
 }

@@ -113,7 +113,7 @@ function OrganizerEdit() {
                 </div>
             </form>
 
-            <OwnerNumbers kind="organizer" slug={slug} />
+            <OwnerNumbers kind="organizer" id={slug} />
 
             <section className="panel mb-4">
                 <h2 className="panel__label">Timetables of your events · {edit.events.length}</h2>

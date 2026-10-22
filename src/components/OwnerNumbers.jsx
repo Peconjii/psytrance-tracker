@@ -1,39 +1,59 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchArtistOwnerStats, fetchOrganizerOwnerStats } from '../api/backend.js'
+import {
+    fetchArtistOwnerStats, fetchFestivalOwnerStats, fetchLabelOwnerStats, fetchOrganizerOwnerStats,
+} from '../api/backend.js'
 import StatView, { StatViewToggle } from './StatView.jsx'
 import { useStatsView } from './statsView.js'
 
 const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
-// The numbers only the owner (and admins) see on the edit page: per gig or event who is going, saved it, reviewed it
-// and how many people heard of it through following. kind: 'artist' or 'organizer'.
-function OwnerNumbers({ kind, slug }) {
+// What each kind of page loads, calls its events and counts as reach
+const KINDS = {
+    artist: {
+        fetch: fetchArtistOwnerStats, events: d => d.gigs, noun: 'gigs', column: 'Gig', reach: 'Followers reached',
+        reachHint: 'Your followers who heard of this gig: listed when they followed you, or emailed when it was new',
+    },
+    organizer: {
+        fetch: fetchOrganizerOwnerStats, events: d => d.events, noun: 'events', column: 'Event', reach: 'Line-up followers',
+        reachHint: 'People who follow someone in the line-up',
+    },
+    label: {
+        fetch: fetchLabelOwnerStats, events: d => d.gigs, noun: 'crew gigs', column: 'Crew gig', reach: 'Label followers reached',
+        reachHint: "The label's followers who heard of this gig",
+    },
+    festival: {
+        fetch: fetchFestivalOwnerStats, events: d => d.editions, noun: 'editions', column: 'Edition', reach: 'Line-up followers',
+        reachHint: 'People who follow someone in the line-up',
+    },
+}
+
+// The numbers only the owner (and admins) see on the edit page: per gig, event or edition who is going, saved it,
+// reviewed it and how many people heard of it through following. kind: artist, organizer, label or festival;
+// id: the artist's or organizer's slug, the label's name or the festival's id.
+function OwnerNumbers({ kind, id }) {
     const [loaded, setLoaded] = useState({ key: null, data: null, error: null })
     const [view, toggleView] = useStatsView()
-    const key = kind + ':' + slug
+    const setup = KINDS[kind]
+    const key = kind + ':' + id
     const data = loaded.key === key ? loaded.data : null
 
     useEffect(() => {
         const controller = new AbortController()
-        const fetch = kind === 'artist' ? fetchArtistOwnerStats : fetchOrganizerOwnerStats
-        fetch(slug, controller.signal)
+        KINDS[kind].fetch(id, controller.signal)
             .then(found => setLoaded({ key, data: found, error: null }))
             .catch(err => { if (!controller.signal.aborted) setLoaded({ key, data: null, error: err.response?.data?.message || 'Could not load the numbers.' }) })
         return () => controller.abort()
-    }, [kind, slug, key])
+    }, [kind, id, key])
 
     const error = loaded.key === key ? loaded.error : null
     if (error) return <section className="panel mb-4"><p className="notice m-0">{error}</p></section>
     if (!data) return null
 
-    const events = kind === 'artist' ? data.gigs : data.events
-    const reachLabel = kind === 'artist' ? 'Followers reached' : 'Line-up followers'
+    const events = setup.events(data)
     const tiles = [
-        ...(kind === 'artist' ? [
-            { value: data.followers, label: 'Followers' },
-            { value: data.followersWithEmails, label: 'Get our emails' },
-        ] : [{ value: events.length, label: 'Events' }]),
+        ...(data.followers !== undefined ? [{ value: data.followers, label: 'Followers' }] : [{ value: events.length, label: setup.noun }]),
+        ...(data.followersWithEmails !== undefined ? [{ value: data.followersWithEmails, label: 'Get our emails' }] : []),
         { value: data.totals.going, label: 'Going, all together' },
         { value: data.totals.saved, label: 'Saved, all together' },
     ]
@@ -52,21 +72,19 @@ function OwnerNumbers({ kind, slug }) {
             </div>
             {upcoming.length > 0 && (
                 <div>
-                    <h3 className="field-label">Going, next {kind === 'artist' ? 'gigs' : 'events'}</h3>
+                    <h3 className="field-label">Going, next {setup.noun}</h3>
                     <StatView view={view} unit="going" rows={upcoming.map(e => ({ key: String(e.eventId), label: e.name, value: e.going }))} />
                 </div>
             )}
             {events.length === 0 ? (
-                <p className="muted text-sm m-0">No {kind === 'artist' ? 'gigs' : 'events'} in the line-ups we read yet.</p>
+                <p className="muted text-sm m-0">No {setup.noun} in the line-ups we read yet.</p>
             ) : (
                 <div className="overflow-x-auto">
                     <table className="owner-table">
                         <thead>
                             <tr>
-                                <th>{kind === 'artist' ? 'Gig' : 'Event'}</th><th>Going</th><th>Saved</th><th>Reviews</th><th>Rating</th>
-                                <th title={kind === 'artist'
-                                    ? 'Your followers who heard of this gig: listed when they followed you, or emailed when it was new'
-                                    : 'People who follow someone in the line-up'}>{reachLabel}</th>
+                                <th>{setup.column}</th><th>Going</th><th>Saved</th><th>Reviews</th><th>Rating</th>
+                                <th title={setup.reachHint}>{setup.reach}</th>
                             </tr>
                         </thead>
                         <tbody>
