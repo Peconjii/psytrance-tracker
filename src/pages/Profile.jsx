@@ -4,7 +4,7 @@ import { FavoritesContext } from '../context/FavoritesContext'
 import { useAuth } from '../context/AuthContext'
 import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
-import api, { fetchMyGoing, setEventReminders } from '../api/backend'
+import api, { fetchMyArtists, fetchMyGoing, setEventReminders } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 // "2026-10-14" in the browser's time zone, to compare with the dates the backend sends
@@ -17,6 +17,13 @@ function Profile() {
     usePageMeta({ title: 'Profile', path: '/profile', noindex: true })
     const { user, updateUser } = useAuth()
     const { follows } = useFollows()
+    // Artist profiles this account owns (an admin linked them)
+    const [myArtists, setMyArtists] = useState([])
+    useEffect(() => {
+        const controller = new AbortController()
+        fetchMyArtists(controller.signal).then(setMyArtists).catch(() => {})
+        return () => controller.abort()
+    }, [])
     const { favorites } = useContext(FavoritesContext)
     const [userReviews, setUserReviews] = useState([])
     const [loadingReviews, setLoadingReviews] = useState(true)
@@ -140,6 +147,20 @@ function Profile() {
                     </div>
                 </div>
             </section>
+
+            {myArtists.length > 0 && (
+                <section className="panel">
+                    <h2 className="panel__label">Your artist profile</h2>
+                    <ul className="rows">
+                        {myArtists.map(a => (
+                            <li key={a.slug} className="rows__item">
+                                <Link className="rows__name link" to={`/artists/${encodeURIComponent(a.slug)}`}>{a.name}</Link>
+                                <Link className="btn" to={`/artists/${encodeURIComponent(a.slug)}/edit`}>✎ Edit profile</Link>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
+            )}
 
             <section className="panel">
                 <h2 className="panel__label">Artists you follow · {follows.length}</h2>

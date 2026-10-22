@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { fetchArtist } from '../api/backend.js'
+import { fetchArtist, fetchMyArtists } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -56,6 +56,8 @@ function Artist() {
     const [attempt, setAttempt] = useState(0)
     // The map's placements come from the backend; until they are in, the genres are the bundled ones
     const [, setPlacementsIn] = useState(false)
+    // Artists whose profile this account owns (an admin linked them), for "Edit profile"
+    const [mine, setMine] = useState([])
 
     const artist = loaded.slug === slug ? loaded.artist : null
     const error = loaded.slug === slug ? loaded.error : null
@@ -66,10 +68,18 @@ function Artist() {
     // The map's side of the artist, by the name the map knows them by
     const mapName = onMap?.name
     const genres = mapName ? genresOfArtist(mapName) : []
-    const tracks = mapName ? tracksOfArtist(mapName).slice(0, 8) : []
+    const mapTracks = mapName ? tracksOfArtist(mapName).slice(0, 8) : []
     const albums = mapName ? mapProfiles[mapName]?.albums ?? [] : []
     const labels = mapName ? labelsOfArtist(mapName) : []
-    const festivals = mapName ? (appearances[mapName] ?? []).filter(x => festivalById[x.festival]) : []
+    const mapFestivals = mapName ? (appearances[mapName] ?? []).filter(x => festivalById[x.festival]) : []
+    // What the artist wrote on their profile comes first; the map's tracks only when they wrote none, and the map's
+    // festivals unless they named the same one
+    const ownTracks = artist?.tracks ?? []
+    const ownFestivals = artist?.festivals ?? []
+    const tracks = ownTracks.length > 0 ? [] : mapTracks
+    const named = new Set(ownFestivals.map(f => f.name.toLowerCase()))
+    const festivals = mapFestivals.filter(x => !named.has(festivalById[x.festival].name.toLowerCase()))
+    const canEdit = Boolean(artist && (user?.admin || mine.some(a => a.slug === artist.slug)))
     const origin = mapName ? mapProfiles[mapName]?.country : null
 
     usePageMeta({
@@ -85,6 +95,13 @@ function Artist() {
     useEffect(() => {
         loadPlacements().then(() => setPlacementsIn(true))
     }, [])
+
+    useEffect(() => {
+        if (!user) return
+        const controller = new AbortController()
+        fetchMyArtists(controller.signal).then(setMine).catch(() => {})
+        return () => controller.abort()
+    }, [user])
 
     useEffect(() => {
         const controller = new AbortController()
@@ -156,8 +173,8 @@ function Artist() {
                     {firstGenre && (
                         <Link className="btn" to={`/?genre=${firstGenre}&artist=${encodeURIComponent(mapName)}`}>◎ View on the map</Link>
                     )}
-                    {user?.admin && artist && (
-                        <Link className="btn btn--ghost" to={`/admin/artists/${encodeURIComponent(slug)}/profile`} state={{ name }}>✎ Edit profile</Link>
+                    {canEdit && (
+                        <Link className="btn btn--ghost" to={`/artists/${encodeURIComponent(artist.slug)}/edit`}>✎ Edit profile</Link>
                     )}
                     <Link className="btn btn--ghost" title="Wrong name, genre or not an artist? Tell us"
                         to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'ARTIST', ref: name, from: `/artists/${slug}` })}`}>
@@ -187,9 +204,21 @@ function Artist() {
                         </Section>
                     )}
 
-                    {(tracks.length > 0 || albums.length > 0 || labels.length > 0 || festivals.length > 0) && (
-                        <Section label="Sound · from the map">
+                    {(ownTracks.length > 0 || tracks.length > 0 || albums.length > 0 || labels.length > 0 || ownFestivals.length > 0 || festivals.length > 0) && (
+                        <Section label="Sound">
                             <div className="artist-sound">
+                                {ownTracks.length > 0 && (
+                                    <div>
+                                        <h3 className="field-label">Tracks</h3>
+                                        <ul className="list-none p-0 m-0 text-sm grid gap-1">
+                                            {ownTracks.map(t => (
+                                                <li key={t.url}>
+                                                    <a className="link" href={t.url} target="_blank" rel="noopener noreferrer">▶ {t.title}</a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                                 {tracks.length > 0 && (
                                     <div>
                                         <h3 className="field-label">Tracks</h3>
@@ -222,10 +251,18 @@ function Artist() {
                                         </ul>
                                     </div>
                                 )}
-                                {festivals.length > 0 && (
+                                {(ownFestivals.length > 0 || festivals.length > 0) && (
                                     <div>
                                         <h3 className="field-label">Festivals played</h3>
                                         <ul className="list-none p-0 m-0 text-sm grid gap-1">
+                                            {ownFestivals.map(f => (
+                                                <li key={`${f.name}|${f.year}`}>
+                                                    {f.url
+                                                        ? <a className="link" href={f.url} target="_blank" rel="noopener noreferrer">▶ {f.name}</a>
+                                                        : <span className="soft">{f.name}</span>}
+                                                    {f.year && <span className="muted mono text-xs"> {f.year}</span>}
+                                                </li>
+                                            ))}
                                             {festivals.map(x => (
                                                 <li key={x.festival}>
                                                     {x.video ? (

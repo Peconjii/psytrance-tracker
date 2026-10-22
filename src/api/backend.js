@@ -279,15 +279,62 @@ export async function unfollowArtist(slug) {
     await api.delete(`/api/me/follows/${encodeURIComponent(slug)}`)
 }
 
-// Admin panel: an artist's profile to edit (every field null when there is none yet)
-export async function fetchAdminArtistProfile(slug, signal) {
-    const response = await api.get(`/api/admin/artists/${encodeURIComponent(slug)}/profile`, { signal })
+// Editing an artist (their owner or an admin): everything the editor shows
+// { slug, name, profile, tracks, festivals, genres, pendingRequests, owner (admins only) }
+export async function fetchArtistEdit(slug, signal) {
+    const response = await api.get(`/api/artists/${encodeURIComponent(slug)}/edit`, { signal })
     return response.data
 }
 
-// Admin panel: write an artist's whole profile (blank fields clear them). Throws on failure; invalid fields are in
-// err.response.data.errors
+const artistPath = (slug) => `/api/artists/${encodeURIComponent(slug)}`
+
+// The whole profile (blank fields clear them). Throws on failure; invalid fields are in err.response.data.errors
 export async function saveArtistProfile(slug, profile) {
-    const response = await api.put(`/api/admin/artists/${encodeURIComponent(slug)}/profile`, profile)
+    const response = await api.put(`${artistPath(slug)}/profile`, profile)
+    return response.data
+}
+
+// The tracks on the profile, in order: [{ title, url }] (at most 6)
+export async function saveArtistTracks(slug, tracks) {
+    const response = await api.put(`${artistPath(slug)}/tracks`, { tracks })
+    return response.data
+}
+
+// The festivals played, in order: [{ name, year, url }] (at most 20)
+export async function saveArtistFestivals(slug, festivals) {
+    const response = await api.put(`${artistPath(slug)}/festivals`, { festivals })
+    return response.data
+}
+
+// Ask for other map genres ({ kind: 'GENRES', genres }) or another name ({ kind: 'NAME', name }); an admin decides
+export async function requestArtistChange(slug, change) {
+    const response = await api.post(`${artistPath(slug)}/requests`, change)
+    return response.data
+}
+
+// The artists whose profile this account owns: [{ slug, name }]
+export async function fetchMyArtists(signal) {
+    const response = await api.get('/api/me/artists', { signal })
+    return response.data
+}
+
+// Admin panel: link an account to an artist as its owner, or unlink it
+export async function setArtistOwner(slug, username) {
+    const response = await api.put(`/api/admin/artists/${encodeURIComponent(slug)}/owner`, { username })
+    return response.data
+}
+
+export async function removeArtistOwner(slug) {
+    await api.delete(`/api/admin/artists/${encodeURIComponent(slug)}/owner`)
+}
+
+// Admin panel: owners' genre and name requests waiting for a decision, newest first
+export async function fetchArtistRequests(signal) {
+    const response = await api.get('/api/admin/artists/requests', { signal })
+    return response.data
+}
+
+export async function decideArtistRequest(id, approve) {
+    const response = await api.post(`/api/admin/artists/requests/${id}`, { approve })
     return response.data
 }
