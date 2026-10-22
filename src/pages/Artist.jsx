@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { fetchArtist, fetchGenresForEvents, fetchGoingForEvents } from '../api/backend.js'
-import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
-import EventTicket from '../components/EventTicket.jsx'
+import { fetchArtist } from '../api/backend.js'
+import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton.jsx'
-import { TicketSkeletons } from '../components/EventFeed.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
+import {
+    appearances, artists as mapProfiles, data, festivalById, genresOfArtist, labelsOfArtist, tracksOfArtist,
+} from '../map/data/types'
+import { mapArtistBySlug } from '../map/data/events'
+import { loadPlacements } from '../map/data/placements'
 
-function soundCloudSearchUrl(artist) {
-    return `https://soundcloud.com/search/people?q=${encodeURIComponent(artist)}`
-}
-
+const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 const PAST_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+const day = (iso, format) => (iso ? format.format(new Date(iso + 'T12:00:00')) : 'Date TBA')
 
 // The links an artist's profile can have, in the order they are shown
 const PROFILE_LINKS = [
@@ -21,29 +22,59 @@ const PROFILE_LINKS = [
     ['websiteUrl', 'Website'],
 ]
 
-// One artist and the upcoming events they play, soonest first
+const youtubeLink = (track) => track.youtube
+    ? `https://www.youtube.com/watch?v=${track.youtube}`
+    : `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.artist} ${track.title}`)}`
+
+function initials(name) {
+    return name.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase()
+}
+
+// One section of the profile, in the site's panel style
+function Section({ label, children }) {
+    return (
+        <section className="panel mb-4">
+            <h2 className="panel__label">{label}</h2>
+            {children}
+        </section>
+    )
+}
+
+// An artist's profile: who they are (photo, bio, links, booking), their sound from the map (genres, tracks,
+// albums, labels, festivals) and where they play next and played before. Artists who are only on the map, not in
+// any line-up yet, get a profile too, from the map alone.
 function Artist() {
     const { slug } = useParams()
     const location = useLocation()
     const navigate = useNavigate()
+    const { user } = useAuth()
     // The name as the link showed it, so the header doesn't wait for the backend
     const passedName = location.state?.name
 
-    // Tagged with the slug it belongs to, so another artist's events never show while this one loads
+    // Tagged with the slug it belongs to, so another artist's data never shows while this one loads
     const [loaded, setLoaded] = useState({ slug: null, artist: null, error: null })
-    const [weather, setWeather] = useState({})
-    const [goingByEvent, setGoingByEvent] = useState({})
-    const [genresByEvent, setGenresByEvent] = useState({})
     const [attempt, setAttempt] = useState(0)
+    // The map's placements come from the backend; until they are in, the genres are the bundled ones
+    const [, setPlacementsIn] = useState(false)
 
     const artist = loaded.slug === slug ? loaded.artist : null
     const error = loaded.slug === slug ? loaded.error : null
-    const name = artist?.name || passedName || slug
+    const onMap = mapArtistBySlug(slug)
+    const name = artist?.name || onMap?.name || passedName || slug
     const profile = artist?.profile
 
+    // The map's side of the artist, by the name the map knows them by
+    const mapName = onMap?.name
+    const genres = mapName ? genresOfArtist(mapName) : []
+    const tracks = mapName ? tracksOfArtist(mapName).slice(0, 8) : []
+    const albums = mapName ? mapProfiles[mapName]?.albums ?? [] : []
+    const labels = mapName ? labelsOfArtist(mapName) : []
+    const festivals = mapName ? (appearances[mapName] ?? []).filter(x => festivalById[x.festival]) : []
+    const origin = mapName ? mapProfiles[mapName]?.country : null
+
     usePageMeta({
-        title: `${name} – Upcoming Psytrance Events`,
-        description: `Where does ${name} play next? Upcoming psytrance festivals and parties with ${name} in the line-up.`,
+        title: `${name} – Psytrance Artist`,
+        description: profile?.bio || `${name}: genres, tracks, labels and where they play next on Map of Psy.`,
         path: `/artists/${slug}`,
     })
 
@@ -52,128 +83,208 @@ function Artist() {
     }, [slug])
 
     useEffect(() => {
+        loadPlacements().then(() => setPlacementsIn(true))
+    }, [])
+
+    useEffect(() => {
         const controller = new AbortController()
         fetchArtist(slug, controller.signal)
-            .then(data => {
-                setLoaded({ slug, artist: data, error: null })
-                fetchWeatherForEvents(data.upcomingEvents, controller.signal)
-                    .then(found => setWeather(prev => ({ ...prev, ...found })))
-                fetchGoingForEvents(data.upcomingEvents, controller.signal)
-                    .then(found => setGoingByEvent(prev => ({ ...prev, ...found })))
-                fetchGenresForEvents(data.upcomingEvents, controller.signal)
-                    .then(found => setGenresByEvent(prev => ({ ...prev, ...found })))
-            })
+            .then(found => setLoaded({ slug, artist: found, error: null }))
             .catch(err => {
                 if (controller.signal.aborted) return
                 setLoaded({
                     slug,
                     artist: null,
-                    // Artists only exist once a line-up with them has been read
+                    // Artists only exist in the backend once a line-up with them has been read
                     error: err.response?.status === 404
                         ? 'notFound'
-                        : err.response?.data?.message || 'Could not load this artist. Is the backend running?'
+                        : err.response?.data?.message || 'Could not load this artist. Is the backend running?',
                 })
             })
         return () => controller.abort()
     }, [slug, attempt])
 
     const goBack = () => (location.key !== 'default' ? navigate(-1) : navigate('/artists'))
+    const loading = !artist && !error
+    const unknown = error === 'notFound' && !onMap
+    const links = profile ? PROFILE_LINKS.filter(([key]) => profile[key]) : []
+    const firstGenre = genres[0]?.id
 
     return (
-        <div className="page page--wide">
+        <div className="page">
             <button onClick={goBack} className="back-link">← Back</button>
 
-            <div className="panel mb-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            {/* Who they are */}
+            <div className="panel mb-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div className="artist-head min-w-0">
-                    {profile?.photoUrl && (
+                    {profile?.photoUrl ? (
                         <img className="artist-head__photo" src={profile.photoUrl} alt={name} loading="lazy" referrerPolicy="no-referrer" />
+                    ) : (
+                        <div className="artist-head__photo artist-head__initials" aria-hidden="true">{initials(name)}</div>
                     )}
                     <div className="min-w-0">
-                        <div className="page-head__tag">// Satellite · artist</div>
+                        <div className="page-head__tag">// Satellite · artist{origin ? ` · ${origin}` : ''}</div>
                         <h1 className="page-title">{name}</h1>
-                        {artist && (
-                            <p className="page-head__sub">
-                                {artist.upcomingEvents.length === 0
-                                    ? 'No upcoming events right now'
-                                    : `Playing at ${artist.upcomingEvents.length} upcoming ${artist.upcomingEvents.length === 1 ? 'event' : 'events'}`}
-                                {artist.followers > 0 && ` · ★ ${artist.followers} ${artist.followers === 1 ? 'follower' : 'followers'}`}
-                            </p>
+                        {genres.length > 0 && (
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {genres.map(g => (
+                                    <Link key={g.id} className="genre-chip no-underline" style={{ '--c': data.families[g.family].color }}
+                                        to={`/?genre=${g.id}&artist=${encodeURIComponent(mapName)}`}>
+                                        {g.name}
+                                    </Link>
+                                ))}
+                            </div>
                         )}
-                        {profile?.bio && <p className="soft whitespace-pre-line mt-3 mb-0 max-w-2xl">{profile.bio}</p>}
-                        {profile && (PROFILE_LINKS.some(([key]) => profile[key]) || profile.bookingEmail) && (
+                        {artist?.followers > 0 && (
+                            <p className="mono text-xs muted mt-2 mb-0">★ {artist.followers} {artist.followers === 1 ? 'follower' : 'followers'}</p>
+                        )}
+                        {(links.length > 0 || profile?.bookingEmail) && (
                             <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 mono text-xs">
-                                {PROFILE_LINKS.filter(([key]) => profile[key]).map(([key, label]) => (
+                                {links.map(([key, label]) => (
                                     <a key={key} className="link" href={profile[key]} target="_blank" rel="noopener noreferrer">{label} ↗</a>
                                 ))}
-                                {profile.bookingEmail && (
+                                {profile?.bookingEmail && (
                                     <a className="link" href={`mailto:${profile.bookingEmail}?subject=${encodeURIComponent(`Booking: ${name}`)}`}>✉ Booking</a>
                                 )}
                             </div>
                         )}
                     </div>
                 </div>
-                <div className="flex flex-wrap gap-2 shrink-0 self-start sm:self-center">
+                <div className="flex flex-wrap sm:flex-col gap-2 shrink-0">
                     {/* Only artists from the line-ups can be followed: they are the ones with gigs */}
                     {artist && <FollowButton slug={artist.slug} name={artist.name} />}
-                    <Link className="btn btn--ghost" title="Wrong name or not an artist? Tell us"
+                    {firstGenre && (
+                        <Link className="btn" to={`/?genre=${firstGenre}&artist=${encodeURIComponent(mapName)}`}>◎ View on the map</Link>
+                    )}
+                    {user?.admin && artist && (
+                        <Link className="btn btn--ghost" to={`/admin/artists/${encodeURIComponent(slug)}/profile`} state={{ name }}>✎ Edit profile</Link>
+                    )}
+                    <Link className="btn btn--ghost" title="Wrong name, genre or not an artist? Tell us"
                         to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'ARTIST', ref: name, from: `/artists/${slug}` })}`}>
                         ✎ Report
                     </Link>
-                    {/* The artist's own SoundCloud is in the links above; without one, search for them */}
-                    {!profile?.soundcloudUrl && (
-                        <a href={soundCloudSearchUrl(name)} target="_blank" rel="noreferrer" className="btn">
-                            SoundCloud ↗
-                        </a>
-                    )}
                 </div>
             </div>
 
-            {error === 'notFound' ? (
+            {unknown ? (
                 <div className="empty">
-                    <p><strong>We haven't seen {name} in other line-ups yet.</strong></p>
+                    <p><strong>We don't know {name} yet.</strong></p>
                     <p>
-                        Line-ups are read in the background a few events at a time, so check back later or{' '}
+                        Artists show up here once a line-up with them has been read, so check back later or{' '}
                         <Link to="/artists" className="link">browse all artists</Link>.
                     </p>
                 </div>
-            ) : error ? (
+            ) : error && error !== 'notFound' ? (
                 <div className="py-8 grid justify-items-center gap-3">
                     <p className="notice m-0">{error}</p>
                     <button onClick={() => setAttempt(count => count + 1)} className="btn">Try again</button>
                 </div>
-            ) : !artist ? (
-                <TicketSkeletons count={4} />
-            ) : artist.upcomingEvents.length > 0 && (
-                // One artist rarely plays twice on a day, so day headings would leave one ticket per row:
-                // the dates are on the tickets, and they fill two columns (one on phones)
-                <div className="tickets">
-                    {artist.upcomingEvents.map(event => (
-                        <EventTicket
-                            key={event.id}
-                            event={event}
-                            weather={weather[weatherKey(event)]}
-                            going={goingByEvent[event.id]}
-                            genres={genresByEvent[event.id]}
-                            onGoingChange={status => setGoingByEvent(prev => ({ ...prev, [event.id]: status }))}
-                        />
-                    ))}
-                </div>
-            )}
+            ) : (
+                <>
+                    {profile?.bio && (
+                        <Section label="About">
+                            <p className="soft whitespace-pre-line m-0 max-w-3xl">{profile.bio}</p>
+                        </Section>
+                    )}
 
-            {artist?.pastEvents?.length > 0 && (
-                <section className="panel mt-6">
-                    <h2 className="panel__label">Played before · {artist.pastEvents.length}</h2>
-                    <ul className="rows">
-                        {artist.pastEvents.map(gig => (
-                            <li key={gig.eventId} className="rows__item">
-                                <span className="rows__name">{gig.name}</span>
-                                <span className="rows__meta">
-                                    {[gig.dateStart && PAST_DAY.format(new Date(gig.dateStart + 'T12:00:00')), gig.town, gig.country].filter(Boolean).join(' · ')}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
+                    {(tracks.length > 0 || albums.length > 0 || labels.length > 0 || festivals.length > 0) && (
+                        <Section label="Sound · from the map">
+                            <div className="artist-sound">
+                                {tracks.length > 0 && (
+                                    <div>
+                                        <h3 className="field-label">Tracks</h3>
+                                        <ul className="list-none p-0 m-0 text-sm grid gap-1">
+                                            {tracks.map(t => (
+                                                <li key={`${t.artist}|${t.title}`}>
+                                                    <a className="link" href={youtubeLink(t)} target="_blank" rel="noopener noreferrer">▶ {t.title}</a>
+                                                    {t.artist !== mapName && <span className="muted"> · {t.artist}</span>}
+                                                    {t.year && <span className="muted mono text-xs"> {t.year}</span>}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {albums.length > 0 && (
+                                    <div>
+                                        <h3 className="field-label">Albums</h3>
+                                        <ul className="list-none p-0 m-0 text-sm grid gap-1 soft">
+                                            {albums.slice(0, 8).map(a => <li key={a.title}>{a.title} <span className="muted mono text-xs">{a.year}</span></li>)}
+                                        </ul>
+                                    </div>
+                                )}
+                                {labels.length > 0 && (
+                                    <div>
+                                        <h3 className="field-label">Labels</h3>
+                                        <ul className="list-none p-0 m-0 text-sm grid gap-1">
+                                            {labels.map(l => (
+                                                <li key={l}><Link className="link" to={`/?label=${encodeURIComponent(l)}`}>{l}</Link></li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                                {festivals.length > 0 && (
+                                    <div>
+                                        <h3 className="field-label">Festivals played</h3>
+                                        <ul className="list-none p-0 m-0 text-sm grid gap-1">
+                                            {festivals.map(x => (
+                                                <li key={x.festival}>
+                                                    {x.video ? (
+                                                        <a className="link" href={`https://www.youtube.com/watch?v=${x.video}`} target="_blank" rel="noopener noreferrer">
+                                                            ▶ {festivalById[x.festival].name}
+                                                        </a>
+                                                    ) : (
+                                                        <Link className="link" to={`/?festival=${x.festival}`}>{festivalById[x.festival].name}</Link>
+                                                    )}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </div>
+                        </Section>
+                    )}
+
+                    {loading ? (
+                        <p className="mono text-xs muted">Loading gigs…</p>
+                    ) : artist && (
+                        <>
+                            <Section label={`Next gigs · ${artist.upcomingEvents.length}`}>
+                                {artist.upcomingEvents.length === 0 ? (
+                                    <p className="muted text-sm m-0">No upcoming gigs right now.</p>
+                                ) : (
+                                    <ul className="rows">
+                                        {artist.upcomingEvents.map(event => (
+                                            <li key={event.id}>
+                                                <Link to={`/events/${event.id}`} state={{ event }} className="rows__item">
+                                                    <span className="rows__name">
+                                                        <span className="mono text-xs muted artist-gig__day">{day(event.dateStart, GIG_DAY)}</span>
+                                                        {event.nameParty}
+                                                    </span>
+                                                    <span className="rows__meta">{[event.nameTown, event.nameCountry].filter(Boolean).join(', ')}</span>
+                                                </Link>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </Section>
+
+                            {artist.pastEvents?.length > 0 && (
+                                <Section label={`Played before · ${artist.pastEvents.length}`}>
+                                    <ul className="rows">
+                                        {artist.pastEvents.map(gig => (
+                                            <li key={gig.eventId} className="rows__item">
+                                                <span className="rows__name">{gig.name}</span>
+                                                <span className="rows__meta">
+                                                    {[day(gig.dateStart, PAST_DAY), gig.town, gig.country].filter(Boolean).join(' · ')}
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </Section>
+                            )}
+                        </>
+                    )}
+                </>
             )}
         </div>
     )

@@ -277,3 +277,6 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .artist-head { display: flex; gap: 18px; align-items: flex-start; }
 .artist-head__photo { width: 96px; height: 96px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--line); }
 @media (max-width: 480px) { .artist-head__photo { width: 64px; height: 64px; } }
+.artist-head__initials { display: flex; align-items: center; justify-content: center; font: 500 24px var(--display, inherit); color: var(--accent); background: rgba(62, 230, 196, 0.06); }
+.artist-sound { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+.artist-gig__day { display: inline-block; min-width: 92px; }

@@ -487,3 +487,5 @@
 .fleet__when { font: 11px var(--mono); color: var(--fg); }
 .fleet__who { grid-column: 1 / -1; font-size: 12px; color: var(--muted); }
 .fleet__live { color: #ff6b8b; margin-left: 6px; }
+/* "Full profile →" under an artist's name in the HUD */
+.hud__profile { display: inline-block; margin: 2px 0 10px; font: 11px var(--mono); letter-spacing: 0.08em; color: var(--fam, var(--accent)); }

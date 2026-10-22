@@ -1,9 +1,11 @@
 import { useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
 import { FixLink } from './FixLink';
 import { HeartButton } from './Playlist';
 import type { PlaylistApi } from '../hooks/usePlaylist';
+import { artistSlug } from '../data/events';
 import {
   appearances, artists, artistsAtFestival, data, labels, labelsOfArtist, sources, festivalById, festivals, genreById, genresOfArtist, genresOfLabel, tracksOfArtist,
   type Track,
@@ -218,6 +220,10 @@ export function Panel({
         <button className="hud__back" onClick={() => onSelectArtist(null)}>← {g.name}</button>
         <div className="hud__tag">// SATELLITE · ARTIST</div>
         <h2>{artist}</h2>
+        {/* The artist's own page: profile, booking, every gig and the ones they played before */}
+        <Link className="hud__link hud__profile" to={`/artists/${encodeURIComponent(artistSlug(artist))}`} state={{ name: artist }}>
+          Full profile →
+        </Link>
         {(p?.country || p?.since) && (
           <div className="hud__stats">
             {p.country && <span>ORIGIN <b>{p.country}</b></span>}
