@@ -1,44 +1,48 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import MapOfPsy from './map/MapOfPsy'
-import Events from './pages/Events'
-import EventDetails from './pages/EventDetails'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import { FavoritesProvider } from './context/FavoritesContext'
 import { FollowsProvider } from './context/FollowsContext'
-import Favorites from './pages/Favorites'
 import { AuthProvider } from './context/AuthContext'
-import Register from './pages/Register'
-import Login from './pages/Login'
-import ForgotPassword from './pages/ForgotPassword'
-import ResetPassword from './pages/ResetPassword'
-import VerifyEmail from './pages/VerifyEmail'
-import Profile from './pages/Profile'
-import GlobalMap from './pages/GlobalMap'
-import Artists from './pages/Artists'
-import Artist from './pages/Artist'
-import Organizers from './pages/Organizers'
-import Organizer from './pages/Organizer'
-import Label from './pages/Label'
-import Festival from './pages/Festival'
-import LabelEdit from './pages/LabelEdit'
-import FestivalEdit from './pages/FestivalEdit'
-import OrganizerEdit from './pages/OrganizerEdit'
-import Feedback from './pages/Feedback'
-import AdminFeedback from './pages/AdminFeedback'
-import AdminGenres from './pages/AdminGenres'
-import AdminHistory from './pages/AdminHistory'
-import AdminEvents from './pages/AdminEvents'
-import AdminRequests from './pages/AdminRequests'
-import AdminOurEvents from './pages/AdminOurEvents'
-import AdminUsers from './pages/AdminUsers'
-import AdminReviews from './pages/AdminReviews'
-import AdminDashboard from './pages/AdminDashboard'
-import AddEvent from './pages/AddEvent'
-import NewPage from './pages/NewPage'
-import ArtistEdit from './pages/ArtistEdit'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
+
+// Each page is its own chunk, loaded when it is first opened: the galaxy (PixiJS) and the admin panel stay out
+// of everyone else's first load
+const MapOfPsy = lazy(() => import('./map/MapOfPsy'))
+const Events = lazy(() => import('./pages/Events'))
+const EventDetails = lazy(() => import('./pages/EventDetails'))
+const Favorites = lazy(() => import('./pages/Favorites'))
+const Register = lazy(() => import('./pages/Register'))
+const Login = lazy(() => import('./pages/Login'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const ResetPassword = lazy(() => import('./pages/ResetPassword'))
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'))
+const Profile = lazy(() => import('./pages/Profile'))
+const GlobalMap = lazy(() => import('./pages/GlobalMap'))
+const Artists = lazy(() => import('./pages/Artists'))
+const Artist = lazy(() => import('./pages/Artist'))
+const Organizers = lazy(() => import('./pages/Organizers'))
+const Organizer = lazy(() => import('./pages/Organizer'))
+const Label = lazy(() => import('./pages/Label'))
+const Festival = lazy(() => import('./pages/Festival'))
+const LabelEdit = lazy(() => import('./pages/LabelEdit'))
+const FestivalEdit = lazy(() => import('./pages/FestivalEdit'))
+const OrganizerEdit = lazy(() => import('./pages/OrganizerEdit'))
+const Feedback = lazy(() => import('./pages/Feedback'))
+const AdminFeedback = lazy(() => import('./pages/AdminFeedback'))
+const AdminGenres = lazy(() => import('./pages/AdminGenres'))
+const AdminHistory = lazy(() => import('./pages/AdminHistory'))
+const AdminEvents = lazy(() => import('./pages/AdminEvents'))
+const AdminRequests = lazy(() => import('./pages/AdminRequests'))
+const AdminOurEvents = lazy(() => import('./pages/AdminOurEvents'))
+const AdminUsers = lazy(() => import('./pages/AdminUsers'))
+const AdminReviews = lazy(() => import('./pages/AdminReviews'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const AddEvent = lazy(() => import('./pages/AddEvent'))
+const NewPage = lazy(() => import('./pages/NewPage'))
+const ArtistEdit = lazy(() => import('./pages/ArtistEdit'))
 
 // The home page is the galaxy map, which fills the window under the navbar, so it has no footer
 function Shell() {
@@ -49,6 +53,8 @@ function Shell() {
       <Navbar />
 
       <main className={`relative z-10 flex-1 ${isHome ? 'min-h-0' : ''}`}>
+        {/* While a page's chunk loads; usually a blink */}
+        <Suspense fallback={<p className="page mono text-xs muted">Loading…</p>}>
         <Routes>
           <Route path="/" element={<MapOfPsy />} />
           <Route path="/events" element={<Events />} />
@@ -103,6 +109,7 @@ function Shell() {
           <Route path="/labels/:name/edit" element={<ProtectedRoute><LabelEdit /></ProtectedRoute>} />
           <Route path="/festivals/:id/edit" element={<ProtectedRoute><FestivalEdit /></ProtectedRoute>} />
         </Routes>
+        </Suspense>
       </main>
 
       {!isHome && <Footer />}
