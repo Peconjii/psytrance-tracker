@@ -4,4 +4,4 @@ Disallow: /favorites
 Disallow: /profile
 Disallow: /reset-password
 
-Sitemap: https://psytrance-tracker.vercel.app/sitemap.xml
+Sitemap: https://psyatlas-one.vercel.app/sitemap.xml
