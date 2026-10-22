@@ -2,6 +2,7 @@ import { useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
+import { LabelCrew } from './LabelCrew';
 import { FixLink } from './FixLink';
 import { HeartButton } from './Playlist';
 import FollowButton from '../../components/FollowButton.jsx';
@@ -163,16 +164,7 @@ export function Panel({
         <p>The systems this label is known for, linked in the order they appeared. Labels often define a sound: follow the line to hear what connects them.</p>
         <div className="hud__label">Systems in this constellation</div>
         {chips([...gs].sort((x, y) => x.year - y.year).map((x) => x.id))}
-        {lp?.artists.length ? (
-          <>
-            <div className="hud__label">Artists on this label</div>
-            <div className="hud__chips">
-              {lp.artists.map((a) => (
-                <button key={a} className="hud__chip" onClick={() => onOpenArtist(a)}>{a}</button>
-              ))}
-            </div>
-          </>
-        ) : null}
+        <LabelCrew label={label} mapCrew={lp?.artists ?? []} onOpenArtist={onOpenArtist} />
         <div className="hud__footer">
           <a className="hud__ext" href={youtube(label)} target="_blank" rel="noopener noreferrer">Search on YouTube ↗</a>
           <FixLink about="LABEL" name={label} />
