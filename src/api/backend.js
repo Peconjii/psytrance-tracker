@@ -134,6 +134,12 @@ export async function setEventReminders(enabled) {
     return response.data.enabled
 }
 
+// The Monday email with the next gigs of who the account follows; returns the new setting
+export async function setWeeklyDigest(enabled) {
+    const response = await api.put('/api/me/weekly-digest', { enabled })
+    return response.data.enabled
+}
+
 // [{ slug, name, upcomingEvents }], busiest first. Throws on failure.
 export async function fetchArtists(search, signal) {
     const response = await api.get('/api/artists', { params: { search: search || undefined }, signal })

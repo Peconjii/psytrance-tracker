@@ -6,7 +6,7 @@ import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import api, {
-    fetchMyArtists, fetchMyClaims, fetchMyFestivals, fetchMyPageRequests, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders,
+    fetchMyArtists, fetchMyClaims, fetchMyFestivals, fetchMyPageRequests, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders, setWeeklyDigest,
     withdrawOurEvent,
 } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -83,6 +83,21 @@ function Profile() {
         }
     }
 
+    const digestOn = user?.weeklyDigest !== false
+    const [savingDigest, setSavingDigest] = useState(false)
+    const [digestError, setDigestError] = useState(null)
+    const toggleDigest = async () => {
+        setSavingDigest(true)
+        setDigestError(null)
+        try {
+            updateUser({ weeklyDigest: await setWeeklyDigest(!digestOn) })
+        } catch {
+            setDigestError('Could not save the setting. Please try again.')
+        } finally {
+            setSavingDigest(false)
+        }
+    }
+
     // Keep ratings within 0-5, because String.repeat throws a RangeError for negative counts
     const clampRating = (value) => Math.max(0, Math.min(5, Math.round(Number(value) || 0)))
 
@@ -147,6 +162,24 @@ function Profile() {
                     aria-label="Email reminders"
                     onClick={toggleReminders}
                     disabled={savingReminders}
+                    className="switch shrink-0"
+                />
+            </section>
+
+            <section className="panel flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 className="panel__label">Weekly email</h2>
+                    <p className={`text-sm m-0 max-w-md ${digestError ? 'text-[var(--danger)]' : 'muted'}`}>
+                        {digestError || 'On Mondays: where the artists and labels you follow play in the next two weeks (only when they play).'}
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    role="switch"
+                    aria-checked={digestOn}
+                    aria-label="Weekly email"
+                    onClick={toggleDigest}
+                    disabled={savingDigest}
                     className="switch shrink-0"
                 />
             </section>
