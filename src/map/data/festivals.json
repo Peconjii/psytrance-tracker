@@ -220,13 +220,14 @@
     "id": "jungle",
     "name": "Jungle Island",
     "country": "Serbia",
-    "description": "Three-day full-on, night full-on and twilight festival run by the Novi Sad collective of the same name, held in nature around Novi Sad (a Danube island, later the Fruška Gora forest).",
+    "description": "Three-day full-on, night full-on and twilight festival with a touch of dark psy, run by the Novi Sad collective of the same name, held in nature around Novi Sad (a Danube island, later the Fruška Gora forest).",
     "x": 2080,
     "y": 1000,
     "genres": [
       "fullon",
       "night",
-      "twilight"
+      "twilight",
+      "dark"
     ]
   },
   {
