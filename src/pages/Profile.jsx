@@ -6,7 +6,7 @@ import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import api, {
-    fetchMyArtists, fetchMyFestivals, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders,
+    fetchMyArtists, fetchMyClaims, fetchMyFestivals, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders,
     withdrawOurEvent,
 } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -30,6 +30,8 @@ function Profile() {
     // Label and festival pages this account owns
     const [myLabels, setMyLabels] = useState([])
     const [myFestivals, setMyFestivals] = useState([])
+    // Pages this account asked to own, while they wait or when they were turned down
+    const [myClaims, setMyClaims] = useState([])
     // Events this account added on our site, with their status
     const [myEvents, setMyEvents] = useState([])
     useEffect(() => {
@@ -38,6 +40,7 @@ function Profile() {
         fetchMyOrganizers(controller.signal).then(setMyOrganizers).catch(() => {})
         fetchMyLabels(controller.signal).then(setMyLabels).catch(() => {})
         fetchMyFestivals(controller.signal).then(setMyFestivals).catch(() => {})
+        fetchMyClaims(controller.signal).then(found => setMyClaims(found.filter(c => c.status !== 'APPROVED'))).catch(() => {})
         fetchMyOurEvents(controller.signal).then(setMyEvents).catch(() => {})
         return () => controller.abort()
     }, [])
@@ -206,6 +209,22 @@ function Profile() {
                         ))}
                     </ul>
                     <Link className="link text-sm" to="/events/new">+ Add an event</Link>
+                </section>
+            )}
+
+            {myClaims.length > 0 && (
+                <section className="panel">
+                    <h2 className="panel__label">Pages you claimed</h2>
+                    <ul className="rows">
+                        {myClaims.map(c => (
+                            <li key={c.id} className="rows__item">
+                                <span className="rows__name">{c.target} <span className="mono text-xs muted">· {c.kind.toLowerCase()}</span></span>
+                                <span className="rows__meta">
+                                    {c.status === 'PENDING' ? 'Waiting for an admin' : 'Not accepted' + (c.rejectReason ? ': ' + c.rejectReason : '')}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
                 </section>
             )}
 

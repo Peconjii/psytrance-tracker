@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchArtist, fetchMyArtists } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton.jsx'
+import ClaimPage from '../components/ClaimPage.jsx'
 import ArtistNumbers from '../components/ArtistNumbers.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import {
@@ -332,6 +333,7 @@ function Artist() {
                     )}
                 </>
             )}
+            {artist && !canEdit && <div className="mt-2"><ClaimPage kind="ARTIST" target={artist.slug} name={artist.name} /></div>}
         </div>
     )
 }

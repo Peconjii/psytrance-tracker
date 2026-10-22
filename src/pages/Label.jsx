@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { fetchLabelPage, fetchLabelStats, fetchMyLabels } from '../api/backend.js'
 import FollowButton from '../components/FollowButton.jsx'
 import GigStats from '../components/GigStats.jsx'
+import ClaimPage from '../components/ClaimPage.jsx'
 import { useOwnedPage } from '../components/ownedPage.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
@@ -123,6 +124,7 @@ function Label() {
                     </section>
                 </>
             )}
+            {!canEdit && <div className="mt-2"><ClaimPage kind="LABEL" target={name} name={name} /></div>}
         </div>
     )
 }

@@ -24,7 +24,7 @@ function AdminDashboard() {
     const waiting = data && [
         { count: data.waiting.feedback, label: 'New messages', to: '/admin/feedback' },
         { count: data.waiting.events, label: 'Events to approve', to: '/admin/our-events' },
-        { count: data.waiting.artistRequests, label: 'Artist requests', to: '/admin/requests' },
+        { count: data.waiting.artistRequests, label: 'Requests and claims', to: '/admin/requests' },
         { count: data.harbour, label: 'Ships in the harbour', to: '/admin/events' },
     ]
 

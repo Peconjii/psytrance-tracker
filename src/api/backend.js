@@ -672,3 +672,26 @@ export async function fetchLabelRequests(signal) {
 export async function decideLabelRequest(id, approve) {
     await api.post(`/api/admin/labels/requests/${id}`, { approve })
 }
+
+// "Claim this page" (kind ARTIST, ORGANIZER, LABEL or FESTIVAL): { status: APPROVED (theirs now) or PENDING, ... }
+export async function claimPage(kind, target, proofUrl, message) {
+    const response = await api.post('/api/claims', { kind, target, proofUrl, message })
+    return response.data
+}
+
+// The claims this account sent, newest first
+export async function fetchMyClaims(signal) {
+    const response = await api.get('/api/me/claims', { signal })
+    return response.data
+}
+
+// Admins: the claims waiting for a decision, and deciding one
+export async function fetchPageClaims(signal) {
+    const response = await api.get('/api/admin/claims', { signal })
+    return response.data
+}
+
+export async function decidePageClaim(id, approve, reason) {
+    const response = await api.post(`/api/admin/claims/${id}`, { approve, reason })
+    return response.data
+}

@@ -10,7 +10,7 @@ function AdminTabs() {
             <NavLink to="/admin/genres" className={tab}>Artist genres</NavLink>
             <NavLink to="/admin/events" className={tab}>Events</NavLink>
             <NavLink to="/admin/our-events" className={tab}>Added events</NavLink>
-            <NavLink to="/admin/requests" className={tab}>Artist requests</NavLink>
+            <NavLink to="/admin/requests" className={tab}>Requests</NavLink>
             <NavLink to="/admin/users" className={tab}>Users</NavLink>
             <NavLink to="/admin/reviews" className={tab}>Reviews</NavLink>
             <NavLink to="/admin/history" className={tab}>History</NavLink>

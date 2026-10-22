@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchMyOrganizers, fetchOrganizer } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
+import ClaimPage from '../components/ClaimPage.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
@@ -126,6 +127,7 @@ function Organizer() {
                     )}
                 </>
             )}
+            {organizer && !canEdit && <div className="mt-2"><ClaimPage kind="ORGANIZER" target={organizer.slug} name={organizer.name} /></div>}
         </div>
     )
 }

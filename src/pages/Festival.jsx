@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchFestivalPage, fetchFestivalStats, fetchMyFestivals } from '../api/backend.js'
 import { GenreChip } from '../components/AdminParts'
+import ClaimPage from '../components/ClaimPage.jsx'
 import StatView, { StatViewToggle } from '../components/StatView.jsx'
 import { useOwnedPage } from '../components/ownedPage.js'
 import { useStatsView } from '../components/statsView.js'
@@ -162,6 +163,7 @@ function Festival() {
                     </ul>
                 </section>
             )}
+            {!canEdit && <div className="mt-2"><ClaimPage kind="FESTIVAL" target={id} name={festival.name} /></div>}
         </div>
     )
 }
