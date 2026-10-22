@@ -6,7 +6,7 @@ import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import api, {
-    fetchMyArtists, fetchMyClaims, fetchMyFestivals, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders,
+    fetchMyArtists, fetchMyClaims, fetchMyFestivals, fetchMyPageRequests, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders,
     withdrawOurEvent,
 } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -32,6 +32,8 @@ function Profile() {
     const [myFestivals, setMyFestivals] = useState([])
     // Pages this account asked to own, while they wait or when they were turned down
     const [myClaims, setMyClaims] = useState([])
+    // Pages this account asked for that the site didn't have ("Not on the map yet?")
+    const [myPageRequests, setMyPageRequests] = useState([])
     // Events this account added on our site, with their status
     const [myEvents, setMyEvents] = useState([])
     useEffect(() => {
@@ -41,6 +43,7 @@ function Profile() {
         fetchMyLabels(controller.signal).then(setMyLabels).catch(() => {})
         fetchMyFestivals(controller.signal).then(setMyFestivals).catch(() => {})
         fetchMyClaims(controller.signal).then(found => setMyClaims(found.filter(c => c.status !== 'APPROVED'))).catch(() => {})
+        fetchMyPageRequests(controller.signal).then(setMyPageRequests).catch(() => {})
         fetchMyOurEvents(controller.signal).then(setMyEvents).catch(() => {})
         return () => controller.abort()
     }, [])
@@ -227,6 +230,29 @@ function Profile() {
                     </ul>
                 </section>
             )}
+
+            <section className="panel">
+                <h2 className="panel__label">New pages you asked for</h2>
+                {myPageRequests.length > 0 && (
+                    <ul className="rows">
+                        {myPageRequests.map(r => (
+                            <li key={r.id} className="rows__item">
+                                <span className="rows__name">
+                                    {r.createdSlug
+                                        ? <Link className="link" to={(r.kind === 'ARTIST' ? '/artists/' : '/organizers/') + encodeURIComponent(r.createdSlug)}>{r.name}</Link>
+                                        : r.name} <span className="mono text-xs muted">· {r.kind.toLowerCase()}</span>
+                                </span>
+                                <span className="rows__meta">
+                                    {r.status === 'PENDING' ? 'Waiting for an admin'
+                                        : r.status === 'REJECTED' ? 'Not accepted' + (r.rejectReason ? ': ' + r.rejectReason : '')
+                                            : r.createdSlug ? 'On the site, yours' : 'Accepted: on the map with the next update'}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                )}
+                <Link className="link text-sm" to="/new-page">+ Not on the map yet? Ask for a page</Link>
+            </section>
 
             {(myLabels.length > 0 || myFestivals.length > 0) && (
                 <section className="panel">

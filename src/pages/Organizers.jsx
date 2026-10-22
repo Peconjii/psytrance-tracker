@@ -57,6 +57,9 @@ function Organizers() {
                 <div className="empty">
                     <p><strong>{debouncedSearch ? `No organizer called "${debouncedSearch}" with upcoming events.` : 'No organizers yet.'}</strong></p>
                     <p>Organizers are read with the line-ups in the background, so the list fills up over a day or so.</p>
+                    {debouncedSearch && (
+                        <p><Link className="link" to={`/new-page?kind=ORGANIZER&name=${encodeURIComponent(debouncedSearch)}`}>Is it your crew? Ask for a page →</Link></p>
+                    )}
                 </div>
             ) : (
                 <ul className={`rows md:columns-2 md:gap-8 ${loading ? 'opacity-60' : ''}`}>

@@ -5,6 +5,7 @@ import AdminTabs from '../components/AdminTabs'
 import { GenreChip } from '../components/AdminParts'
 import LabelRequests from '../components/LabelRequests.jsx'
 import ClaimRequests from '../components/ClaimRequests.jsx'
+import NewPageRequests from '../components/NewPageRequests.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -81,6 +82,7 @@ function AdminRequests() {
                 </ul>
             )}
             <ClaimRequests />
+            <NewPageRequests />
             <LabelRequests />
         </div>
     )

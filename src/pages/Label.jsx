@@ -41,7 +41,8 @@ function Label() {
         return (
             <div className="page">
                 <div className="empty"><p><strong>No label called {name} on the map.</strong></p>
-                    <p><Link className="link" to="/">Back to the galaxy</Link></p></div>
+                    <p><Link className="link" to="/">Back to the galaxy</Link>
+                        {' · '}<Link className="link" to={`/new-page?kind=LABEL&name=${encodeURIComponent(name)}`}>Is it your label? Ask for it →</Link></p></div>
             </div>
         )
     }

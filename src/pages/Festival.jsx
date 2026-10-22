@@ -46,7 +46,10 @@ function Festival() {
     }, [match])
 
     if (!festival) {
-        return <div className="page"><div className="empty"><p><strong>No festival called {id} on the map.</strong></p></div></div>
+        return (
+            <div className="page"><div className="empty"><p><strong>No festival called {id} on the map.</strong></p>
+                <p><Link className="link" to="/new-page?kind=FESTIVAL">Is it your festival? Ask for it →</Link></p></div></div>
+        )
     }
 
     const sets = artistsAtFestival(id).flatMap(name => appearances[name].filter(x => x.festival === id).map(x => ({ name, ...x })))

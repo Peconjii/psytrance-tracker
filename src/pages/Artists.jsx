@@ -89,6 +89,9 @@ function Artists() {
                             : debouncedSearch ? `No upcoming events with "${debouncedSearch}" in the line-up.` : 'No artists found yet.'}
                     </strong></p>
                     <p>Line-ups are read in the background a few events at a time, so check back in a little while.</p>
+                    {debouncedSearch && (
+                        <p><Link className="link" to={`/new-page?kind=ARTIST&name=${encodeURIComponent(debouncedSearch)}`}>Is it you? Ask for a page →</Link></p>
+                    )}
                 </div>
             ) : (
                 <ul className={`rows md:columns-2 md:gap-8 ${loading ? 'opacity-60' : ''}`}>

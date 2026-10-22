@@ -695,3 +695,26 @@ export async function decidePageClaim(id, approve, reason) {
     const response = await api.post(`/api/admin/claims/${id}`, { approve, reason })
     return response.data
 }
+
+// "Not on the map yet?": ask for a page the site doesn't have (kind, name, country, websiteUrl, proofUrl, genres, message)
+export async function askForPage(request) {
+    const response = await api.post('/api/page-requests', request)
+    return response.data
+}
+
+// The pages this account asked for, newest first
+export async function fetchMyPageRequests(signal) {
+    const response = await api.get('/api/me/page-requests', { signal })
+    return response.data
+}
+
+// For admins: the new page requests waiting for a decision
+export async function fetchNewPageRequests(signal) {
+    const response = await api.get('/api/admin/page-requests', { signal })
+    return response.data
+}
+
+export async function decideNewPageRequest(id, approve, reason) {
+    const response = await api.post('/api/admin/page-requests/' + id, { approve, reason })
+    return response.data
+}

@@ -35,6 +35,7 @@ import AdminUsers from './pages/AdminUsers'
 import AdminReviews from './pages/AdminReviews'
 import AdminDashboard from './pages/AdminDashboard'
 import AddEvent from './pages/AddEvent'
+import NewPage from './pages/NewPage'
 import ArtistEdit from './pages/ArtistEdit'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
@@ -65,6 +66,7 @@ function Shell() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/feedback" element={<Feedback />} />
+          <Route path="/new-page" element={<NewPage />} />
 
           {/* Only for logged-in users; guests are redirected to /login */}
           <Route 
