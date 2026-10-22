@@ -28,7 +28,6 @@ const PROFILE_LINKS = [
 // Until the artist writes their own, a search for them there (like the SoundCloud links of an event's line-up)
 const SEARCH_LINKS = [
     ['soundcloudUrl', 'SoundCloud', (name) => `https://soundcloud.com/search/people?q=${encodeURIComponent(name)}`],
-    ['bandcampUrl', 'Bandcamp', (name) => `https://bandcamp.com/search?q=${encodeURIComponent(name)}&item_type=b`],
 ]
 
 const youtubeLink = (track) => track.youtube
