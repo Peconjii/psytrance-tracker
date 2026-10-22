@@ -2925,5 +2925,170 @@
       "frankfurt": "confirmed"
     },
     "suggest": []
+  },
+  "Acajou": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Amras": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Astroalien": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Atim": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Calabi Yau": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Inner Coma": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Nabhit": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Nibiru": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Nost": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Paralocks": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Psytohigh": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Sonic System": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Spirituvel": {
+    "tags": [
+      "hitech",
+      "hitech psytrance",
+      "psytrance"
+    ],
+    "check": {
+      "hitech": "confirmed"
+    },
+    "suggest": []
+  },
+  "Mokiru": {
+    "tags": [
+      "darkpsy",
+      "darkpsy trance",
+      "psytrance"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
+  },
+  "Vox Fabri": {
+    "tags": [
+      "darkpsy",
+      "darkpsy trance",
+      "psytrance"
+    ],
+    "check": {
+      "dark": "confirmed"
+    },
+    "suggest": []
   }
 }
