@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import usePageMeta from '../hooks/usePageMeta.js'
+import BotTrap from '../components/BotTrap.jsx'
 
 function Register() {
     usePageMeta({ title: 'Register', path: '/register', noindex: true })
@@ -10,13 +11,15 @@ function Register() {
     const [password, setPassword] = useState('')
     const [email, setEmail] = useState('')
     const [error, setError] = useState('')
+    // Never shown to people; bots fill it in
+    const [website, setWebsite] = useState('')
     const { register } = useAuth()
     const navigate = useNavigate()
 
     async function handleSubmit(e) {
         e.preventDefault()
         try {
-            await register(username, email, password)
+            await register(username, email, password, website)
             navigate('/login', { state: { registered: email } })
         } catch (err) {
             // Backend sends { message } and, for validation errors, { errors: { field: reason } }
@@ -68,6 +71,7 @@ function Register() {
                             className="field"
                         />
                     </div>
+                    <BotTrap id="register-trap" value={website} onChange={setWebsite} />
                     <button type="submit" className="btn btn--primary btn--block mt-2">Create account</button>
                 </form>
                 <p className="muted text-sm mt-6 mb-0">

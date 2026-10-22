@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { claimPage } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
+import BotTrap from './BotTrap.jsx'
 
 const WHAT = { ARTIST: 'artist', ORGANIZER: 'organizer', LABEL: 'label', FESTIVAL: 'festival' }
 
@@ -14,6 +15,7 @@ function ClaimPage({ kind, target, name, onClaimed }) {
     const [open, setOpen] = useState(false)
     const [proofUrl, setProofUrl] = useState('')
     const [message, setMessage] = useState('')
+    const [website, setWebsite] = useState('')
     const [state, setState] = useState({ sending: false, done: null, error: '' })
 
     if (!user) {
@@ -39,7 +41,7 @@ function ClaimPage({ kind, target, name, onClaimed }) {
         e.preventDefault()
         setState({ sending: true, done: null, error: '' })
         try {
-            const claim = await claimPage(kind, target, proofUrl.trim(), message.trim())
+            const claim = await claimPage(kind, target, proofUrl.trim(), message.trim(), website)
             setState({ sending: false, done: claim.status, error: '' })
             if (claim.status === 'APPROVED') onClaimed?.()
         } catch (err) {
@@ -65,6 +67,7 @@ function ClaimPage({ kind, target, name, onClaimed }) {
                 <textarea id="claim-message" className="field" rows={2} maxLength={1000} value={message}
                     onChange={(e) => setMessage(e.target.value)} />
             </div>
+            <BotTrap id="claim-trap" value={website} onChange={setWebsite} />
             <div className="flex flex-wrap items-center gap-2">
                 <button type="submit" className="btn btn--primary" disabled={state.sending}>{state.sending ? 'Sending…' : 'Claim the page'}</button>
                 <button type="button" className="btn btn--ghost" onClick={() => setOpen(false)}>Cancel</button>

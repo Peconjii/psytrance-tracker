@@ -682,8 +682,8 @@ export async function decideLabelRequest(id, approve) {
 }
 
 // "Claim this page" (kind ARTIST, ORGANIZER, LABEL or FESTIVAL): { status: APPROVED (theirs now) or PENDING, ... }
-export async function claimPage(kind, target, proofUrl, message) {
-    const response = await api.post('/api/claims', { kind, target, proofUrl, message })
+export async function claimPage(kind, target, proofUrl, message, website) {
+    const response = await api.post('/api/claims', { kind, target, proofUrl, message, website })
     return response.data
 }
 

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { askForPage } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
+import BotTrap from '../components/BotTrap.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const KINDS = [
@@ -20,6 +21,8 @@ function NewPage() {
     const [form, setForm] = useState({
         kind: KINDS.some(k => k.id === params.get('kind')) ? params.get('kind') : 'ARTIST',
         name: params.get('name') ?? '', country: '', websiteUrl: '', proofUrl: '', genres: '', message: '',
+        // Never shown to people; bots fill it in
+        website: '',
     })
     const [state, setState] = useState({ sending: false, done: false, error: '' })
     const kind = KINDS.find(k => k.id === form.kind)
@@ -107,6 +110,7 @@ function NewPage() {
                         <label htmlFor="np-message" className="field-label">Anything else for the admin (optional)</label>
                         <textarea id="np-message" className="field" rows={3} maxLength={1000} value={form.message} onChange={set('message')} />
                     </div>
+                    <BotTrap id="np-trap" value={form.website} onChange={(website) => setForm(f => ({ ...f, website }))} />
                     <div>
                         <button type="submit" className="btn btn--primary" disabled={state.sending}>{state.sending ? 'Sending…' : 'Ask for the page'}</button>
                     </div>
