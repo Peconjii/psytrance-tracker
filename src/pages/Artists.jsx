@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchArtists } from '../api/backend.js'
-import { ROLES, ROLE_LABELS, roleOf } from '../components/artistRole.js'
+import { ROLES, ROLE_LABELS, matchesRole, roleOf } from '../components/artistRole.js'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import CrewTabs from '../components/CrewTabs.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -19,7 +19,7 @@ function Artists() {
     // Tagged with the search it belongs to, so a slow old answer never replaces a newer one
     const [result, setResult] = useState({ search: null, artists: [], error: null })
     const [attempt, setAttempt] = useState(0)
-    // '' = everyone, else 'DJ', 'PRODUCER' or 'LIVE' (picked or guessed)
+    // '' = everyone, else 'DJ' (producers too), 'PRODUCER' or 'LIVE' (picked or guessed)
     const [roleFilter, setRoleFilter] = useState('')
 
     useEffect(() => {
@@ -39,7 +39,7 @@ function Artists() {
 
     const loading = result.search !== debouncedSearch
     const withRoles = result.artists.map(artist => ({ ...artist, role: roleOf(artist).role }))
-    const shown = roleFilter ? withRoles.filter(artist => artist.role === roleFilter) : withRoles
+    const shown = roleFilter ? withRoles.filter(artist => matchesRole(artist.role, roleFilter)) : withRoles
 
     return (
         <div className="page">
