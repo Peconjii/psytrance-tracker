@@ -6,11 +6,11 @@ import AdminTabs from '../components/AdminTabs'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-const KIND_LABELS = { ARTIST_GENRES: 'Artist genres', EVENT_GENRES: 'Event genres', ARTIST_HIDDEN: 'Not an artist', ARTIST_MERGED: 'Merged', EVENT_TIMETABLE: 'Timetable' }
-// Merges move events between artists, and a timetable is too long to keep a copy of: neither can be undone
-const NO_UNDO = ['ARTIST_MERGED', 'EVENT_TIMETABLE']
+const KIND_LABELS = { ARTIST_GENRES: 'Artist genres', EVENT_GENRES: 'Event genres', ARTIST_HIDDEN: 'Not an artist', ARTIST_MERGED: 'Merged', EVENT_TIMETABLE: 'Timetable', ARTIST_PROFILE: 'Artist profile' }
+// Merges move events between artists, and timetables and profiles are too long to keep a copy of: none can be undone
+const NO_UNDO = ['ARTIST_MERGED', 'EVENT_TIMETABLE', 'ARTIST_PROFILE']
 // An empty value means: the artist isn't on the map, or the event's genres come from its line-up
-const EMPTY = { ARTIST_GENRES: 'not on the map', EVENT_GENRES: 'from the line-up' }
+const EMPTY = { ARTIST_GENRES: 'not on the map', EVENT_GENRES: 'from the line-up', ARTIST_PROFILE: 'empty' }
 // Event changes are about "<id> · <name>"
 const targetLink = (change) => change.kind.startsWith('EVENT_')
     ? `/admin/events?id=${change.target.split(' ')[0]}`

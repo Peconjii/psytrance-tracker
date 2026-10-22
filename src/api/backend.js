@@ -278,3 +278,16 @@ export async function followArtist(slug) {
 export async function unfollowArtist(slug) {
     await api.delete(`/api/me/follows/${encodeURIComponent(slug)}`)
 }
+
+// Admin panel: an artist's profile to edit (every field null when there is none yet)
+export async function fetchAdminArtistProfile(slug, signal) {
+    const response = await api.get(`/api/admin/artists/${encodeURIComponent(slug)}/profile`, { signal })
+    return response.data
+}
+
+// Admin panel: write an artist's whole profile (blank fields clear them). Throws on failure; invalid fields are in
+// err.response.data.errors
+export async function saveArtistProfile(slug, profile) {
+    const response = await api.put(`/api/admin/artists/${encodeURIComponent(slug)}/profile`, profile)
+    return response.data
+}

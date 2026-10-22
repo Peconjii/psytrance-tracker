@@ -11,6 +11,16 @@ function soundCloudSearchUrl(artist) {
     return `https://soundcloud.com/search/people?q=${encodeURIComponent(artist)}`
 }
 
+const PAST_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+
+// The links an artist's profile can have, in the order they are shown
+const PROFILE_LINKS = [
+    ['soundcloudUrl', 'SoundCloud'],
+    ['bandcampUrl', 'Bandcamp'],
+    ['instagramUrl', 'Instagram'],
+    ['websiteUrl', 'Website'],
+]
+
 // One artist and the upcoming events they play, soonest first
 function Artist() {
     const { slug } = useParams()
@@ -29,6 +39,7 @@ function Artist() {
     const artist = loaded.slug === slug ? loaded.artist : null
     const error = loaded.slug === slug ? loaded.error : null
     const name = artist?.name || passedName || slug
+    const profile = artist?.profile
 
     usePageMeta({
         title: `${name} – Upcoming Psytrance Events`,
@@ -72,17 +83,34 @@ function Artist() {
         <div className="page page--wide">
             <button onClick={goBack} className="back-link">← Back</button>
 
-            <div className="panel mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="min-w-0">
-                    <div className="page-head__tag">// Satellite · artist</div>
-                    <h1 className="page-title">{name}</h1>
-                    {artist && (
-                        <p className="page-head__sub">
-                            {artist.upcomingEvents.length === 0
-                                ? 'No upcoming events right now'
-                                : `Playing at ${artist.upcomingEvents.length} upcoming ${artist.upcomingEvents.length === 1 ? 'event' : 'events'}`}
-                        </p>
+            <div className="panel mb-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="artist-head min-w-0">
+                    {profile?.photoUrl && (
+                        <img className="artist-head__photo" src={profile.photoUrl} alt={name} loading="lazy" referrerPolicy="no-referrer" />
                     )}
+                    <div className="min-w-0">
+                        <div className="page-head__tag">// Satellite · artist</div>
+                        <h1 className="page-title">{name}</h1>
+                        {artist && (
+                            <p className="page-head__sub">
+                                {artist.upcomingEvents.length === 0
+                                    ? 'No upcoming events right now'
+                                    : `Playing at ${artist.upcomingEvents.length} upcoming ${artist.upcomingEvents.length === 1 ? 'event' : 'events'}`}
+                                {artist.followers > 0 && ` · ★ ${artist.followers} ${artist.followers === 1 ? 'follower' : 'followers'}`}
+                            </p>
+                        )}
+                        {profile?.bio && <p className="soft whitespace-pre-line mt-3 mb-0 max-w-2xl">{profile.bio}</p>}
+                        {profile && (PROFILE_LINKS.some(([key]) => profile[key]) || profile.bookingEmail) && (
+                            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-3 mono text-xs">
+                                {PROFILE_LINKS.filter(([key]) => profile[key]).map(([key, label]) => (
+                                    <a key={key} className="link" href={profile[key]} target="_blank" rel="noopener noreferrer">{label} ↗</a>
+                                ))}
+                                {profile.bookingEmail && (
+                                    <a className="link" href={`mailto:${profile.bookingEmail}?subject=${encodeURIComponent(`Booking: ${name}`)}`}>✉ Booking</a>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
                 <div className="flex flex-wrap gap-2 shrink-0 self-start sm:self-center">
                     {/* Only artists from the line-ups can be followed: they are the ones with gigs */}
@@ -91,9 +119,12 @@ function Artist() {
                         to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'ARTIST', ref: name, from: `/artists/${slug}` })}`}>
                         ✎ Report
                     </Link>
-                    <a href={soundCloudSearchUrl(name)} target="_blank" rel="noreferrer" className="btn">
-                        SoundCloud ↗
-                    </a>
+                    {/* The artist's own SoundCloud is in the links above; without one, search for them */}
+                    {!profile?.soundcloudUrl && (
+                        <a href={soundCloudSearchUrl(name)} target="_blank" rel="noreferrer" className="btn">
+                            SoundCloud ↗
+                        </a>
+                    )}
                 </div>
             </div>
 
@@ -127,6 +158,22 @@ function Artist() {
                         />
                     ))}
                 </div>
+            )}
+
+            {artist?.pastEvents?.length > 0 && (
+                <section className="panel mt-6">
+                    <h2 className="panel__label">Played before · {artist.pastEvents.length}</h2>
+                    <ul className="rows">
+                        {artist.pastEvents.map(gig => (
+                            <li key={gig.eventId} className="rows__item">
+                                <span className="rows__name">{gig.name}</span>
+                                <span className="rows__meta">
+                                    {[gig.dateStart && PAST_DAY.format(new Date(gig.dateStart + 'T12:00:00')), gig.town, gig.country].filter(Boolean).join(' · ')}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </section>
             )}
         </div>
     )

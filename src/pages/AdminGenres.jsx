@@ -37,6 +37,7 @@ function ArtistRow({ artist, onSaved, onGone }) {
                         <Link className="link" to={`/?genre=${firstGenre}&artist=${encodeURIComponent(artist.name)}`}>On the map →</Link>
                     )}
                     <Link className="link" to={`/artists/${encodeURIComponent(artist.slug)}`} state={{ name: artist.name }}>Gigs →</Link>
+                    <Link className="link" to={`/admin/artists/${encodeURIComponent(artist.slug)}/profile`} state={{ name: artist.name }}>Profile →</Link>
                 </span>
             </div>
             <div className="flex flex-wrap items-center gap-2">

@@ -272,3 +272,8 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 /* Admin panel: one artist per row, name and links on top, genres below */
 .admin-artist { flex-direction: column; align-items: stretch; gap: 8px; }
 .admin-artist__add { width: auto; padding: 4px 8px; font-size: 12px; }
+
+/* Artist page: the profile photo next to the name */
+.artist-head { display: flex; gap: 18px; align-items: flex-start; }
+.artist-head__photo { width: 96px; height: 96px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--line); }
+@media (max-width: 480px) { .artist-head__photo { width: 64px; height: 64px; } }
