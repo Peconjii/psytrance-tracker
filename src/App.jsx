@@ -43,11 +43,23 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AddEvent = lazy(() => import('./pages/AddEvent'))
 const NewPage = lazy(() => import('./pages/NewPage'))
 const Search = lazy(() => import('./pages/Search'))
+const EmbedGigs = lazy(() => import('./pages/EmbedGigs'))
 const ArtistEdit = lazy(() => import('./pages/ArtistEdit'))
 
 // The home page is the galaxy map, which fills the window under the navbar, so it has no footer
 function Shell() {
-  const isHome = useLocation().pathname === '/'
+  const { pathname } = useLocation()
+  const isHome = pathname === '/'
+  // Widgets for other websites (in an iframe) come without the site's menu and footer
+  if (pathname.startsWith('/embed/')) {
+    return (
+      <Suspense fallback={null}>
+        <Routes>
+          <Route path="/embed/artists/:slug" element={<EmbedGigs />} />
+        </Routes>
+      </Suspense>
+    )
+  }
   return (
     // On the home page the layout is exactly one window tall and the map takes what the navbar leaves
     <div className={`relative flex flex-col overflow-x-hidden ${isHome ? 'h-dvh overflow-hidden' : 'min-h-screen'}`}>

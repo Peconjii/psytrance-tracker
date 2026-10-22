@@ -8,6 +8,7 @@ import {
 import { ROLES } from '../components/artistRole.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
+import GigsWidgetCode from '../components/GigsWidgetCode.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { genreById } from '../map/data/types'
 
@@ -149,6 +150,8 @@ function ArtistEdit() {
             </header>
 
             <OwnerNumbers kind="artist" id={slug} />
+
+            <GigsWidgetCode slug={slug} />
 
             <Part label="Profile" saving={profileSave.saving} status={profileSave.status}
                 onSave={() => profileSave.run(() => saveArtistProfile(slug, Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, trim(v)]))))}>

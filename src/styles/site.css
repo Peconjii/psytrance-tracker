@@ -104,6 +104,11 @@ a { color: inherit; }
   clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
   background-image: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
 }
+/* The "next gigs" widget in an artist's own website (iframe): no menu, fills the frame */
+.embed { min-height: 100vh; padding: 16px; background: var(--bg); display: flex; flex-direction: column; gap: 10px; }
+.embed__head { border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+.embed__foot { margin-top: auto; }
+
 /* A stage of the event form's timetable: a card inside the "Sound" panel */
 .stage-card { padding: 12px; border: 1px dashed var(--line); border-left: 2px solid var(--accent); }
 /* A set: day, start – end on one line, the artist after (on the next line when the form is narrow) */
