@@ -4,6 +4,7 @@ import { fetchArtist, fetchMyArtists } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton.jsx'
 import SoundCloudPlayer from '../components/SoundCloudPlayer.jsx'
+import StoryButton from '../components/StoryButton.jsx'
 import ClaimPage from '../components/ClaimPage.jsx'
 import ArtistNumbers from '../components/ArtistNumbers.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -320,14 +321,15 @@ function Artist() {
                                 ) : (
                                     <ul className="rows">
                                         {artist.upcomingEvents.map(event => (
-                                            <li key={event.id}>
-                                                <Link to={`/events/${event.id}`} state={{ event }} className="rows__item">
+                                            <li key={event.id} className={canEdit ? 'flex items-center gap-2' : undefined}>
+                                                <Link to={`/events/${event.id}`} state={{ event }} className="rows__item flex-1 min-w-0">
                                                     <span className="rows__name">
                                                         <span className="mono text-xs muted artist-gig__day">{day(event.dateStart, GIG_DAY)}</span>
                                                         {event.nameParty}
                                                     </span>
                                                     <span className="rows__meta">{[event.nameTown, event.nameCountry].filter(Boolean).join(', ')}</span>
                                                 </Link>
+                                                {canEdit && <StoryButton artistName={name} event={event} />}
                                             </li>
                                         ))}
                                     </ul>
