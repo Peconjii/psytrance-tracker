@@ -3,5 +3,12 @@ Allow: /
 Disallow: /favorites
 Disallow: /profile
 Disallow: /reset-password
+Disallow: /verify-email
+Disallow: /admin
+Disallow: /embed/
+Disallow: /events/new
+Disallow: /events/added/
+Disallow: /new-page
+Disallow: /search
 
 Sitemap: https://psyatlas-one.vercel.app/sitemap.xml

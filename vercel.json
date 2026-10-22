@@ -1,3 +1,6 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/sitemap.xml", "destination": "https://psytrance-tracker-backend.onrender.com/api/sitemap.xml" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
