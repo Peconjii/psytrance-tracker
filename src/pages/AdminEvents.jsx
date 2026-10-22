@@ -5,6 +5,7 @@ import {
 } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import { AddGenre, FeedbackBanner, GenreChip } from '../components/AdminParts'
+import HarbourQueue from '../components/HarbourQueue.jsx'
 import TimetableEditor from '../components/TimetableEditor.jsx'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -142,6 +143,11 @@ function AdminEvents() {
                                     ))}
                                 </ul>
                             )
+            )}
+
+            {/* The work list when nothing is being searched: ships whose genre isn't known */}
+            {debounced.length < 2 && (
+                <HarbourQueue onOpen={(id) => { setParams(feedbackId ? { id, feedback: feedbackId } : { id: String(id) }); window.scrollTo(0, 0) }} />
             )}
         </div>
     )
