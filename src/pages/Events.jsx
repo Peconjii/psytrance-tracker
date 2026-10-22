@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
+import PastEventList from '../components/PastEventList.jsx'
 import { GenreChip, GenreOptions } from '../components/AdminParts'
 import { genreById } from '../map/data/types'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
@@ -9,10 +10,12 @@ import usePageMeta from '../hooks/usePageMeta.js'
 // The genre filter uses the map's genres (?genre=forest). Links from before (?genre=Dark) still work.
 const OLD_GENRES = { Progressive: 'prog', 'Full On': 'fullon', Dark: 'dark', Forest: 'forest', Goa: 'goa', 'Hi-Tech': 'hitech', Zenonesque: 'zenon' }
 const genreOf = (value) => (genreById[value] ? value : OLD_GENRES[value] ?? 'All')
-// value = what the backend expects (EventTimeline enum), label = what the user sees
+// value = what the backend expects (EventTimeline enum), label = what the user sees. PAST is the archive
+// (/api/events/past), not a timeline of the upcoming list.
 const TIMELINES = [
     { value: 'ALL', label: 'Any time' },
-    { value: 'THIS_WEEKEND', label: 'This weekend' }
+    { value: 'THIS_WEEKEND', label: 'This weekend' },
+    { value: 'PAST', label: 'Past' }
 ]
 
 // Filters live in the URL (?search=boom&genre=dark...), so going back from an event page, reloading
@@ -89,8 +92,8 @@ function Events() {
             <header className="page-head flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                 <div>
                     <div className="page-head__tag">// Departures · Goabase + Map of Psy</div>
-                    <h1 className="page-title">Upcoming events</h1>
-                    <p className="page-head__sub">Psytrance festivals and parties worldwide, soonest first.</p>
+                    <h1 className="page-title">{timeline === 'PAST' ? 'Past events' : 'Upcoming events'}</h1>
+                    <p className="page-head__sub">{timeline === 'PAST' ? 'The archive: what the site read since October 2026, newest first.' : 'Psytrance festivals and parties worldwide, soonest first.'}</p>
                 </div>
                 <Link className="btn shrink-0" to="/events/new">+ Add an event</Link>
             </header>
@@ -186,14 +189,18 @@ function Events() {
                 )}
             </section>
 
-            <EventFeed
-                key={feedKey}
-                search={debouncedSearch}
-                country={debouncedCountry}
-                genre={genre}
-                timeline={timeline}
-                near={near}
-            />
+            {timeline === 'PAST' ? (
+                <PastEventList key={debouncedSearch} search={debouncedSearch} />
+            ) : (
+                <EventFeed
+                    key={feedKey}
+                    search={debouncedSearch}
+                    country={debouncedCountry}
+                    genre={genre}
+                    timeline={timeline}
+                    near={near}
+                />
+            )}
         </div>
     )
 }

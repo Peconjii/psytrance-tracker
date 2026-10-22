@@ -18,6 +18,12 @@ api.interceptors.request.use(config => {
 
 // One page of events, filtered and paged by the backend. Throws on failure so the
 // caller can show an error; pass an AbortSignal to cancel it when filters change.
+// The archive: events that are over, newest first ({ content, hasNext, totalElements }); search in the name or town
+export async function fetchPastEvents({ page, size, search }, signal) {
+    const response = await api.get('/api/events/past', { params: { page, size, search: search || undefined }, signal })
+    return response.data
+}
+
 // near: { lat, lon, km } for "Near me", or null
 export async function fetchEventsPage({ page, size, search, country, genre, timeline, near }, signal) {
     const response = await api.get('/api/events', {
