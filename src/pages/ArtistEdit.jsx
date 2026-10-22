@@ -3,8 +3,9 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
     fetchArtistEdit, removeArtistOwner, requestArtistChange, saveArtistFestivals, saveArtistProfile, saveArtistTracks,
-    setArtistOwner,
+    setArtistOwner, setArtistRole,
 } from '../api/backend.js'
+import { ROLES } from '../components/artistRole.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { genreById } from '../map/data/types'
@@ -83,6 +84,7 @@ function ArtistEdit() {
     const [genres, setGenres] = useState([])
     const [name, setName] = useState('')
     const [owner, setOwner] = useState('')
+    const [role, setRole] = useState('')
 
     const profileSave = useSave()
     const tracksSave = useSave()
@@ -90,6 +92,7 @@ function ArtistEdit() {
     const genresSave = useSave()
     const nameSave = useSave()
     const ownerSave = useSave()
+    const roleSave = useSave()
 
     usePageMeta({ title: `Edit · ${edit?.name || slug}`, path: `/artists/${slug}/edit`, noindex: true })
 
@@ -101,6 +104,7 @@ function ArtistEdit() {
         setGenres(found.genres)
         setName(found.profile.displayName || found.name)
         setOwner(found.owner || '')
+        setRole(found.role || '')
     }
 
     useEffect(() => {
@@ -161,6 +165,15 @@ function ArtistEdit() {
                         placeholder="A few sentences: where you're from, your sound, your labels…"
                         onChange={(e) => setProfile(p => ({ ...p, bio: e.target.value }))} />
                 </div>
+            </Part>
+
+            <Part label="Main role" hint="A label and a filter on the artists page. Every role gets the same profile options."
+                saving={roleSave.saving} status={roleSave.status}
+                onSave={() => roleSave.run(() => setArtistRole(slug, role || null))}>
+                <select className="field" aria-label="Main role" value={role} onChange={(e) => setRole(e.target.value)}>
+                    <option value="">Let the site guess</option>
+                    {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+                </select>
             </Part>
 
             <Part label={`Tracks · ${tracks.length}/${MAX_TRACKS}`} hint="Links to listen: YouTube, SoundCloud, Bandcamp… In the order they show."

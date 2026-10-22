@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchArtists } from '../api/backend.js'
+import { ROLES, ROLE_LABELS, roleOf } from '../components/artistRole.js'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -17,6 +18,8 @@ function Artists() {
     // Tagged with the search it belongs to, so a slow old answer never replaces a newer one
     const [result, setResult] = useState({ search: null, artists: [], error: null })
     const [attempt, setAttempt] = useState(0)
+    // '' = everyone, else 'DJ', 'PRODUCER' or 'LIVE' (picked or guessed)
+    const [roleFilter, setRoleFilter] = useState('')
 
     useEffect(() => {
         const controller = new AbortController()
@@ -34,6 +37,8 @@ function Artists() {
     }, [debouncedSearch, attempt])
 
     const loading = result.search !== debouncedSearch
+    const withRoles = result.artists.map(artist => ({ ...artist, role: roleOf(artist).role }))
+    const shown = roleFilter ? withRoles.filter(artist => artist.role === roleFilter) : withRoles
 
     return (
         <div className="page">
@@ -53,6 +58,14 @@ function Artists() {
                     onChange={(e) => setSearch(e.target.value)}
                     className="field"
                 />
+                <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label="Role">
+                    {[{ value: '', label: 'Everyone' }, ...ROLES.map(r => ({ ...r, label: r.label + 's' }))].map(r => (
+                        <button key={r.value} type="button" className={`chip${roleFilter === r.value ? ' is-on' : ''}`}
+                            aria-pressed={roleFilter === r.value} onClick={() => setRoleFilter(r.value)}>
+                            {r.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {result.error ? (
@@ -66,16 +79,18 @@ function Artists() {
                         <li key={i} className="rows__item"><div className="skeleton h-4 w-1/3" /></li>
                     ))}
                 </ul>
-            ) : result.artists.length === 0 ? (
+            ) : shown.length === 0 ? (
                 <div className="empty">
                     <p><strong>
-                        {debouncedSearch ? `No upcoming events with "${debouncedSearch}" in the line-up.` : 'No artists found yet.'}
+                        {roleFilter && result.artists.length > 0
+                            ? `No ${ROLE_LABELS[roleFilter]}s here. Try everyone.`
+                            : debouncedSearch ? `No upcoming events with "${debouncedSearch}" in the line-up.` : 'No artists found yet.'}
                     </strong></p>
                     <p>Line-ups are read in the background a few events at a time, so check back in a little while.</p>
                 </div>
             ) : (
                 <ul className={`rows md:columns-2 md:gap-8 ${loading ? 'opacity-60' : ''}`}>
-                    {result.artists.map(artist => (
+                    {shown.map(artist => (
                         <li key={artist.slug} className="break-inside-avoid">
                             <Link
                                 to={`/artists/${encodeURIComponent(artist.slug)}`}
@@ -84,7 +99,7 @@ function Artists() {
                             >
                                 <span className="rows__name">{artist.name}</span>
                                 <span className="rows__meta">
-                                    {artist.upcomingEvents} {artist.upcomingEvents === 1 ? 'event' : 'events'}
+                                    {ROLE_LABELS[artist.role]} · {artist.upcomingEvents} {artist.upcomingEvents === 1 ? 'event' : 'events'}
                                 </span>
                             </Link>
                         </li>

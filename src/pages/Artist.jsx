@@ -9,6 +9,7 @@ import {
 } from '../map/data/types'
 import { mapArtistBySlug } from '../map/data/events'
 import { loadPlacements } from '../map/data/placements'
+import { ROLE_LABELS, roleOf } from '../components/artistRole.js'
 
 const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 const PAST_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -80,6 +81,7 @@ function Artist() {
     const named = new Set(ownFestivals.map(f => f.name.toLowerCase()))
     const festivals = mapFestivals.filter(x => !named.has(festivalById[x.festival].name.toLowerCase()))
     const canEdit = Boolean(artist && (user?.admin || mine.some(a => a.slug === artist.slug)))
+    const role = artist ? roleOf(artist) : null
     const origin = mapName ? mapProfiles[mapName]?.country : null
 
     usePageMeta({
@@ -142,8 +144,13 @@ function Artist() {
                     <div className="min-w-0">
                         <div className="page-head__tag">// Satellite · artist{origin ? ` · ${origin}` : ''}</div>
                         <h1 className="page-title">{name}</h1>
-                        {genres.length > 0 && (
+                        {(genres.length > 0 || role) && (
                             <div className="flex flex-wrap gap-2 mt-2">
+                                {role && (
+                                    <span className="badge" title={role.guessed ? 'Guessed from the line-ups and the map' : 'Picked by the artist'}>
+                                        {ROLE_LABELS[role.role]}
+                                    </span>
+                                )}
                                 {genres.map(g => (
                                     <Link key={g.id} className="genre-chip no-underline" style={{ '--c': data.families[g.family].color }}
                                         to={`/?genre=${g.id}&artist=${encodeURIComponent(mapName)}`}>

@@ -338,3 +338,9 @@ export async function decideArtistRequest(id, approve) {
     const response = await api.post(`/api/admin/artists/requests/${id}`, { approve })
     return response.data
 }
+
+// The artist's main role: 'DJ', 'PRODUCER' or 'LIVE'; null hands it back to the guess. Their owner or an admin.
+export async function setArtistRole(slug, role) {
+    const response = await api.put(`/api/artists/${encodeURIComponent(slug)}/role`, { role })
+    return response.data
+}
