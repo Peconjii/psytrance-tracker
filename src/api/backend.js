@@ -472,3 +472,6 @@ export async function fetchAdminUsers(search, signal) {
     const response = await api.get('/api/admin/users', { params: search ? { search } : {}, signal })
     return response.data
 }
+
+// "Add to calendar": the event as a .ics file, which phones and calendar apps open
+export const calendarUrl = (id) => `${api.defaults.baseURL}/api/events/${id}/calendar.ics`

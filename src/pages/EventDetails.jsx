@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
-import { fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent } from '../api/backend.js'
+import { calendarUrl, fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent } from '../api/backend.js'
 import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
@@ -293,6 +293,7 @@ function EventDetails() {
                     <div className="mt-auto pt-4 border-t border-dashed border-[var(--line)] flex flex-wrap items-center gap-3">
                         <FavoriteButton event={event} />
                         <GoingButton eventId={id} status={currentGoing} onChange={status => setGoing({ id, value: status })} />
+                        <a href={calendarUrl(id)} className="btn" title="A calendar file for your phone or calendar app">+ Calendar</a>
                         {event.urlPartyHtml && (
                             <a href={event.urlPartyHtml} target="_blank" rel="noreferrer" className="btn">
                                 {isOurEvent(id) ? 'Tickets ↗' : 'Goabase ↗'}
