@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { fetchFeedback, setFeedbackStatus } from '../api/backend.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import AdminTabs from '../components/AdminTabs'
+import FeedbackReply from '../components/FeedbackReply.jsx'
 import { isSitePath } from '../components/sitePath.js'
 
 const STATUSES = [
@@ -110,6 +111,8 @@ function AdminFeedback() {
                                     </select>
                                 </label>
                             </div>
+                            <FeedbackReply item={item}
+                                onReplied={(updated) => setLoaded(prev => ({ ...prev, items: prev.items.map(i => (i.id === updated.id ? updated : i)) }))} />
                         </li>
                     ))}
                 </ul>

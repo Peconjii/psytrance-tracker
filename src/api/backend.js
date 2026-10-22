@@ -532,3 +532,9 @@ export async function updateOurEvent(id, event) {
     const response = await api.put(`/api/our-events/${id}`, event)
     return response.data
 }
+
+// Admins: emails an answer to a feedback message's sender; returns the message with the answer
+export async function replyToFeedback(id, text) {
+    const response = await api.post(`/api/admin/feedback/${id}/reply`, { text })
+    return response.data
+}
