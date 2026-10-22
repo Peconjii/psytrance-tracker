@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { submitOurEvent } from '../api/backend.js'
+import { useEffect, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
+import { fetchOurEvent, submitOurEvent, updateOurEvent } from '../api/backend.js'
 import { searchPlaces } from '../api/places.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
@@ -26,10 +26,15 @@ function errorOf(err) {
     return data?.message || 'Could not send the event. Try again.'
 }
 
+// "2026-11-14T22:00:00" from the backend -> "2026-11-14T22:00" for a datetime-local field
+const toField = (value) => (value ? value.slice(0, 16) : '')
+
 // Adding an event on our site, next to the ones from Goabase. Needs a confirmed email; an admin checks it before it
-// goes on the map (the organizer's own account and admins skip that).
+// goes on the map (the organizer's own account and admins skip that). With an id (/events/added/7/edit) it changes
+// one the account sent instead: a waiting one keeps waiting, an approved one changes on the map right away.
 function AddEvent() {
-    usePageMeta({ title: 'Add an event', path: '/events/new', noindex: true })
+    const { id: editId } = useParams()
+    usePageMeta({ title: editId ? 'Edit your event' : 'Add an event', path: editId ? `/events/added/${editId}/edit` : '/events/new', noindex: true })
     const { user } = useAuth()
     const [form, setForm] = useState(EMPTY)
     const [genres, setGenres] = useState([])
@@ -40,6 +45,23 @@ function AddEvent() {
     const [sending, setSending] = useState(false)
     const [error, setError] = useState('')
     const [sent, setSent] = useState(null)
+    const [loaded, setLoaded] = useState(!editId)
+
+    // Editing: the form starts with the event as it is
+    useEffect(() => {
+        if (!editId) return
+        const controller = new AbortController()
+        fetchOurEvent(editId, controller.signal)
+            .then(ev => {
+                setForm(Object.fromEntries(Object.keys(EMPTY).map(key => [key,
+                    key === 'startsAt' || key === 'endsAt' ? toField(ev[key]) : (ev[key] ?? '')])))
+                setGenres(ev.genres)
+                setPlace({ name: ev.town, region: '', country: ev.country, lat: ev.lat, lon: ev.lon, timeZone: ev.timeZone })
+                setLoaded(true)
+            })
+            .catch(err => { if (!controller.signal.aborted) setError(err.response?.data?.message || 'Could not load the event.') })
+        return () => controller.abort()
+    }, [editId])
 
     const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
 
@@ -63,7 +85,8 @@ function AddEvent() {
         setError('')
         try {
             const trimmed = Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v.trim()]))
-            setSent(await submitOurEvent({
+            const save = editId ? (event) => updateOurEvent(editId, event) : submitOurEvent
+            setSent(await save({
                 ...trimmed,
                 // datetime-local gives "2026-11-14T22:00"; the backend wants seconds too
                 startsAt: trimmed.startsAt.length === 16 ? trimmed.startsAt + ':00' : trimmed.startsAt,
@@ -90,18 +113,22 @@ function AddEvent() {
                     <h1 className="page-title m-0">{sent.name}</h1>
                     {sent.status === 'APPROVED' ? (
                         <>
-                            <p className="notice notice--ok m-0">It is on the map now. Its line-up is read within half an hour.</p>
+                            <p className="notice notice--ok m-0">
+                                {editId ? 'Saved: the map shows the change now.' : 'It is on the map now.'} Its line-up is read within half an hour.
+                            </p>
                             <Link className="btn btn--primary" to={`/events/${sent.eventId}`}>Open the event</Link>
                         </>
                     ) : (
                         <p className="notice notice--ok m-0">
-                            Thanks! An admin checks it soon, then it goes on the map. You see its status on your
-                            {' '}<Link className="link" to="/profile">profile</Link>.
+                            {editId ? 'Saved. It still waits for an admin.' : 'Thanks! An admin checks it soon, then it goes on the map.'}
+                            {' '}You see its status on your <Link className="link" to="/profile">profile</Link>.
                         </p>
                     )}
-                    <button type="button" className="btn btn--ghost" onClick={() => { setSent(null); setForm(EMPTY); setGenres([]); setPlace(null); setPlaces(null) }}>
-                        Add another event
-                    </button>
+                    {!editId && (
+                        <button type="button" className="btn btn--ghost" onClick={() => { setSent(null); setForm(EMPTY); setGenres([]); setPlace(null); setPlaces(null) }}>
+                            Add another event
+                        </button>
+                    )}
                 </div>
             </div>
         )
@@ -110,15 +137,18 @@ function AddEvent() {
     return (
         <div className="page page--narrow grid gap-4">
             <header className="page-head m-0">
-                <div className="page-head__tag">// Launch a ship</div>
-                <h1 className="page-title">Add an event</h1>
+                <div className="page-head__tag">// {editId ? 'Refit a ship' : 'Launch a ship'}</div>
+                <h1 className="page-title">{editId ? 'Edit your event' : 'Add an event'}</h1>
                 <p className="page-head__sub">
-                    For events that are not on Goabase. An admin checks it before it goes on the map; organizers whose page
-                    is linked to their account are on the map right away.
+                    {editId
+                        ? 'A change to an event on the map shows right away; one still waiting keeps waiting for an admin.'
+                        : 'For events that are not on Goabase. An admin checks it before it goes on the map; organizers whose page is linked to their account are on the map right away.'}
                 </p>
             </header>
 
-            {!user?.emailVerified && !user?.admin ? (
+            {!loaded ? (
+                error ? <p className="notice">{error}</p> : <p className="mono text-xs muted">Loading…</p>
+            ) : !user?.emailVerified && !user?.admin ? (
                 <VerifyEmailNotice reason="Only accounts with a confirmed email can add events, so the map stays free of spam." />
             ) : (
                 <form className="grid gap-4" onSubmit={submit}>
@@ -225,7 +255,7 @@ function AddEvent() {
 
                     {error && <p className="notice m-0">{error}</p>}
                     <button type="submit" className="btn btn--primary btn--block" disabled={sending}>
-                        {sending ? 'Sending…' : 'Send the event'}
+                        {sending ? 'Sending…' : editId ? 'Save the changes' : 'Send the event'}
                     </button>
                 </form>
             )}

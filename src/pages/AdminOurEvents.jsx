@@ -112,6 +112,7 @@ function AdminOurEvents() {
                                         <button type="button" className="btn btn--primary" disabled={busy === event.id}
                                             onClick={() => decide(event, true)}>Approve</button>
                                     )}
+                                    <Link className="btn btn--ghost" to={'/events/added/' + event.id + '/edit'}>Edit</Link>
                                     <input className="field flex-1 min-w-48" aria-label="Reason" maxLength={500}
                                         placeholder="Reason (shown to the sender)" value={reasons[event.id] ?? ''}
                                         onChange={(e) => setReasons(r => ({ ...r, [event.id]: e.target.value }))} />

@@ -187,6 +187,9 @@ function Profile() {
                                 <span className="rows__meta">
                                     {EVENT_STATUS[ev.status]}{ev.rejectReason && `: ${ev.rejectReason}`}
                                 </span>
+                                {ev.status !== 'REJECTED' && (
+                                    <Link className="btn btn--ghost" to={'/events/added/' + ev.id + '/edit'}>Edit</Link>
+                                )}
                                 {ev.status === 'PENDING' && (
                                     <button type="button" className="btn btn--ghost" onClick={async () => {
                                         await withdrawOurEvent(ev.id).catch(() => {})

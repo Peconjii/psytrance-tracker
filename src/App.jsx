@@ -90,6 +90,7 @@ function Shell() {
           {/* The artist's owner or an admin; the backend says who may */}
           <Route path="/artists/:slug/edit" element={<ProtectedRoute><ArtistEdit /></ProtectedRoute>} />
           <Route path="/events/new" element={<ProtectedRoute><AddEvent /></ProtectedRoute>} />
+          <Route path="/events/added/:id/edit" element={<ProtectedRoute><AddEvent key="edit" /></ProtectedRoute>} />
           <Route path="/organizers/:slug/edit" element={<ProtectedRoute><OrganizerEdit /></ProtectedRoute>} />
         </Routes>
       </main>

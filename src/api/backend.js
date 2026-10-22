@@ -520,3 +520,15 @@ export async function fetchHiddenEvents(signal) {
     const response = await api.get('/api/admin/events/hidden', { signal })
     return response.data
 }
+
+// One event this account added (any for admins), for its edit form
+export async function fetchOurEvent(id, signal) {
+    const response = await api.get(`/api/our-events/${id}`, { signal })
+    return response.data
+}
+
+// Changes an added event: a waiting one keeps waiting, an approved one changes on the map right away
+export async function updateOurEvent(id, event) {
+    const response = await api.put(`/api/our-events/${id}`, event)
+    return response.data
+}
