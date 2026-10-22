@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchArtist, fetchMyArtists } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton.jsx'
+import ArtistNumbers from '../components/ArtistNumbers.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import {
     appearances, artists as mapProfiles, data, festivalById, genresOfArtist, labelsOfArtist, tracksOfArtist,
@@ -253,7 +254,7 @@ function Artist() {
                                         <h3 className="field-label">Labels</h3>
                                         <ul className="list-none p-0 m-0 text-sm grid gap-1">
                                             {labels.map(l => (
-                                                <li key={l}><Link className="link" to={`/?label=${encodeURIComponent(l)}`}>{l}</Link></li>
+                                                <li key={l}><Link className="link" to={`/labels/${encodeURIComponent(l)}`}>{l}</Link></li>
                                             ))}
                                         </ul>
                                     </div>
@@ -326,6 +327,7 @@ function Artist() {
                                     </ul>
                                 </Section>
                             )}
+                            <ArtistNumbers slug={artist.slug} />
                         </>
                     )}
                 </>

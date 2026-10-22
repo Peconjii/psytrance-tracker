@@ -554,3 +554,15 @@ export async function fetchFeaturedEvents(signal) {
     const response = await api.get('/api/admin/events/featured', { signal })
     return response.data
 }
+
+// An artist's numbers: { gigs: { total, upcoming, past, live, byCountry, byGenre, byYear, countedSince }, followers, followersByMonth }
+export async function fetchArtistStats(slug, signal) {
+    const response = await api.get(`/api/artists/${encodeURIComponent(slug)}/stats`, { signal })
+    return response.data
+}
+
+// A label of the map with its crew together: { crew, crewWithGigs, gigs, followers, followersByMonth, upcoming: [gigs] }
+export async function fetchLabelStats(label, signal) {
+    const response = await api.get('/api/labels/stats', { params: { label }, signal })
+    return response.data
+}

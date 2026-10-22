@@ -177,6 +177,7 @@ export function Panel({
           <FixLink about="LABEL" name={label} />
           <ShareButton />
           <FollowButton label={label} name={label} className="hud__share" />
+          <Link className="hud__ext" to={`/labels/${encodeURIComponent(label)}`}>Label page →</Link>
         </div>
       </HudShell>
     );

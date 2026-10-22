@@ -283,3 +283,11 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .artist-head__initials { display: flex; align-items: center; justify-content: center; font: 500 24px var(--display, inherit); color: var(--accent); background: rgba(62, 230, 196, 0.06); }
 .artist-sound { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
 .artist-gig__day { display: inline-block; min-width: 92px; }
+
+/* Small bar lists of the statistics (StatBars): thin bars with a rounded end, the number beside them */
+.stat-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.stat-bars__row { display: grid; grid-template-columns: minmax(80px, 34%) 1fr 3ch; align-items: center; gap: 10px; }
+.stat-bars__label { font-size: 13px; color: var(--soft, var(--fg)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stat-bars__track { height: 8px; }
+.stat-bars__bar { display: block; height: 100%; min-width: 2px; background: var(--accent); border-radius: 0 4px 4px 0; }
+.stat-bars__value { font: 12px var(--mono); color: var(--fg); text-align: right; }
