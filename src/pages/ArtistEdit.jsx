@@ -7,6 +7,7 @@ import {
 } from '../api/backend.js'
 import { ROLES } from '../components/artistRole.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
+import OwnerNumbers from '../components/OwnerNumbers.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { genreById } from '../map/data/types'
 
@@ -146,6 +147,8 @@ function ArtistEdit() {
                     Genres and the name are checked by an admin first.
                 </p>
             </header>
+
+            <OwnerNumbers kind="artist" slug={slug} />
 
             <Part label="Profile" saving={profileSave.saving} status={profileSave.status}
                 onSave={() => profileSave.run(() => saveArtistProfile(slug, Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, trim(v)]))))}>

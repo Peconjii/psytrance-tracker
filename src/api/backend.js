@@ -572,3 +572,15 @@ export async function fetchFestivalStats(match, signal) {
     const response = await api.get('/api/festivals/stats', { params: { match }, signal })
     return response.data
 }
+
+// Owners and admins: per gig going, saved, reviews, rating and followers reached, plus followers and totals
+export async function fetchArtistOwnerStats(slug, signal) {
+    const response = await api.get(`/api/artists/${encodeURIComponent(slug)}/owner-stats`, { signal })
+    return response.data
+}
+
+// Owners and admins: per event going, saved, reviews, rating and how many follow someone in its line-up
+export async function fetchOrganizerOwnerStats(slug, signal) {
+    const response = await api.get(`/api/organizers/${encodeURIComponent(slug)}/owner-stats`, { signal })
+    return response.data
+}

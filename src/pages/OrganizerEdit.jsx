@@ -6,6 +6,7 @@ import {
     setOrganizerTimetable,
 } from '../api/backend.js'
 import TimetableEditor from '../components/TimetableEditor.jsx'
+import OwnerNumbers from '../components/OwnerNumbers.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const FIELDS = [
@@ -111,6 +112,8 @@ function OrganizerEdit() {
                     {statusLine('profile')}
                 </div>
             </form>
+
+            <OwnerNumbers kind="organizer" slug={slug} />
 
             <section className="panel mb-4">
                 <h2 className="panel__label">Timetables of your events · {edit.events.length}</h2>

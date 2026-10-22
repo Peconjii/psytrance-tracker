@@ -304,3 +304,11 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .stat-chart__cross { stroke: var(--muted); stroke-width: 1; }
 .stat-chart__tip { min-height: 1.4em; margin-top: 4px; color: var(--fg); }
 .stat-chart rect:focus { outline: none; }
+
+/* The owner's per-event table (OwnerNumbers): numbers in aligned columns */
+.owner-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.owner-table th { font: 10px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.owner-table th:first-child, .owner-table td:first-child { text-align: left; min-width: 200px; }
+.owner-table td { padding: 8px; border-bottom: 1px dashed var(--line); text-align: right; color: var(--fg);
+  font-variant-numeric: tabular-nums; vertical-align: top; }
