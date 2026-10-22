@@ -4,6 +4,7 @@ import { fetchLabelPage, fetchLabelStats, fetchMyLabels } from '../api/backend.j
 import FollowButton from '../components/FollowButton.jsx'
 import GigStats from '../components/GigStats.jsx'
 import ClaimPage from '../components/ClaimPage.jsx'
+import { useMapExtras } from '../components/useMapExtras.js'
 import { useOwnedPage } from '../components/ownedPage.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
@@ -14,6 +15,8 @@ const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numer
 // A label of the map as a page: its crew, where the crew plays next (the label's tour) and its numbers
 function Label() {
     const { name } = useParams()
+    // Labels admins added to the map are looked up once they are loaded
+    const extrasReady = useMapExtras()
     const label = labels[name]
     usePageMeta({
         title: `${name} – Psytrance Label`,
@@ -38,6 +41,7 @@ function Label() {
     }, [name, label])
 
     if (!label) {
+        if (!extrasReady) return <div className="page"><p className="mono text-xs muted">Loading…</p></div>
         return (
             <div className="page">
                 <div className="empty"><p><strong>No label called {name} on the map.</strong></p>

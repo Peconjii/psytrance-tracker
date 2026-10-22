@@ -4,6 +4,7 @@ import { fetchFestivalPage, fetchFestivalStats, fetchMyFestivals, setFestivalEdi
 import { useAuth } from '../context/AuthContext'
 import { GenreChip } from '../components/AdminParts'
 import ClaimPage from '../components/ClaimPage.jsx'
+import { useMapExtras } from '../components/useMapExtras.js'
 import StatView, { StatViewToggle } from '../components/StatView.jsx'
 import { useOwnedPage } from '../components/ownedPage.js'
 import { useStatsView } from '../components/statsView.js'
@@ -23,6 +24,8 @@ function festivalMatch(name) {
 // its editions in the event lists, their line-ups, genres, "I'm going" and saves, and years artists wrote themselves
 function Festival() {
     const { id } = useParams()
+    // Festivals admins added to the map are looked up once they are loaded
+    const extrasReady = useMapExtras()
     const festival = festivalById[id]
     usePageMeta({
         title: festival ? `${festival.name} – Psytrance Festival` : 'Festival',
@@ -72,6 +75,7 @@ function Festival() {
     }
 
     if (!festival) {
+        if (!extrasReady) return <div className="page"><p className="mono text-xs muted">Loading…</p></div>
         return (
             <div className="page"><div className="empty"><p><strong>No festival called {id} on the map.</strong></p>
                 <p><Link className="link" to="/new-page?kind=FESTIVAL">Is it your festival? Ask for it →</Link></p></div></div>

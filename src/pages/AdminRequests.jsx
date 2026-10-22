@@ -6,6 +6,7 @@ import { GenreChip } from '../components/AdminParts'
 import LabelRequests from '../components/LabelRequests.jsx'
 import ClaimRequests from '../components/ClaimRequests.jsx'
 import NewPageRequests from '../components/NewPageRequests.jsx'
+import AddToMap from '../components/AddToMap.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
@@ -13,7 +14,7 @@ const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', 
 // Admin panel: what artists asked to change on their profile and need an admin for: their genres on the map
 // (approving moves their satellite for everyone, and is in the history with undo) or the name on their page.
 function AdminRequests() {
-    usePageMeta({ title: 'Artist requests', path: '/admin/requests', noindex: true })
+    usePageMeta({ title: 'Requests', path: '/admin/requests', noindex: true })
     const [requests, setRequests] = useState(null)
     const [error, setError] = useState('')
     const [deciding, setDeciding] = useState(null)
@@ -83,6 +84,7 @@ function AdminRequests() {
             )}
             <ClaimRequests />
             <NewPageRequests />
+            <AddToMap />
             <LabelRequests />
         </div>
     )

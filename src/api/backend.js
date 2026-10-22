@@ -204,6 +204,23 @@ export async function fetchPlacements(signal) {
     return response.data
 }
 
+// The labels and festivals admins added to the map: { labels: [{ name, country, since, genres, x, y }], festivals: [...] }
+export async function fetchMapExtras(signal) {
+    const response = await api.get('/api/map/extras', { signal })
+    return response.data
+}
+
+// For admins: put a label ({ name, country, since, genres }) or festival (also { description }) on the map
+export async function addMapLabel(label) {
+    const response = await api.post('/api/admin/map/labels', label)
+    return response.data
+}
+
+export async function addMapFestival(festival) {
+    const response = await api.post('/api/admin/map/festivals', festival)
+    return response.data
+}
+
 // Admin panel: map and line-up artists whose name contains the search, with their map genres
 export async function searchAdminArtists(search, signal) {
     const response = await api.get('/api/admin/artists', { params: { search }, signal })
@@ -723,8 +740,9 @@ export async function fetchNewPageRequests(signal) {
     return response.data
 }
 
-export async function decideNewPageRequest(id, approve, reason) {
-    const response = await api.post('/api/admin/page-requests/' + id, { approve, reason })
+// onTheMap: for a label or festival, { country, since, description, genres } to put it on the map right away
+export async function decideNewPageRequest(id, approve, reason, onTheMap) {
+    const response = await api.post('/api/admin/page-requests/' + id, { approve, reason, onTheMap })
     return response.data
 }
 
