@@ -576,8 +576,9 @@ export async function fetchLabelStats(label, signal) {
 }
 
 // A festival of the map: { editions: [events named like it, with going and saved], byGenre, topArtists, reportedByYear }
-export async function fetchFestivalStats(match, signal) {
-    const response = await api.get('/api/festivals/stats', { params: { match }, signal })
+// id: the festival of the map, so the editions set by hand count too
+export async function fetchFestivalStats(match, id, signal) {
+    const response = await api.get('/api/festivals/stats', { params: { match, id }, signal })
     return response.data
 }
 
@@ -725,4 +726,9 @@ export async function fetchNewPageRequests(signal) {
 export async function decideNewPageRequest(id, approve, reason) {
     const response = await api.post('/api/admin/page-requests/' + id, { approve, reason })
     return response.data
+}
+
+// For editors and admins: edition true (an edition of the festival), false (not one), null (go by the name again)
+export async function setFestivalEdition(eventId, festivalId, edition) {
+    await api.put('/api/admin/events/' + eventId + '/festival-edition', { festivalId, edition })
 }
