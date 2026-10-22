@@ -1,5 +1,6 @@
 import { data, genreById } from '../map/data/types'
-import StatBars from './StatBars.jsx'
+import StatView, { StatViewToggle } from './StatView.jsx'
+import { useStatsView } from './statsView.js'
 
 const SINCE = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
 const MONTH = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' })
@@ -7,6 +8,7 @@ const MONTH = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric'
 // The numbers of an artist or a label: gigs (next, before, live), where and in which sound, and the followers month by
 // month. `stats` is what /api/artists/<slug>/stats or /api/labels/stats sends.
 function GigStats({ stats, extraTiles = [] }) {
+    const [view, toggleView] = useStatsView()
     const { gigs } = stats
     const tiles = [
         { value: gigs.total, label: 'Gigs counted' },
@@ -30,25 +32,26 @@ function GigStats({ stats, extraTiles = [] }) {
                     <div key={t.label} className="stat"><span className="stat__value">{t.value}</span><span className="stat__label">{t.label}</span></div>
                 ))}
             </div>
+            <div className="flex justify-end -mb-2"><StatViewToggle view={view} onToggle={toggleView} /></div>
             <div className="grid md:grid-cols-2 gap-6">
                 <div>
                     <h3 className="field-label">Where</h3>
-                    <StatBars unit="gigs" rows={gigs.byCountry.map(c => ({ key: c.key, label: c.key, value: c.count }))} />
+                    <StatView view={view} unit="gigs" rows={gigs.byCountry.map(c => ({ key: c.key, label: c.key, value: c.count }))} />
                 </div>
                 <div>
                     <h3 className="field-label">Sound of the events</h3>
-                    <StatBars unit="events" rows={genres} empty="No genres known yet." />
+                    <StatView view={view} unit="events" rows={genres} empty="No genres known yet." />
                 </div>
                 {gigs.byYear.length > 1 && (
                     <div>
                         <h3 className="field-label">By year</h3>
-                        <StatBars unit="gigs" rows={gigs.byYear.map(y => ({ key: y.key, label: y.key, value: y.count }))} />
+                        <StatView view={view} unit="gigs" rows={gigs.byYear.map(y => ({ key: y.key, label: y.key, value: y.count }))} />
                     </div>
                 )}
                 {months.length > 0 && (
                     <div>
                         <h3 className="field-label">Followers, month by month</h3>
-                        <StatBars unit="followers" rows={months} />
+                        <StatView view={view} kind="line" unit="followers" rows={months} />
                     </div>
                 )}
             </div>

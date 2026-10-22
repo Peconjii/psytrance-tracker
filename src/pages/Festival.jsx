@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { fetchFestivalStats } from '../api/backend.js'
 import { GenreChip } from '../components/AdminParts'
-import StatBars from '../components/StatBars.jsx'
+import StatView, { StatViewToggle } from '../components/StatView.jsx'
+import { useStatsView } from '../components/statsView.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { appearances, artistsAtFestival, data, festivalById, genreById } from '../map/data/types'
@@ -26,6 +27,7 @@ function Festival() {
         path: `/festivals/${id}`,
     })
     const match = festival ? festivalMatch(festival.name) : ''
+    const [view, toggleView] = useStatsView()
     const [loaded, setLoaded] = useState({ match: null, stats: null })
     const stats = loaded.match === match ? loaded.stats : null
 
@@ -94,21 +96,24 @@ function Festival() {
                     </section>
                     {(genres.length > 0 || stats.topArtists.length > 0 || stats.reportedByYear.length > 0) && (
                         <section className="panel mb-4">
-                            <h2 className="panel__label">Numbers</h2>
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                                <h2 className="panel__label m-0">Numbers</h2>
+                                <StatViewToggle view={view} onToggle={toggleView} />
+                            </div>
                             <div className="grid md:grid-cols-2 gap-6">
                                 {genres.length > 0 && (
-                                    <div><h3 className="field-label">Sound of the editions</h3><StatBars unit="editions" rows={genres} /></div>
+                                    <div><h3 className="field-label">Sound of the editions</h3><StatView view={view} unit="editions" rows={genres} /></div>
                                 )}
                                 {stats.topArtists.length > 0 && (
                                     <div>
                                         <h3 className="field-label">Who plays most often</h3>
-                                        <StatBars unit="editions" rows={stats.topArtists.map(a => ({ key: a.key, label: a.key, value: a.count }))} />
+                                        <StatView view={view} unit="editions" rows={stats.topArtists.map(a => ({ key: a.key, label: a.key, value: a.count }))} />
                                     </div>
                                 )}
                                 {stats.reportedByYear.length > 0 && (
                                     <div>
                                         <h3 className="field-label">Artists who list it on their profile, by year</h3>
-                                        <StatBars unit="artists" rows={stats.reportedByYear.map(y => ({ key: y.key, label: y.key, value: y.count }))} />
+                                        <StatView view={view} unit="artists" rows={stats.reportedByYear.map(y => ({ key: y.key, label: y.key, value: y.count }))} />
                                     </div>
                                 )}
                             </div>
