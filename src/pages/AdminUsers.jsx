@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchAdminUsers, setUserRole } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
+import UserPages from '../components/UserPages.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -22,6 +23,8 @@ function AdminUsers() {
     const [loaded, setLoaded] = useState({ key: null, data: null })
     const [error, setError] = useState('')
     const [saving, setSaving] = useState(null)
+    // Bumped to load the users again after a page was linked, unlinked or trusted
+    const [version, setVersion] = useState(0)
     const key = query + '|' + team
     const data = loaded.key === key ? loaded.data : null
 
@@ -37,7 +40,7 @@ function AdminUsers() {
             .then(found => setLoaded({ key: query + '|' + team, data: found }))
             .catch(err => { if (!controller.signal.aborted) setError(err.response?.data?.message || 'Could not load the users.') })
         return () => controller.abort()
-    }, [query, team])
+    }, [query, team, version])
 
     const changeRole = async (u, role) => {
         setSaving(u.username)
@@ -86,7 +89,8 @@ function AdminUsers() {
                 </div>
                 <p className="mono text-xs muted mt-0 mb-3">
                     Editor: events, their genres and timetables, artist genres, added events, reviews. Admin: everything,
-                    also the inbox, accounts, requests, history and roles.
+                    also the inbox, accounts, requests, history and roles. Under each account: the pages it owns (artist,
+                    organizer, label, festival); “trusted” lets its changes there go live without an admin.
                 </p>
                 {!data ? (
                     <p className="mono text-xs muted m-0">Loading…</p>
@@ -115,6 +119,7 @@ function AdminUsers() {
                                         {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
                                     </select>
                                 )}
+                                <UserPages user={u} onChanged={() => setVersion(v => v + 1)} />
                             </li>
                         ))}
                     </ul>

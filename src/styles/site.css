@@ -343,3 +343,9 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .join-strip__text { margin: 0; max-width: 62ch; font-size: 14px; color: var(--soft, var(--fg)); }
 .join-strip--inline { margin-bottom: 24px; border: 1px solid var(--line); }
 .join-strip--inline .join-strip__inner { padding: 18px 20px; }
+
+/* Admin → Users: the pages an account owns, under it (UserPages) */
+.user-pages { flex-basis: 100%; display: grid; gap: 6px; padding-left: 12px; border-left: 1px dashed var(--line); }
+.user-pages__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; }
+.user-pages__pick { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; text-align: left; color: var(--fg); background: transparent; border: 1px solid var(--line); cursor: pointer; }
+.user-pages__pick:hover, .user-pages__pick:focus-visible { border-color: var(--accent); outline: none; }
