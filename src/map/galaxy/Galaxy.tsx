@@ -476,6 +476,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
 
       // Animation: pulse on the beat (one pulse per bar), particles, orbiting satellites
       let time = 0;
+      // Festival and label names hidden because another one already stands there, at the zoom they were worked out for
+      const crowded = new Set<Text>();
+      let crowdedAt = -1;
       app.ticker.add((tk) => {
         // With reduced motion the clock stops, so pulses, orbits, rotations and bobbing all hold still
         const still = reducedMotionRef.current;
@@ -483,10 +486,25 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         for (const icon of stations) icon.rotation = Math.PI / 4 + time * 0.3;
         const stationScale = Math.max(1, 0.9 / vp.scale.x);
         const showStationNames = vp.scale.x >= STATION_NAME_ZOOM;
-        for (const t of stationTexts) { t.visible = showStationNames; t.scale.set(stationScale); }
+        for (const t of stationTexts) t.scale.set(stationScale);
+        for (const t of labelTexts) t.scale.set(stationScale);
+        // Names that would cover each other: festivals first, then labels in their order; the rest wait for a closer
+        // zoom. Worked out only when the zoom changes (moving the map doesn't change what overlaps)
+        if (vp.scale.x !== crowdedAt) {
+          crowdedAt = vp.scale.x;
+          crowded.clear();
+          const kept: { x0: number; y0: number; x1: number; y1: number }[] = [];
+          for (const t of [...stationTexts, ...labelTexts]) {
+            const at = t.parent!.position;
+            const box = { x0: at.x - t.width / 2, y0: at.y + t.y * t.scale.y, x1: at.x + t.width / 2, y1: at.y + t.y * t.scale.y + t.height };
+            if (kept.some((k) => box.x0 < k.x1 && box.x1 > k.x0 && box.y0 < k.y1 && box.y1 > k.y0)) crowded.add(t);
+            else kept.push(box);
+          }
+        }
+        for (const t of stationTexts) t.visible = showStationNames && !crowded.has(t);
         // Label names appear at mid zoom: hidden in the overview (too crowded) and up close, where artist satellites need the room
         const showLabelNames = vp.scale.x >= 0.75 && vp.scale.x < SAT_ZOOM;
-        for (const t of labelTexts) { t.visible = showLabelNames; t.scale.set(stationScale); }
+        for (const t of labelTexts) t.visible = showLabelNames && !crowded.has(t);
         const zoomed = vp.scale.x >= SAT_ZOOM;
         // Keep star names readable when zoomed far out
         const labelScale = Math.max(1, 0.8 / vp.scale.x);
