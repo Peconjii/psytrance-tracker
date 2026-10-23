@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import EventFeed from '../components/EventFeed.jsx'
 import PastEventList from '../components/PastEventList.jsx'
+import JoinStrip from '../components/JoinStrip.jsx'
 import { GenreChip, GenreOptions } from '../components/AdminParts'
 import { genreById } from '../map/data/types'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
@@ -97,6 +98,8 @@ function Events() {
                 </div>
                 <Link className="btn shrink-0" to="/events/new">+ Add an event</Link>
             </header>
+
+            <JoinStrip inline />
 
             <section className="panel mb-6" aria-label="Filters">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">

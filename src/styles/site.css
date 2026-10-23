@@ -341,3 +341,5 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .join-strip__inner { max-width: 1500px; margin: 0 auto; padding: 22px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; border-left: 2px solid var(--accent); }
 .join-strip__title { margin: 6px 0 4px; font: 500 18px var(--display, inherit); color: var(--fg); }
 .join-strip__text { margin: 0; max-width: 62ch; font-size: 14px; color: var(--soft, var(--fg)); }
+.join-strip--inline { margin-bottom: 24px; border: 1px solid var(--line); }
+.join-strip--inline .join-strip__inner { padding: 18px 20px; }
