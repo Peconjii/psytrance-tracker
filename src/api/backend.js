@@ -134,6 +134,11 @@ export async function setEventReminders(enabled) {
     return response.data.enabled
 }
 
+// "Delete my account": the password again; everything that is the person's goes for good
+export async function deleteAccount(password) {
+    await api.post('/api/me/delete-account', { password })
+}
+
 // The Monday email with the next gigs of who the account follows; returns the new setting
 export async function setWeeklyDigest(enabled) {
     const response = await api.put('/api/me/weekly-digest', { enabled })

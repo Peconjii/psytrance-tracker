@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { useFollows } from '../context/FollowsContext'
 import FollowButton from '../components/FollowButton.jsx'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
+import DeleteAccount from '../components/DeleteAccount.jsx'
 import api, {
     fetchMyArtists, fetchMyClaims, fetchMyFestivals, fetchMyPageRequests, fetchMyGoing, fetchMyLabels, fetchMyOrganizers, fetchMyOurEvents, setEventReminders, setWeeklyDigest,
     withdrawOurEvent,
@@ -409,6 +410,8 @@ function Profile() {
                     </ul>
                 )}
             </section>
+
+            <DeleteAccount />
         </div>
     )
 }

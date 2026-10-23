@@ -45,6 +45,7 @@ const NewPage = lazy(() => import('./pages/NewPage'))
 const Search = lazy(() => import('./pages/Search'))
 const Labels = lazy(() => import('./pages/Labels'))
 const Festivals = lazy(() => import('./pages/Festivals'))
+const Privacy = lazy(() => import('./pages/Privacy'))
 const EmbedGigs = lazy(() => import('./pages/EmbedGigs'))
 const ArtistEdit = lazy(() => import('./pages/ArtistEdit'))
 
@@ -91,6 +92,7 @@ function Shell() {
           <Route path="/feedback" element={<Feedback />} />
           <Route path="/new-page" element={<NewPage />} />
           <Route path="/search" element={<Search />} />
+          <Route path="/privacy" element={<Privacy />} />
 
           {/* Only for logged-in users; guests are redirected to /login */}
           <Route 

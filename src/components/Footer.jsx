@@ -33,7 +33,7 @@ function Footer() {
                         {' '}· built by <ExternalLink href={LINKEDIN_PROFILE}>{AUTHOR_NAME}</ExternalLink>
                     </p>
                     <p className="m-0">
-                        <Link to="/feedback">✎ Feedback</Link> ·{' '}
+                        <Link to="/feedback">✎ Feedback</Link> · <Link to="/privacy">Privacy</Link> ·{' '}
                         <ExternalLink href={GITHUB_PROFILE}>GitHub ↗</ExternalLink>
                         {LINKEDIN_PROFILE && <> · <ExternalLink href={LINKEDIN_PROFILE}>LinkedIn ↗</ExternalLink></>}
                     </p>

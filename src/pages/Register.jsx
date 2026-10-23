@@ -73,6 +73,10 @@ function Register() {
                     </div>
                     <BotTrap id="register-trap" value={website} onChange={setWebsite} />
                     <button type="submit" className="btn btn--primary btn--block mt-2">Create account</button>
+                    <p className="mono text-xs muted m-0">
+                        We keep your username, email and what you do on the site, and nothing more.{' '}
+                        <Link to="/privacy" className="link">What and why</Link>
+                    </p>
                 </form>
                 <p className="muted text-sm mt-6 mb-0">
                     Already have an account? <Link to="/login" className="link">Log in</Link>
