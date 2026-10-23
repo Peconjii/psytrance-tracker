@@ -187,6 +187,8 @@
 /* Topbar buttons */
 .tools__btn { padding: 8px 12px; font: 13px var(--mono); color: var(--fg); background: var(--hud); border: 1px solid var(--line); cursor: pointer; white-space: nowrap; }
 .tools__btn:hover, .tools__btn:focus-visible { border-color: var(--accent); outline: none; }
+/* "Not on the map? Add yourself": a link that looks like the other tools, in the accent colour */
+.tools__btn--join { color: var(--accent); text-decoration: none; display: inline-block; }
 
 /* Quiz */
 .quiz__options { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 4px 0 12px; }

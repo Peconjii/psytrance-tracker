@@ -4,6 +4,8 @@ import { decideNewPageRequest, fetchNewPageRequests } from '../api/backend.js'
 import { reloadMapExtrasLater } from '../map/data/extras'
 import MapPlaceFields from './MapPlaceFields.jsx'
 import { emptyMapPlace, mapPlaceOf } from './mapPlace.js'
+import { GenreChip } from './AdminParts'
+import { genreById } from '../map/data/types'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 const KIND = { ARTIST: 'Artist', ORGANIZER: 'Organizer', LABEL: 'Label', FESTIVAL: 'Festival' }
@@ -34,7 +36,13 @@ function NewPageRequests() {
         return () => controller.abort()
     }, [])
 
-    const placeOf = (r) => places[r.id] ?? emptyMapPlace(r.country ?? '')
+    // Starts from what the asker proposed: their genres (the ones the map has), year and words
+    const placeOf = (r) => places[r.id] ?? {
+        ...emptyMapPlace(r.country ?? ''),
+        since: r.since ? String(r.since) : '',
+        description: r.description ?? '',
+        genres: (r.genres ?? '').split(',').map(g => g.trim()).filter(g => genreById[g]).slice(0, 6),
+    }
 
     const decide = async (request, approve) => {
         setDeciding(request.id)
@@ -82,8 +90,35 @@ function NewPageRequests() {
                             {[r.websiteUrl, r.proofUrl].filter(Boolean).map(link => (
                                 <a key={link} className="link mono text-xs" href={link} target="_blank" rel="noopener noreferrer">{link} ↗</a>
                             ))}
-                            {r.genres && <p className="mono text-xs soft m-0">Genres they play: {r.genres}</p>}
+                            {r.genres && (
+                                <div className="flex flex-wrap items-center gap-1">
+                                    <span className="mono text-xs muted">Sounds like:</span>
+                                    {r.genres.split(',').map(g => g.trim()).filter(Boolean).map(g => (
+                                        genreById[g] ? <GenreChip key={g} id={g} /> : <span key={g} className="mono text-xs soft">{g}</span>
+                                    ))}
+                                </div>
+                            )}
+                            {(r.since || r.town) && (
+                                <p className="mono text-xs muted m-0">
+                                    {[r.since && `since ${r.since}`, r.town && `in ${r.town}`].filter(Boolean).join(' · ')}
+                                </p>
+                            )}
+                            {r.description && <p className="soft text-sm whitespace-pre-line m-0">“{r.description}”</p>}
+                            {r.imageUrl && (
+                                <a className="link mono text-xs" href={r.imageUrl} target="_blank" rel="noopener noreferrer">
+                                    {r.kind === 'ARTIST' ? 'Photo' : 'Logo'}: {r.imageUrl} ↗
+                                </a>
+                            )}
+                            {r.artists && (
+                                <p className="mono text-xs soft m-0">
+                                    Artists on it: {r.artists}
+                                    <span className="block muted">The ones the site knows from line-ups join the crew on approval; the others later.</span>
+                                </p>
+                            )}
                             {r.message && <p className="soft text-sm whitespace-pre-line m-0">{r.message}</p>}
+                            {onTheMap(r.kind) && (
+                                <p className="mono text-xs muted m-0">Filled in from the proposal below: check it, change what's wrong, then approve.</p>
+                            )}
                             {onTheMap(r.kind) && (
                                 <MapPlaceFields kind={r.kind} idPrefix={`request-${r.id}`} value={place}
                                     onChange={(value) => setPlaces(x => ({ ...x, [r.id]: value }))} />

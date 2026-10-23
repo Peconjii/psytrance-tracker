@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { askForPage } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import BotTrap from '../components/BotTrap.jsx'
+import { AddGenre, GenreChip } from '../components/AdminParts'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const KINDS = [
@@ -20,10 +21,14 @@ function NewPage() {
     const [params] = useSearchParams()
     const [form, setForm] = useState({
         kind: KINDS.some(k => k.id === params.get('kind')) ? params.get('kind') : 'ARTIST',
-        name: params.get('name') ?? '', country: '', websiteUrl: '', proofUrl: '', genres: '', message: '',
+        name: params.get('name') ?? '', country: '', websiteUrl: '', proofUrl: '', message: '',
+        since: '', description: '', imageUrl: '', artists: '', town: '',
         // Never shown to people; bots fill it in
         website: '',
     })
+    // The map genres it sounds like: where a satellite (artist) or marker (label, festival) could go
+    const [genreIds, setGenreIds] = useState([])
+    const maxGenres = form.kind === 'ARTIST' ? 4 : 6
     const [state, setState] = useState({ sending: false, done: false, error: '' })
     const kind = KINDS.find(k => k.id === form.kind)
     const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
@@ -33,7 +38,7 @@ function NewPage() {
         setState({ sending: true, done: false, error: '' })
         try {
             const trimmed = Object.fromEntries(Object.entries(form).map(([k, v]) => [k, v.trim()]))
-            await askForPage({ ...trimmed, genres: form.kind === 'ARTIST' ? trimmed.genres : '' })
+            await askForPage({ ...trimmed, genres: genreIds.slice(0, maxGenres).join(', '), since: trimmed.since ? Number(trimmed.since) : null })
             setState({ sending: false, done: true, error: '' })
         } catch (err) {
             const data = err.response?.data
@@ -62,7 +67,8 @@ function NewPage() {
                     <div className="flex flex-wrap gap-2">
                         <Link className="btn" to="/profile">Your profile</Link>
                         <button type="button" className="btn btn--ghost" onClick={() => {
-                            setForm(f => ({ ...f, name: '', country: '', websiteUrl: '', proofUrl: '', genres: '', message: '' }))
+                            setForm(f => ({ ...f, name: '', country: '', websiteUrl: '', proofUrl: '', message: '', since: '', description: '', imageUrl: '', artists: '', town: '' }))
+                            setGenreIds([])
                             setState({ sending: false, done: false, error: '' })
                         }}>Ask for another</button>
                     </div>
@@ -98,12 +104,57 @@ function NewPage() {
                         <input id="np-proof" type="url" className="field" placeholder="https://…" maxLength={500}
                             value={form.proofUrl} onChange={set('proofUrl')} />
                     </div>
-                    {form.kind === 'ARTIST' && (
+                    <div>
+                        <span className="field-label">{form.kind === 'ARTIST' ? 'Genres you play' : 'What it sounds like'} (up to {maxGenres})</span>
+                        <div className="flex flex-wrap items-center gap-2">
+                            {genreIds.slice(0, maxGenres).map(id => (
+                                <GenreChip key={id} id={id} onRemove={() => setGenreIds(g => g.filter(x => x !== id))} />
+                            ))}
+                            {genreIds.length < maxGenres && (
+                                <AddGenre exclude={genreIds} onAdd={(id) => setGenreIds(g => [...g, id])} />
+                            )}
+                        </div>
+                        <p className="mono text-xs muted mt-1 mb-0">
+                            {form.kind === 'ARTIST' ? 'Where your satellite could orbit; an admin checks it.'
+                                : form.kind === 'ORGANIZER' ? 'The sound of your parties.'
+                                    : 'It sits on the map next to these stars; an admin checks it.'}
+                        </p>
+                    </div>
+                    {form.kind !== 'ARTIST' && (
+                        <div className="grid sm:grid-cols-2 gap-3">
+                            <div>
+                                <label htmlFor="np-since" className="field-label">Since (year, optional)</label>
+                                <input id="np-since" className="field" inputMode="numeric" maxLength={4} placeholder="e.g. 2015"
+                                    value={form.since} onChange={(e) => setForm(f => ({ ...f, since: e.target.value.replace(/\D/g, '') }))} />
+                            </div>
+                            {form.kind === 'FESTIVAL' && (
+                                <div>
+                                    <label htmlFor="np-town" className="field-label">Town or place (optional)</label>
+                                    <input id="np-town" className="field" maxLength={100} value={form.town} onChange={set('town')} />
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <div>
+                        <label htmlFor="np-description" className="field-label">
+                            {form.kind === 'ARTIST' ? 'A few words about you' : `A few words about the ${kind.label.toLowerCase()}`} (optional)
+                        </label>
+                        <textarea id="np-description" className="field" rows={3} maxLength={1000} value={form.description}
+                            onChange={set('description')} />
+                    </div>
+                    <div>
+                        <label htmlFor="np-image" className="field-label">
+                            {form.kind === 'ARTIST' ? 'A photo' : 'A logo'} (image link, optional)
+                        </label>
+                        <input id="np-image" type="url" className="field" placeholder="https://…" maxLength={500}
+                            value={form.imageUrl} onChange={set('imageUrl')} />
+                    </div>
+                    {form.kind === 'LABEL' && (
                         <div>
-                            <label htmlFor="np-genres" className="field-label">Genres you play (optional)</label>
-                            <input id="np-genres" className="field" placeholder="e.g. dark, forest" maxLength={300}
-                                value={form.genres} onChange={set('genres')} />
-                            <p className="mono text-xs muted mt-1 mb-0">An admin decides where on the map your satellite orbits.</p>
+                            <label htmlFor="np-artists" className="field-label">Artists on the label (optional)</label>
+                            <textarea id="np-artists" className="field" rows={2} maxLength={1000} placeholder="One per line, or separated by commas"
+                                value={form.artists} onChange={set('artists')} />
+                            <p className="mono text-xs muted mt-1 mb-0">The ones the site knows from line-ups join the crew right away.</p>
                         </div>
                     )}
                     <div>

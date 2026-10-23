@@ -366,6 +366,9 @@ function MapOfPsy() {
           <LabelsMenu onOpen={openLabel} />
           <button className="tools__btn" onClick={startQuiz} data-closes-menu>Quiz</button>
           <button className="tools__btn" onClick={surprise} data-closes-menu title="Surprise me: random system and track" aria-label="Surprise me">🎲 Surprise</button>
+          {/* Artists, labels, festivals and crews that aren't on the map ask for a page, without searching first */}
+          <Link className="tools__btn tools__btn--join" to="/new-page" data-closes-menu
+            title="An artist, label, festival or crew that isn't on the map yet? Ask for your page">+ Not on the map? Add yourself</Link>
           <PlaylistMenu playlist={playlist} playing={hidden ? null : playing} onPlay={(t) => play(t, false, playlist.items)} />
           <Search onSelect={(id, name) => { setMenu(false); reveal(id, name); }}
             onOpenLabel={(l) => { setMenu(false); openLabel(l); }} onOpenFestival={(id) => { setMenu(false); openFestival(id); }} />
