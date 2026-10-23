@@ -7,10 +7,11 @@ import {
 } from '../api/backend.js'
 import TimetableEditor from '../components/TimetableEditor.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
+import ImageField from '../components/ImageField.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const FIELDS = [
-    { key: 'photoUrl', label: 'Photo or logo', placeholder: 'https://…' },
+    { key: 'photoUrl', label: 'Photo or logo', placeholder: 'https://…', image: 'square' },
     { key: 'instagramUrl', label: 'Instagram', placeholder: 'https://instagram.com/…' },
     { key: 'websiteUrl', label: 'Website', placeholder: 'https://…' },
 ]
@@ -94,7 +95,10 @@ function OrganizerEdit() {
                 run('profile', () => saveOrganizerProfile(slug, Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, v.trim()]))))
             }}>
                 <h2 className="panel__label m-0">Page</h2>
-                {FIELDS.map(field => (
+                {FIELDS.map(field => field.image ? (
+                    <ImageField key={field.key} id={`org-${field.key}`} label={field.label} kind={field.image} value={profile[field.key]}
+                        placeholder={field.placeholder} onChange={(url) => setProfile(p => ({ ...p, [field.key]: url }))} />
+                ) : (
                     <div key={field.key}>
                         <label htmlFor={`org-${field.key}`} className="field-label">{field.label}</label>
                         <input id={`org-${field.key}`} type="url" className="field" value={profile[field.key]} placeholder={field.placeholder}

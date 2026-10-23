@@ -790,3 +790,11 @@ export async function decideNewPageRequest(id, approve, reason, onTheMap) {
 export async function setFestivalEdition(eventId, festivalId, edition) {
     await api.put('/api/admin/events/' + eventId + '/festival-edition', { festivalId, edition })
 }
+
+// Uploads a picture (a Blob, already made small by ImageField) and returns its address, to put in a picture field
+export async function uploadImage(blob) {
+    const form = new FormData()
+    form.append('file', blob, 'picture')
+    const response = await api.post('/api/images', form)
+    return response.data.url
+}

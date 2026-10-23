@@ -91,10 +91,13 @@ function Festival() {
     return (
         <div className="page">
             <div className="panel mb-4 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                <div className="min-w-0">
-                    <div className="page-head__tag">// Station · festival</div>
-                    <h1 className="page-title">{festival.name}</h1>
-                    <p className="mono text-xs muted mt-2 mb-0">{[festival.country, festival.since && `since ${festival.since}`].filter(Boolean).join(' · ')}</p>
+                <div className="min-w-0 flex items-start gap-4">
+                    {profile?.logoUrl && <img className="artist-head__photo" src={profile.logoUrl} alt={festival.name} referrerPolicy="no-referrer" />}
+                    <div className="min-w-0">
+                        <div className="page-head__tag">// Station · festival</div>
+                        <h1 className="page-title">{festival.name}</h1>
+                        <p className="mono text-xs muted mt-2 mb-0">{[festival.country, festival.since && `since ${festival.since}`].filter(Boolean).join(' · ')}</p>
+                    </div>
                 </div>
                 <div className="flex flex-wrap gap-2 shrink-0">
                     <Link className="btn btn--ghost" to={`/?festival=${encodeURIComponent(id)}`}>On the map →</Link>

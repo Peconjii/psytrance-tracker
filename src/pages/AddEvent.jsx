@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { fetchOurEvent, submitOurEvent, updateOurEvent } from '../api/backend.js'
 import { searchPlaces } from '../api/places.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
+import ImageField from '../components/ImageField.jsx'
 import StageCards from '../components/StageCards.jsx'
 import { emptyStage, eventDays, lineUpOf, stagesOf } from '../components/stageText.js'
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
@@ -15,7 +16,7 @@ const MAX_GENRES = 4
 const LINKS = [
     { key: 'ticketUrl', label: 'Tickets or event page', placeholder: 'https://…' },
     { key: 'organizerUrl', label: 'Organizer website', placeholder: 'https://…' },
-    { key: 'imageUrl', label: 'Flyer (image link)', placeholder: 'https://…' },
+    { key: 'imageUrl', label: 'Flyer', placeholder: 'https://… or upload one', image: 'flyer' },
 ]
 const EMPTY = {
     name: '', eventType: 'Festival', startsAt: '', endsAt: '', lineUp: '', organizerName: '', locationText: '',
@@ -280,7 +281,10 @@ function AddEvent() {
                             <label htmlFor="ev-organizer" className="field-label">Organizer</label>
                             <input id="ev-organizer" className="field" maxLength={200} value={form.organizerName} onChange={set('organizerName')} />
                         </div>
-                        {LINKS.map(link => (
+                        {LINKS.map(link => link.image ? (
+                            <ImageField key={link.key} id={`ev-${link.key}`} label={link.label} kind={link.image} value={form[link.key]}
+                                placeholder={link.placeholder} onChange={(url) => setForm(f => ({ ...f, [link.key]: url }))} />
+                        ) : (
                             <div key={link.key}>
                                 <label htmlFor={`ev-${link.key}`} className="field-label">{link.label}</label>
                                 <input id={`ev-${link.key}`} type="url" className="field" maxLength={500} placeholder={link.placeholder}

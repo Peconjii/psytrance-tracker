@@ -9,11 +9,12 @@ import { ROLES } from '../components/artistRole.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
 import GigsWidgetCode from '../components/GigsWidgetCode.jsx'
+import ImageField from '../components/ImageField.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { genreById } from '../map/data/types'
 
 const PROFILE_FIELDS = [
-    { key: 'photoUrl', label: 'Photo', placeholder: 'https://… (a square picture works best)' },
+    { key: 'photoUrl', label: 'Photo', placeholder: 'https://… (a square picture works best)', image: 'square' },
     { key: 'soundcloudUrl', label: 'SoundCloud', placeholder: 'https://soundcloud.com/…' },
     { key: 'bandcampUrl', label: 'Bandcamp', placeholder: 'https://….bandcamp.com' },
     { key: 'instagramUrl', label: 'Instagram', placeholder: 'https://instagram.com/…' },
@@ -155,10 +156,10 @@ function ArtistEdit() {
 
             <Part label="Profile" saving={profileSave.saving} status={profileSave.status}
                 onSave={() => profileSave.run(() => saveArtistProfile(slug, Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, trim(v)]))))}>
-                {profile.photoUrl.startsWith('https://') && (
-                    <img className="artist-head__photo" src={profile.photoUrl} alt="" referrerPolicy="no-referrer" />
-                )}
-                {PROFILE_FIELDS.map(field => (
+                {PROFILE_FIELDS.map(field => field.image ? (
+                    <ImageField key={field.key} id={`profile-${field.key}`} label={field.label} kind={field.image} value={profile[field.key]}
+                        placeholder={field.placeholder} onChange={(url) => setProfile(p => ({ ...p, [field.key]: url }))} />
+                ) : (
                     <div key={field.key}>
                         <label htmlFor={`profile-${field.key}`} className="field-label">{field.label}</label>
                         <input id={`profile-${field.key}`} type={field.type || 'url'} className="field" value={profile[field.key]}

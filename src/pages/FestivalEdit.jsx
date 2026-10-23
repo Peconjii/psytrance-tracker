@@ -5,16 +5,18 @@ import {
 } from '../api/backend.js'
 import OwnerForm from '../components/OwnerForm.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
+import ImageField from '../components/ImageField.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const FIELDS = [
+    { key: 'logoUrl', label: 'Logo', placeholder: 'https://…', image: 'square' },
     { key: 'websiteUrl', label: 'Website', placeholder: 'https://…' },
     { key: 'ticketUrl', label: 'Tickets', placeholder: 'https://…' },
     { key: 'instagramUrl', label: 'Instagram', placeholder: 'https://instagram.com/…' },
 ]
 const MAX_TEXT = 2000
-const EMPTY = { description: '', websiteUrl: '', ticketUrl: '', instagramUrl: '', organizerSlug: '' }
+const EMPTY = { description: '', logoUrl: '', websiteUrl: '', ticketUrl: '', instagramUrl: '', organizerSlug: '' }
 
 // Editing a festival's page: by its owner (an admin linked them) or an admin. Their own words and links, and the
 // organizer who runs the festival, so the festival's page leads to the organizer's page and its events.
@@ -99,7 +101,10 @@ function FestivalEdit() {
                         placeholder="What the festival is about, this year's edition…"
                         onChange={(e) => setProfile(p => ({ ...p, description: e.target.value }))} />
                 </div>
-                {FIELDS.map(field => (
+                {FIELDS.map(field => field.image ? (
+                    <ImageField key={field.key} id={`festival-${field.key}`} label={field.label} kind={field.image} value={profile[field.key]}
+                        placeholder={field.placeholder} onChange={(url) => setProfile(p => ({ ...p, [field.key]: url }))} />
+                ) : (
                     <div key={field.key}>
                         <label htmlFor={`festival-${field.key}`} className="field-label">{field.label}</label>
                         <input id={`festival-${field.key}`} type="url" className="field" value={profile[field.key]} placeholder={field.placeholder}

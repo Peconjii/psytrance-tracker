@@ -325,3 +325,9 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .owner-table th:first-child, .owner-table td:first-child { text-align: left; min-width: 200px; }
 .owner-table td { padding: 8px; border-bottom: 1px dashed var(--line); text-align: right; color: var(--fg);
   font-variant-numeric: tabular-nums; vertical-align: top; }
+
+/* A picture field (ImageField): the picture beside its link and the upload button */
+.image-field { display: flex; gap: 12px; align-items: flex-start; }
+.image-field__inputs { flex: 1; min-width: 0; display: grid; gap: 8px; }
+.image-field__preview { flex-shrink: 0; width: 72px; height: 72px; object-fit: cover; border: 1px solid var(--line); }
+.image-field--flyer .image-field__preview { width: 96px; height: auto; max-height: 136px; object-fit: contain; }
