@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchArtist, fetchMyArtists } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton.jsx'
-import SoundCloudPlayer from '../components/SoundCloudPlayer.jsx'
 import StoryButton from '../components/StoryButton.jsx'
 import ClaimPage from '../components/ClaimPage.jsx'
 import ArtistNumbers from '../components/ArtistNumbers.jsx'
@@ -31,9 +30,6 @@ const PROFILE_LINKS = [
 const SEARCH_LINKS = [
     ['soundcloudUrl', 'SoundCloud', (name) => `https://soundcloud.com/search/people?q=${encodeURIComponent(name)}`],
 ]
-
-// The artist's own SoundCloud page (not a search): it can be played on the page
-const SOUNDCLOUD = /^https:\/\/(www\.|m\.)?soundcloud\.com\/[^/?#]+/i
 
 const youtubeLink = (track) => track.youtube
     ? `https://www.youtube.com/watch?v=${track.youtube}`
@@ -225,12 +221,6 @@ function Artist() {
                     {profile?.bio && (
                         <Section label="About">
                             <p className="soft whitespace-pre-line m-0 max-w-3xl">{profile.bio}</p>
-                        </Section>
-                    )}
-
-                    {SOUNDCLOUD.test(profile?.soundcloudUrl ?? '') && (
-                        <Section label="Listen">
-                            <SoundCloudPlayer url={profile.soundcloudUrl} name={name} />
                         </Section>
                     )}
 
