@@ -247,6 +247,15 @@ export async function addMapLabel(label) {
     return response.data
 }
 
+// For admins: take a label or festival added from the panel off the map again
+export async function removeMapLabel(name) {
+    await api.delete('/api/admin/map/labels', { params: { name } })
+}
+
+export async function removeMapFestival(id) {
+    await api.delete('/api/admin/map/festivals', { params: { id } })
+}
+
 export async function addMapFestival(festival) {
     const response = await api.post('/api/admin/map/festivals', festival)
     return response.data

@@ -39,6 +39,19 @@ export function loadMapExtras(): Promise<void> {
   return loading;
 }
 
+/** After an admin took a label or festival off the map: it leaves the map data at once */
+export function forgetMapExtra(kind: 'LABEL' | 'FESTIVAL', key: string) {
+  if (kind === 'LABEL') {
+    delete labels[key];
+    for (const genre of Object.values(genreById)) genre.labels = genre.labels.filter((l) => l !== key);
+  } else {
+    const at = festivals.findIndex((f) => f.id === key);
+    if (at >= 0) festivals.splice(at, 1);
+    delete festivalById[key];
+    for (const genre of Object.values(genreById)) genre.festivals = genre.festivals.filter((f) => f !== key);
+  }
+}
+
 /** After an admin added a label or festival: the next galaxy or page visit loads them again (new ones join) */
 export function reloadMapExtrasLater() {
   applied = false;
