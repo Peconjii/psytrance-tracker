@@ -24,7 +24,10 @@ export function PlaylistMenu({ playlist, playing, onPlay }: MenuProps) {
   const { items } = playlist;
   return (
     <div className="tours playlist">
-      <button className="tools__btn" aria-expanded={open} onClick={() => setOpen((o) => !o)}>♥ {items.length}</button>
+      <button className="tools__btn" aria-expanded={open} onClick={() => setOpen((o) => !o)}
+        title="Your playlist: tracks you saved with ♡, played one after another. Kept in this browser only.">
+        ♥ Playlist · {items.length}
+      </button>
       {open && (
         <div className="tours__list playlist__panel">
           <div className="playlist__head">
@@ -32,7 +35,10 @@ export function PlaylistMenu({ playlist, playing, onPlay }: MenuProps) {
             {items.length > 0 && <button className="tourbar__next" onClick={() => onPlay(items[0])}>Play all ▶</button>}
           </div>
           {items.length === 0 ? (
-            <p className="playlist__empty">Tap ♡ next to any track (or in the player) to save it here. Saved in this browser only.</p>
+            <p className="playlist__empty">
+              Your own mix from the galaxy: tap ♡ next to any track (or in the player) to save it here, then
+              "Play all" plays them one after another. Saved in this browser only, no account needed.
+            </p>
           ) : (
             <ol>
               {items.map((t) => (
