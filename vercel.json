@@ -1,6 +1,11 @@
 {
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "https://psytrance-tracker-backend.onrender.com/api/sitemap.xml" },
+    {
+      "source": "/:kind(artists|events|labels|festivals|organizers)/:key",
+      "has": [{ "type": "header", "key": "user-agent", "value": "(?i).*(facebookexternalhit|facebot|twitterbot|whatsapp|telegrambot|slackbot|discordbot|linkedinbot|pinterest|skypeuripreview|redditbot|vkshare|embedly|iframely|mastodon|signal|viber).*" }],
+      "destination": "https://psytrance-tracker-backend.onrender.com/api/share/:kind/:key"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
