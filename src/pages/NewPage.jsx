@@ -3,6 +3,7 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { askForPage } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import BotTrap from '../components/BotTrap.jsx'
+import ImageField from '../components/ImageField.jsx'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import usePageMeta from '../hooks/usePageMeta.js'
 
@@ -142,13 +143,8 @@ function NewPage() {
                         <textarea id="np-description" className="field" rows={3} maxLength={1000} value={form.description}
                             onChange={set('description')} />
                     </div>
-                    <div>
-                        <label htmlFor="np-image" className="field-label">
-                            {form.kind === 'ARTIST' ? 'A photo' : 'A logo'} (image link, optional)
-                        </label>
-                        <input id="np-image" type="url" className="field" placeholder="https://…" maxLength={500}
-                            value={form.imageUrl} onChange={set('imageUrl')} />
-                    </div>
+                    <ImageField id="np-image" label={`${form.kind === 'ARTIST' ? 'A photo' : 'A logo'} (optional)`}
+                        value={form.imageUrl} onChange={(url) => setForm(f => ({ ...f, imageUrl: url }))} />
                     {form.kind === 'LABEL' && (
                         <div>
                             <label htmlFor="np-artists" className="field-label">Artists on the label (optional)</label>

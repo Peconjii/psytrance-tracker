@@ -105,8 +105,9 @@ function NewPageRequests() {
                             )}
                             {r.description && <p className="soft text-sm whitespace-pre-line m-0">“{r.description}”</p>}
                             {r.imageUrl && (
-                                <a className="link mono text-xs" href={r.imageUrl} target="_blank" rel="noopener noreferrer">
-                                    {r.kind === 'ARTIST' ? 'Photo' : 'Logo'}: {r.imageUrl} ↗
+                                <a className="link mono text-xs flex items-center gap-2 w-fit" href={r.imageUrl} target="_blank" rel="noopener noreferrer">
+                                    <img className="image-field__preview" src={r.imageUrl} alt="" loading="lazy" referrerPolicy="no-referrer" />
+                                    {r.kind === 'ARTIST' ? 'Photo' : 'Logo'} ↗
                                 </a>
                             )}
                             {r.artists && (
