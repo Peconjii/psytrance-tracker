@@ -4,6 +4,7 @@ import { fetchArtists } from '../api/backend.js'
 import { ROLES, ROLE_LABELS, matchesRole, roleOf } from '../components/artistRole.js'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import CrewTabs from '../components/CrewTabs.jsx'
+import NewPagesList from '../components/NewPagesList.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 // Artists found in the line-ups of upcoming events, busiest first. The backend reads line-ups
@@ -21,6 +22,8 @@ function Artists() {
     const [attempt, setAttempt] = useState(0)
     // '' = everyone, else 'DJ' (producers too), 'PRODUCER' or 'LIVE' (picked or guessed)
     const [roleFilter, setRoleFilter] = useState('')
+    // How many new pages (no gigs yet) match, shown under the list
+    const [freshCount, setFreshCount] = useState(0)
 
     useEffect(() => {
         const controller = new AbortController()
@@ -81,7 +84,7 @@ function Artists() {
                         <li key={i} className="rows__item"><div className="skeleton h-4 w-1/3" /></li>
                     ))}
                 </ul>
-            ) : shown.length === 0 ? (
+            ) : shown.length === 0 && freshCount > 0 ? null : shown.length === 0 ? (
                 <div className="empty">
                     <p><strong>
                         {roleFilter && result.artists.length > 0
@@ -111,6 +114,10 @@ function Artists() {
                     ))}
                 </ul>
             )}
+
+            <NewPagesList kind="artists" search={debouncedSearch}
+                keep={roleFilter ? (page) => matchesRole(roleOf(page).role, roleFilter) : null}
+                meta={(page) => ROLE_LABELS[roleOf(page).role]} onCount={setFreshCount} />
         </div>
     )
 }

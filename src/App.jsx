@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import JoinStrip from './components/JoinStrip'
 import { FavoritesProvider } from './context/FavoritesContext'
 import { FollowsProvider } from './context/FollowsContext'
 import { AuthProvider } from './context/AuthContext'
@@ -132,6 +133,7 @@ function Shell() {
         </Suspense>
       </main>
 
+      {!isHome && <JoinStrip />}
       {!isHome && <Footer />}
     </div>
   )

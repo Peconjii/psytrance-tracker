@@ -4,6 +4,7 @@ import { fetchOrganizers } from '../api/backend.js'
 import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import CrewTabs from '../components/CrewTabs.jsx'
+import NewPagesList from '../components/NewPagesList.jsx'
 
 // Organizers (crews, promoters) of the upcoming events, busiest first: who Goabase says runs each event
 function Organizers() {
@@ -17,6 +18,8 @@ function Organizers() {
     // Tagged with the search it belongs to, so a slow old answer never replaces a newer one
     const [result, setResult] = useState({ search: null, organizers: [], error: null })
     const [attempt, setAttempt] = useState(0)
+    // How many new pages (no events yet) match, shown under the list
+    const [freshCount, setFreshCount] = useState(0)
 
     useEffect(() => {
         const controller = new AbortController()
@@ -53,7 +56,7 @@ function Organizers() {
                 </div>
             ) : loading && result.organizers.length === 0 ? (
                 <p className="mono text-xs muted">Loading…</p>
-            ) : result.organizers.length === 0 ? (
+            ) : result.organizers.length === 0 && freshCount > 0 ? null : result.organizers.length === 0 ? (
                 <div className="empty">
                     <p><strong>{debouncedSearch ? `No organizer called "${debouncedSearch}" with upcoming events.` : 'No organizers yet.'}</strong></p>
                     <p>Organizers are read with the line-ups in the background, so the list fills up over a day or so.</p>
@@ -73,6 +76,8 @@ function Organizers() {
                     ))}
                 </ul>
             )}
+
+            <NewPagesList kind="organizers" search={debouncedSearch} onCount={setFreshCount} />
         </div>
     )
 }

@@ -798,3 +798,10 @@ export async function uploadImage(blob) {
     const response = await api.post('/api/images', form)
     return response.data.url
 }
+
+// Artists or organizers (kind: 'artists' | 'organizers') with their own page and no upcoming event yet, newest first:
+// [{ slug, name, photoUrl, role }]
+export async function fetchNewPages(kind, search, signal) {
+    const response = await api.get(`/api/${kind}/new-pages`, { params: { search: search || undefined }, signal })
+    return response.data
+}

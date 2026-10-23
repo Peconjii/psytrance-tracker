@@ -331,3 +331,13 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .image-field__inputs { flex: 1; min-width: 0; display: grid; gap: 8px; }
 .image-field__preview { flex-shrink: 0; width: 72px; height: 72px; object-fit: cover; border: 1px solid var(--line); }
 .image-field--flyer .image-field__preview { width: 96px; height: auto; max-height: 136px; object-fit: contain; }
+
+/* A row's small picture (NewPagesList); the initials stand in when there is none */
+.rows__thumb { width: 28px; height: 28px; flex-shrink: 0; object-fit: cover; border: 1px solid var(--line); }
+.rows__thumb--initials { display: inline-flex; align-items: center; justify-content: center; font: 500 11px var(--mono); color: var(--accent); background: rgba(62, 230, 196, 0.06); }
+
+/* The open call above the footer (JoinStrip): artists, labels, festivals and crews asked to get their page */
+.join-strip { position: relative; z-index: 10; border-top: 1px solid var(--line); background: linear-gradient(90deg, rgba(62, 230, 196, 0.06), transparent 60%); }
+.join-strip__inner { max-width: 1500px; margin: 0 auto; padding: 22px 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; border-left: 2px solid var(--accent); }
+.join-strip__title { margin: 6px 0 4px; font: 500 18px var(--display, inherit); color: var(--fg); }
+.join-strip__text { margin: 0; max-width: 62ch; font-size: 14px; color: var(--soft, var(--fg)); }
