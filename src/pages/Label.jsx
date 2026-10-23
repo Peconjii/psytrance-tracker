@@ -8,9 +8,25 @@ import { useMapExtras } from '../components/useMapExtras.js'
 import { useOwnedPage } from '../components/ownedPage.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
-import { labels } from '../map/data/types'
+import { appearances, festivalById, genresOfLabel, labels } from '../map/data/types'
+import { GenreChip } from '../components/AdminParts'
 
 const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+const PAST_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+
+// The festivals of the map where artists of the crew played (sets on video): most of the crew first
+function festivalsOf(crew) {
+    const byFestival = {}
+    for (const name of crew) {
+        for (const set of appearances[name] ?? []) {
+            if (!festivalById[set.festival]) continue
+            const f = (byFestival[set.festival] ??= { id: set.festival, name: festivalById[set.festival].name, artists: new Set() })
+            f.artists.add(name)
+        }
+    }
+    return Object.values(byFestival).map(f => ({ ...f, artists: [...f.artists] }))
+        .sort((a, b) => b.artists.length - a.artists.length || a.name.localeCompare(b.name))
+}
 
 // A label of the map as a page: its crew, where the crew plays next (the label's tour) and its numbers
 function Label() {
@@ -28,6 +44,9 @@ function Label() {
     // What the label's owner wrote, and the crew with the changes admins approved (the map's until it loads)
     const { page, canEdit } = useOwnedPage(fetchLabelPage, fetchMyLabels, name, own => own.name === name)
     const crew = page?.crew ?? label?.artists ?? []
+    // Its constellation on the map, oldest system first, and the festivals the crew played
+    const systems = [...genresOfLabel(name)].sort((a, b) => a.year - b.year)
+    const crewFestivals = festivalsOf(crew)
     const profile = page?.profile
     const error = loaded.name === name ? loaded.error : null
 
@@ -92,6 +111,36 @@ function Label() {
                 </div>
             </section>
 
+            {(systems.length > 0 || crewFestivals.length > 0) && (
+                <section className="panel mb-4 grid sm:grid-cols-2 gap-4">
+                    {systems.length > 0 && (
+                        <div>
+                            <h2 className="panel__label">Sound · the systems of its constellation</h2>
+                            <div className="flex flex-wrap gap-2">
+                                {systems.map(g => (
+                                    <Link key={g.id} to={`/?genre=${g.id}`} className="no-underline"><GenreChip id={g.id} /></Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {crewFestivals.length > 0 && (
+                        <div>
+                            <h2 className="panel__label">Festivals the crew played</h2>
+                            <ul className="rows">
+                                {crewFestivals.map(f => (
+                                    <li key={f.id}>
+                                        <Link to={`/festivals/${encodeURIComponent(f.id)}`} className="rows__item">
+                                            <span className="rows__name">{f.name}</span>
+                                            <span className="rows__meta">{f.artists.length} of the crew</span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </section>
+            )}
+
             {error && <p className="notice">{error}</p>}
             {!stats ? (
                 !error && <p className="mono text-xs muted">Loading…</p>
@@ -120,6 +169,27 @@ function Label() {
                             </ul>
                         )}
                     </section>
+                    {stats.past?.length > 0 && (
+                        <section className="panel mb-4">
+                            <h2 className="panel__label">The crew played · {stats.past.length}</h2>
+                            <ul className="rows">
+                                {stats.past.map(gig => (
+                                    <li key={gig.eventId}>
+                                        <Link to={`/events/${gig.eventId}`} className="rows__item">
+                                            <span className="rows__name">
+                                                <span className="mono text-xs muted artist-gig__day">
+                                                    {gig.dateStart ? PAST_DAY.format(new Date(gig.dateStart + 'T12:00:00')) : 'Date unknown'}
+                                                </span>
+                                                {gig.name}
+                                                <span className="block mono text-xs muted">{gig.artists.join(', ')}</span>
+                                            </span>
+                                            <span className="rows__meta">{[gig.town, gig.country].filter(Boolean).join(', ')}</span>
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </section>
+                    )}
                     <section className="panel mb-4">
                         <h2 className="panel__label">Numbers</h2>
                         <GigStats stats={stats} extraTiles={[]} />

@@ -195,6 +195,18 @@ function Festival() {
                             <p className="mono text-xs muted mt-3 mb-0">Editions are the events whose name has “{match}” as a word, and the ones an editor set by hand.</p>
                         </section>
                     )}
+                    {stats.reportedBy?.length > 0 && (
+                        <section className="panel mb-4">
+                            <h2 className="panel__label">Played here, on their own profile · {stats.reportedBy.length}</h2>
+                            <div className="flex flex-wrap gap-2">
+                                {stats.reportedBy.map(a => (
+                                    <Link key={a.slug} className="chip no-underline" to={`/artists/${encodeURIComponent(a.slug)}`}>
+                                        {a.name}{a.year ? <span className="muted"> · {a.year}</span> : null}
+                                    </Link>
+                                ))}
+                            </div>
+                        </section>
+                    )}
                 </>
             )}
             {sets.length > 0 && (

@@ -43,6 +43,8 @@ const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AddEvent = lazy(() => import('./pages/AddEvent'))
 const NewPage = lazy(() => import('./pages/NewPage'))
 const Search = lazy(() => import('./pages/Search'))
+const Labels = lazy(() => import('./pages/Labels'))
+const Festivals = lazy(() => import('./pages/Festivals'))
 const EmbedGigs = lazy(() => import('./pages/EmbedGigs'))
 const ArtistEdit = lazy(() => import('./pages/ArtistEdit'))
 
@@ -77,7 +79,9 @@ function Shell() {
           <Route path="/artists/:slug" element={<Artist />} />
           <Route path="/organizers" element={<Organizers />} />
           <Route path="/organizers/:slug" element={<Organizer />} />
+          <Route path="/labels" element={<Labels />} />
           <Route path="/labels/:name" element={<Label />} />
+          <Route path="/festivals" element={<Festivals />} />
           <Route path="/festivals/:id" element={<Festival />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
