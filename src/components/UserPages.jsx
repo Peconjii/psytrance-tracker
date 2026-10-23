@@ -8,10 +8,10 @@ import { TRUST_POWERS } from './pageTrust.js'
 
 // Per kind of page: its label, its path on the site, and how an admin links or unlinks its owner
 const KINDS = {
-    ARTIST: { label: 'Artist', path: (key) => `/artists/${key}`, link: setArtistOwner, unlink: removeArtistOwner },
-    ORGANIZER: { label: 'Organizer', path: (key) => `/organizers/${key}`, link: setOrganizerOwner, unlink: removeOrganizerOwner },
-    LABEL: { label: 'Label', path: (key) => `/labels/${encodeURIComponent(key)}`, link: setLabelOwner, unlink: removeLabelOwner },
-    FESTIVAL: { label: 'Festival', path: (key) => `/festivals/${key}`, link: setFestivalOwner, unlink: removeFestivalOwner },
+    ARTIST: { label: 'Artist', which: 'Which artist (DJ, producer, live act)?', path: (key) => `/artists/${key}`, link: setArtistOwner, unlink: removeArtistOwner },
+    ORGANIZER: { label: 'Organizer', which: 'Which organizer?', path: (key) => `/organizers/${key}`, link: setOrganizerOwner, unlink: removeOrganizerOwner },
+    LABEL: { label: 'Label', which: 'Which label?', path: (key) => `/labels/${encodeURIComponent(key)}`, link: setLabelOwner, unlink: removeLabelOwner },
+    FESTIVAL: { label: 'Festival', which: 'Which festival?', path: (key) => `/festivals/${key}`, link: setFestivalOwner, unlink: removeFestivalOwner },
 }
 
 // The site search's answer as pages to pick: { kind, key, name }
@@ -23,9 +23,9 @@ const pagesFound = (found) => [
 ]
 
 // Admin → Users, under an account: the pages it owns, whether it is trusted on each (see PageTrust), and linking it
-// to another page. onChanged: load the users again.
-function UserPages({ user, onChanged }) {
-    const [adding, setAdding] = useState(false)
+// to another page. onChanged: load the users again. linking: the kind of page being linked (ARTIST, ORGANIZER, LABEL,
+// FESTIVAL, or ANY), or null; onLinking changes it.
+function UserPages({ user, onChanged, linking, onLinking }) {
     const [search, setSearch] = useState('')
     const [found, setFound] = useState([])
     const [busy, setBusy] = useState(false)
@@ -55,10 +55,14 @@ function UserPages({ user, onChanged }) {
     }
     const link = (page) => run(async () => {
         await KINDS[page.kind].link(page.key, user.username)
-        setAdding(false)
+        stopLinking()
+    })
+    const stopLinking = () => {
+        onLinking(null)
         setSearch('')
         setFound([])
-    })
+    }
+    const shown = found.filter(page => linking === 'ANY' || page.kind === linking)
     const unlink = (page) => {
         if (window.confirm(`Take ${page.name} away from ${user.username}?`)) run(() => KINDS[page.kind].unlink(page.key))
     }
@@ -78,13 +82,16 @@ function UserPages({ user, onChanged }) {
                         aria-label={`Unlink ${page.name}`}>✕</button>
                 </div>
             ))}
-            {adding ? (
+            {linking ? (
                 <div className="grid gap-2">
-                    <input className="field" autoFocus aria-label={`Page to link to ${user.username}`} value={search}
-                        placeholder="Artist, organizer, label or festival…" onChange={(e) => setSearch(e.target.value)} />
-                    {search.trim().length >= 2 && found.length > 0 && (
+                    <label htmlFor={`link-${user.id}`} className="field-label m-0">
+                        {linking === 'ANY' ? 'Which page?' : KINDS[linking].which} It becomes {user.username}’s.
+                    </label>
+                    <input id={`link-${user.id}`} className="field" autoFocus value={search}
+                        placeholder="Type its name…" onChange={(e) => setSearch(e.target.value)} />
+                    {search.trim().length >= 2 && (shown.length > 0 ? (
                         <ul className="list-none p-0 m-0 grid gap-1">
-                            {found.slice(0, 8).map(page => (
+                            {shown.slice(0, 8).map(page => (
                                 <li key={page.kind + page.key}>
                                     <button type="button" className="user-pages__pick" disabled={busy} onClick={() => link(page)}>
                                         <span className="badge">{KINDS[page.kind].label}</span> {page.name}
@@ -92,14 +99,16 @@ function UserPages({ user, onChanged }) {
                                 </li>
                             ))}
                         </ul>
-                    )}
+                    ) : (
+                        <p className="mono text-xs muted m-0">Nothing found yet.</p>
+                    ))}
                     <p className="mono text-xs muted m-0">
                         Picking one makes {user.username} its owner (a previous owner loses it). Not on the site? They ask with “Get your page”.
                     </p>
-                    <button type="button" className="btn btn--ghost w-fit" onClick={() => { setAdding(false); setSearch(''); setFound([]) }}>Cancel</button>
+                    <button type="button" className="btn btn--ghost w-fit" onClick={stopLinking}>Cancel</button>
                 </div>
             ) : (
-                <button type="button" className="btn btn--ghost w-fit" onClick={() => setAdding(true)}>+ Link a page</button>
+                <button type="button" className="btn btn--ghost w-fit" onClick={() => onLinking('ANY')}>+ Link a page</button>
             )}
             {error && <p className="notice m-0">{error}</p>}
         </div>

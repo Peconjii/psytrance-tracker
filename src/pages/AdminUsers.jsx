@@ -11,6 +11,13 @@ const ROLES = [
     { id: 'EDITOR', label: 'Editor' },
     { id: 'ADMIN', label: 'Admin' },
 ]
+// Not a role of the account: picking one opens the search for the page they own (see UserPages, PageTrust)
+const PAGE_ROLES = [
+    { kind: 'ARTIST', label: 'Artist (DJ, producer, live act)…' },
+    { kind: 'ORGANIZER', label: 'Organizer…' },
+    { kind: 'LABEL', label: 'Label…' },
+    { kind: 'FESTIVAL', label: 'Festival…' },
+]
 
 // Admin panel: who has an account, newest first, what they use (follows, saved events, "I'm going"...) and their role.
 // An editor fixes the content (events, genres, added events, reviews); an admin may do everything.
@@ -53,6 +60,13 @@ function AdminUsers() {
         } finally {
             setSaving(null)
         }
+    }
+
+    // Per account: the kind of page being linked (ARTIST, ORGANIZER, LABEL, FESTIVAL or ANY), or none
+    const [linking, setLinking] = useState({})
+    const pickRole = (u, value) => {
+        if (value.startsWith('PAGE:')) setLinking(l => ({ ...l, [u.id]: value.slice('PAGE:'.length) }))
+        else changeRole(u, value)
     }
 
     const usage = (u) => [
@@ -103,6 +117,9 @@ function AdminUsers() {
                                 <span className="rows__name">
                                     {u.username}
                                     {u.role && <span className="badge ml-2">{u.role.toLowerCase()}</span>}
+                                    {[...new Set(u.pages.map(p => p.kind))].map(kind => (
+                                        <span key={kind} className="badge ml-2">{kind.toLowerCase()}</span>
+                                    ))}
                                     <span className="block mono text-xs muted">{u.email || 'no email'}{!u.emailVerified && ' · not confirmed'}</span>
                                 </span>
                                 <span className="rows__meta">
@@ -115,11 +132,17 @@ function AdminUsers() {
                                     <span className="mono text-xs muted shrink-0">you</span>
                                 ) : (
                                     <select className="field shrink-0" style={{ width: 'auto', minWidth: '8rem' }} aria-label={`Role of ${u.username}`} value={u.role ?? ''}
-                                        disabled={saving !== null} onChange={(e) => changeRole(u, e.target.value)}>
-                                        {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+                                        disabled={saving !== null} onChange={(e) => pickRole(u, e.target.value)}>
+                                        <optgroup label="Site role">
+                                            {ROLES.map(r => <option key={r.id} value={r.id}>{r.label}</option>)}
+                                        </optgroup>
+                                        <optgroup label="Owner of a page (pick which next)">
+                                            {PAGE_ROLES.map(r => <option key={r.kind} value={'PAGE:' + r.kind}>{r.label}</option>)}
+                                        </optgroup>
                                     </select>
                                 )}
-                                <UserPages user={u} onChanged={() => setVersion(v => v + 1)} />
+                                <UserPages user={u} onChanged={() => setVersion(v => v + 1)}
+                                    linking={linking[u.id] ?? null} onLinking={(kind) => setLinking(l => ({ ...l, [u.id]: kind }))} />
                             </li>
                         ))}
                     </ul>
