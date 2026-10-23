@@ -5,9 +5,10 @@ import {
 } from '../api/backend.js'
 import OwnerForm from '../components/OwnerForm.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
-import ImageField from '../components/ImageField.jsx'
+import LinkFields from '../components/LinkFields.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { errorOf } from '../components/formErrors.js'
 
 const FIELDS = [
     { key: 'logoUrl', label: 'Logo', placeholder: 'https://…', image: 'square' },
@@ -57,9 +58,7 @@ function LabelEdit() {
             await action()
             setStatus({ part, ok, error: '' })
         } catch (err) {
-            const data = err.response?.data
-            setStatus({ part, ok: '', error: data?.errors ? 'Some fields need a fix: ' + Object.keys(data.errors).join(', ')
-                : data?.message || 'Could not save. Try again.' })
+            setStatus({ part, ok: '', error: errorOf(err) })
         } finally {
             setSaving(null)
         }
@@ -102,16 +101,8 @@ function LabelEdit() {
                     <textarea id="label-description" className="field" rows={5} maxLength={MAX_TEXT} value={profile.description}
                         placeholder="Who you are, your sound, your story…" onChange={(e) => setProfile(p => ({ ...p, description: e.target.value }))} />
                 </div>
-                {FIELDS.map(field => field.image ? (
-                    <ImageField key={field.key} id={`label-${field.key}`} label={field.label} kind={field.image} value={profile[field.key]}
-                        placeholder={field.placeholder} onChange={(url) => setProfile(p => ({ ...p, [field.key]: url }))} />
-                ) : (
-                    <div key={field.key}>
-                        <label htmlFor={`label-${field.key}`} className="field-label">{field.label}</label>
-                        <input id={`label-${field.key}`} type="url" className="field" value={profile[field.key]} placeholder={field.placeholder}
-                            onChange={(e) => setProfile(p => ({ ...p, [field.key]: e.target.value }))} />
-                    </div>
-                ))}
+                <LinkFields fields={FIELDS} idPrefix="label" values={profile}
+                    onChange={(key, value) => setProfile(p => ({ ...p, [key]: value }))} />
                 <div className="flex flex-wrap items-center gap-3">
                     <button type="submit" className="btn btn--primary" disabled={saving === 'profile'}>{saving === 'profile' ? 'Saving…' : 'Save'}</button>
                     {statusOf('profile')}

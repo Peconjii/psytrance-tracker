@@ -7,8 +7,9 @@ import {
 } from '../api/backend.js'
 import TimetableEditor from '../components/TimetableEditor.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
-import ImageField from '../components/ImageField.jsx'
+import LinkFields from '../components/LinkFields.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { errorOf } from '../components/formErrors.js'
 
 const FIELDS = [
     { key: 'photoUrl', label: 'Photo or logo', placeholder: 'https://…', image: 'square' },
@@ -17,12 +18,6 @@ const FIELDS = [
 ]
 const MAX_BIO = 1000
 const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-
-function errorOf(err) {
-    const data = err.response?.data
-    if (data?.errors) return 'Some fields need a fix: ' + Object.keys(data.errors).join(', ')
-    return data?.message || 'Could not save. Try again.'
-}
 
 // Editing an organizer's page: by the organizer (an account an admin linked to them) or an admin. Besides the page,
 // they write the timetables of their own events, which send the events' live fleets across the map.
@@ -95,16 +90,8 @@ function OrganizerEdit() {
                 run('profile', () => saveOrganizerProfile(slug, Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, v.trim()]))))
             }}>
                 <h2 className="panel__label m-0">Page</h2>
-                {FIELDS.map(field => field.image ? (
-                    <ImageField key={field.key} id={`org-${field.key}`} label={field.label} kind={field.image} value={profile[field.key]}
-                        placeholder={field.placeholder} onChange={(url) => setProfile(p => ({ ...p, [field.key]: url }))} />
-                ) : (
-                    <div key={field.key}>
-                        <label htmlFor={`org-${field.key}`} className="field-label">{field.label}</label>
-                        <input id={`org-${field.key}`} type="url" className="field" value={profile[field.key]} placeholder={field.placeholder}
-                            onChange={(e) => setProfile(p => ({ ...p, [field.key]: e.target.value }))} />
-                    </div>
-                ))}
+                <LinkFields fields={FIELDS} idPrefix="org" values={profile}
+                    onChange={(key, value) => setProfile(p => ({ ...p, [key]: value }))} />
                 <div>
                     <label htmlFor="org-bio" className="field-label">About · {profile.bio.length}/{MAX_BIO}</label>
                     <textarea id="org-bio" className="field" rows={4} maxLength={MAX_BIO} value={profile.bio}

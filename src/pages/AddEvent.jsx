@@ -9,6 +9,7 @@ import { emptyStage, eventDays, lineUpOf, stagesOf } from '../components/stageTe
 import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { errorOf } from '../components/formErrors.js'
 
 // The kinds of event the backend accepts (OurEvents.TYPES), the same as on Goabase
 const TYPES = ['Festival', 'Open Air', 'Club', 'Indoor', 'In- & Outdoor']
@@ -21,12 +22,6 @@ const LINKS = [
 const EMPTY = {
     name: '', eventType: 'Festival', startsAt: '', endsAt: '', lineUp: '', organizerName: '', locationText: '',
     entryFee: '', info: '', ticketUrl: '', organizerUrl: '', imageUrl: '',
-}
-
-function errorOf(err) {
-    const data = err.response?.data
-    if (data?.errors) return 'Some fields need a fix: ' + Object.entries(data.errors).map(([f, why]) => `${f} ${why}`).join(', ')
-    return data?.message || 'Could not send the event. Try again.'
 }
 
 // "2026-11-14T22:00:00" from the backend -> "2026-11-14T22:00" for a datetime-local field
@@ -125,7 +120,7 @@ function AddEvent() {
                 genres,
             }))
         } catch (err) {
-            setError(errorOf(err))
+            setError(errorOf(err, 'Could not send the event. Try again.'))
         } finally {
             setSending(false)
         }

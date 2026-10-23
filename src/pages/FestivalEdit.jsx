@@ -5,9 +5,10 @@ import {
 } from '../api/backend.js'
 import OwnerForm from '../components/OwnerForm.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
-import ImageField from '../components/ImageField.jsx'
+import LinkFields from '../components/LinkFields.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { errorOf } from '../components/formErrors.js'
 
 const FIELDS = [
     { key: 'logoUrl', label: 'Logo', placeholder: 'https://…', image: 'square' },
@@ -70,9 +71,7 @@ function FestivalEdit() {
             await reload()
             setStatus({ ok: 'Saved.', error: '' })
         } catch (err) {
-            const data = err.response?.data
-            setStatus({ ok: '', error: data?.errors ? 'Some fields need a fix: ' + Object.keys(data.errors).join(', ')
-                : data?.message || 'Could not save. Try again.' })
+            setStatus({ ok: '', error: errorOf(err) })
         } finally {
             setSaving(false)
         }
@@ -101,16 +100,8 @@ function FestivalEdit() {
                         placeholder="What the festival is about, this year's edition…"
                         onChange={(e) => setProfile(p => ({ ...p, description: e.target.value }))} />
                 </div>
-                {FIELDS.map(field => field.image ? (
-                    <ImageField key={field.key} id={`festival-${field.key}`} label={field.label} kind={field.image} value={profile[field.key]}
-                        placeholder={field.placeholder} onChange={(url) => setProfile(p => ({ ...p, [field.key]: url }))} />
-                ) : (
-                    <div key={field.key}>
-                        <label htmlFor={`festival-${field.key}`} className="field-label">{field.label}</label>
-                        <input id={`festival-${field.key}`} type="url" className="field" value={profile[field.key]} placeholder={field.placeholder}
-                            onChange={(e) => setProfile(p => ({ ...p, [field.key]: e.target.value }))} />
-                    </div>
-                ))}
+                <LinkFields fields={FIELDS} idPrefix="festival" values={profile}
+                    onChange={(key, value) => setProfile(p => ({ ...p, [key]: value }))} />
                 <div>
                     <label htmlFor="festival-organizer" className="field-label">Organizer who runs it</label>
                     <p className="mono text-xs muted m-0 mb-2">

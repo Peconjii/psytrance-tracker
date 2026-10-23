@@ -1,15 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
-
-// Pages where the call would be in the way: the forms it leads to, account pages, editing and the admin panel.
-// The events list scrolls without end, so nobody reaches its footer: it shows the call in its head instead (inline).
-const QUIET = [/^\/events$/,/^\/new-page/, /^\/feedback/, /^\/admin/, /^\/(login|register|forgot-password|reset-password|verify-email)/, /\/edit$/, /^\/events\/new/]
+import { showsOpenCall } from './openCall.js'
 
 // Above the footer on every page: the scene's own people (artists, labels, festivals, crews) are asked to make or
 // take over their page and to tell us what's wrong, so the site grows and its facts get better.
 // inline: inside a page (the events list) rather than above the footer.
 function JoinStrip({ inline = false }) {
     const { pathname } = useLocation()
-    if (!inline && QUIET.some(path => path.test(pathname))) return null
+    if (!inline && !showsOpenCall(pathname)) return null
 
     return (
         <aside className={`join-strip${inline ? ' join-strip--inline' : ''}`} aria-label="Get your page">

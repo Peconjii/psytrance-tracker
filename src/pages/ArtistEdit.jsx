@@ -9,9 +9,10 @@ import { ROLES } from '../components/artistRole.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
 import GigsWidgetCode from '../components/GigsWidgetCode.jsx'
-import ImageField from '../components/ImageField.jsx'
+import LinkFields from '../components/LinkFields.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { genreById } from '../map/data/types'
+import { errorOf } from '../components/formErrors.js'
 
 const PROFILE_FIELDS = [
     { key: 'photoUrl', label: 'Photo', placeholder: 'https://… (a square picture works best)', image: 'square' },
@@ -25,13 +26,6 @@ const MAX_BIO = 1000
 const MAX_TRACKS = 6
 const MAX_FESTIVALS = 20
 const MAX_GENRES = 4
-
-// The message of a failed save: the backend's, or which fields need a fix
-function errorOf(err) {
-    const data = err.response?.data
-    if (data?.errors) return 'Some fields need a fix: ' + Object.keys(data.errors).join(', ')
-    return data?.message || 'Could not save. Try again.'
-}
 
 // One part of the editor with its own Save button and status
 function Part({ label, hint, onSave, saving, status, children }) {
@@ -156,16 +150,8 @@ function ArtistEdit() {
 
             <Part label="Profile" saving={profileSave.saving} status={profileSave.status}
                 onSave={() => profileSave.run(() => saveArtistProfile(slug, Object.fromEntries(Object.entries(profile).map(([k, v]) => [k, trim(v)]))))}>
-                {PROFILE_FIELDS.map(field => field.image ? (
-                    <ImageField key={field.key} id={`profile-${field.key}`} label={field.label} kind={field.image} value={profile[field.key]}
-                        placeholder={field.placeholder} onChange={(url) => setProfile(p => ({ ...p, [field.key]: url }))} />
-                ) : (
-                    <div key={field.key}>
-                        <label htmlFor={`profile-${field.key}`} className="field-label">{field.label}</label>
-                        <input id={`profile-${field.key}`} type={field.type || 'url'} className="field" value={profile[field.key]}
-                            placeholder={field.placeholder} onChange={(e) => setProfile(p => ({ ...p, [field.key]: e.target.value }))} />
-                    </div>
-                ))}
+                <LinkFields fields={PROFILE_FIELDS} idPrefix="profile" values={profile}
+                    onChange={(key, value) => setProfile(p => ({ ...p, [key]: value }))} />
                 <div>
                     <label htmlFor="profile-bio" className="field-label">Bio · {profile.bio.length}/{MAX_BIO}</label>
                     <textarea id="profile-bio" className="field" rows={5} maxLength={MAX_BIO} value={profile.bio}
