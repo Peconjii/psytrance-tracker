@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { fetchFestivalPage, fetchFestivalStats, fetchMyFestivals, setFestivalEdition } from '../api/backend.js'
+import {
+    fetchFestivalPage, fetchFestivalStats, fetchMyFestivals, fetchPageTrust, setFestivalEdition, setOwnFestivalEdition,
+} from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import { GenreChip } from '../components/AdminParts'
 import ClaimPage from '../components/ClaimPage.jsx'
@@ -39,8 +41,10 @@ function Festival() {
     // What the festival's owner wrote: their words, links and the organizer who runs it
     const { page, canEdit } = useOwnedPage(fetchFestivalPage, fetchMyFestivals, id, own => own.id === id)
     const profile = page?.profile
-    // Editors and admins set the editions the name doesn't show; bumped to load the editions again
+    // Editors, admins and the festival's trusted owner set the editions the name doesn't show; bumped to load them again
     const { user } = useAuth()
+    const [trustedOwner, setTrustedOwner] = useState(false)
+    const canSetEditions = Boolean(user?.editor || trustedOwner)
     const [version, setVersion] = useState(0)
     const [linkText, setLinkText] = useState('')
     const [editionError, setEditionError] = useState('')
@@ -54,11 +58,18 @@ function Festival() {
         return () => controller.abort()
     }, [match, id, version])
 
+    useEffect(() => {
+        if (!canEdit || user?.editor) return
+        const controller = new AbortController()
+        fetchPageTrust('FESTIVAL', id, controller.signal).then(t => setTrustedOwner(t.trusted)).catch(() => {})
+        return () => controller.abort()
+    }, [canEdit, user, id])
+
     // edition: true (it is one), false (it isn't), null (go by the name again)
     const setEdition = async (eventId, edition) => {
         setEditionError('')
         try {
-            await setFestivalEdition(eventId, id, edition)
+            await (user?.editor ? setFestivalEdition(eventId, id, edition) : setOwnFestivalEdition(id, eventId, edition))
             setVersion(v => v + 1)
             return true
         } catch (err) {
@@ -139,19 +150,19 @@ function Festival() {
                         ) : (
                             <ul className="rows">
                                 {stats.editions.map(e => (
-                                    <li key={e.eventId} className={user?.editor ? 'flex items-center gap-2' : undefined}>
+                                    <li key={e.eventId} className={canSetEditions ? 'flex items-center gap-2' : undefined}>
                                         <Link to={`/events/${e.eventId}`} className="rows__item flex-1 min-w-0">
                                             <span className="rows__name">
                                                 {e.name}
                                                 <span className="block mono text-xs muted">
                                                     {e.dateStart ? DAY.format(new Date(e.dateStart + 'T12:00:00')) : 'Date TBA'}
                                                     {' · '}{[e.town, e.country].filter(Boolean).join(', ')}{e.upcoming ? ' · coming up' : ''}
-                                                    {user?.editor && e.linked ? ' · set by hand' : ''}
+                                                    {canSetEditions && e.linked ? ' · set by hand' : ''}
                                                 </span>
                                             </span>
                                             <span className="rows__meta">{e.artists} artists · {e.going} going · {e.saved} saved</span>
                                         </Link>
-                                        {user?.editor && (
+                                        {canSetEditions && (
                                             <button type="button" className="btn btn--ghost shrink-0"
                                                 title={e.linked ? 'Go by the name again' : 'Its name matches, but it is another event'}
                                                 onClick={() => setEdition(e.eventId, e.linked ? null : false)}>
@@ -162,7 +173,7 @@ function Festival() {
                                 ))}
                             </ul>
                         )}
-                        {user?.editor && (
+                        {canSetEditions && (
                             <form className="flex flex-wrap items-center gap-2 mt-3" onSubmit={linkEdition}>
                                 <input className="field flex-1 min-w-48" aria-label="Event link or number" value={linkText}
                                     placeholder="An edition named differently: paste the event’s link"

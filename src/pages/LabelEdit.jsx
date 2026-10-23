@@ -5,6 +5,7 @@ import {
 } from '../api/backend.js'
 import OwnerForm from '../components/OwnerForm.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
+import TrustPanel from '../components/TrustPanel.jsx'
 import LinkFields from '../components/LinkFields.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -88,6 +89,8 @@ function LabelEdit() {
                     away. Artists joining or leaving the crew are checked by an admin first.
                 </p>
             </header>
+
+            <TrustPanel kind="LABEL" id={name} />
 
             <OwnerNumbers kind="label" id={name} />
 

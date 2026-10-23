@@ -8,6 +8,7 @@ import {
 import { ROLES } from '../components/artistRole.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
+import TrustPanel from '../components/TrustPanel.jsx'
 import GigsWidgetCode from '../components/GigsWidgetCode.jsx'
 import LinkFields from '../components/LinkFields.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -140,9 +141,11 @@ function ArtistEdit() {
                 <h1 className="page-title">{edit.name}</h1>
                 <p className="page-head__sub">
                     What you change here shows on <Link className="link" to={`/artists/${slug}`}>the profile</Link> right away.
-                    Genres and the name are checked by an admin first.
+                    Genres and the name are checked by an admin first, unless an admin trusts your page.
                 </p>
             </header>
+
+            <TrustPanel kind="ARTIST" id={slug} />
 
             <OwnerNumbers kind="artist" id={slug} />
 

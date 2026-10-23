@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { decidePageClaim, fetchPageClaims } from '../api/backend.js'
+import { TrustCheckbox } from './TrustPanel.jsx'
 
 const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 const KIND = { ARTIST: 'Artist', ORGANIZER: 'Organizer', LABEL: 'Label', FESTIVAL: 'Festival' }
@@ -26,11 +27,14 @@ function ClaimRequests() {
         return () => controller.abort()
     }, [])
 
+    // Claims whose new owner is trusted with the approval
+    const [trusted, setTrusted] = useState({})
+
     const decide = async (claim, approve) => {
         setDeciding(claim.id)
         setError('')
         try {
-            await decidePageClaim(claim.id, approve, reasons[claim.id]?.trim() || null)
+            await decidePageClaim(claim.id, approve, reasons[claim.id]?.trim() || null, approve && Boolean(trusted[claim.id]))
             setClaims(list => list.filter(c => c.id !== claim.id))
         } catch (err) {
             setError(err.response?.data?.message || 'Could not save. Try again.')
@@ -58,6 +62,8 @@ function ClaimRequests() {
                             <a className="link mono text-xs" href={claim.proofUrl} target="_blank" rel="noopener noreferrer">{claim.proofUrl} ↗</a>
                         )}
                         {claim.message && <p className="soft text-sm whitespace-pre-line m-0">{claim.message}</p>}
+                        <TrustCheckbox kind={claim.kind} id={`claim-trust-${claim.id}`} checked={Boolean(trusted[claim.id])}
+                            onChange={(on) => setTrusted(t => ({ ...t, [claim.id]: on }))} />
                         <div className="flex flex-wrap items-center gap-2">
                             <button className="btn btn--primary" disabled={deciding !== null} onClick={() => decide(claim, true)}>
                                 {deciding === claim.id ? 'Saving…' : 'Approve'}

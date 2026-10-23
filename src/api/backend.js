@@ -757,8 +757,8 @@ export async function fetchPageClaims(signal) {
     return response.data
 }
 
-export async function decidePageClaim(id, approve, reason) {
-    const response = await api.post(`/api/admin/claims/${id}`, { approve, reason })
+export async function decidePageClaim(id, approve, reason, trusted = false) {
+    const response = await api.post(`/api/admin/claims/${id}`, { approve, reason, trusted })
     return response.data
 }
 
@@ -781,8 +781,8 @@ export async function fetchNewPageRequests(signal) {
 }
 
 // onTheMap: for a label or festival, { country, since, description, genres } to put it on the map right away
-export async function decideNewPageRequest(id, approve, reason, onTheMap) {
-    const response = await api.post('/api/admin/page-requests/' + id, { approve, reason, onTheMap })
+export async function decideNewPageRequest(id, approve, reason, onTheMap, trusted = false) {
+    const response = await api.post('/api/admin/page-requests/' + id, { approve, reason, onTheMap, trusted })
     return response.data
 }
 
@@ -804,4 +804,22 @@ export async function uploadImage(blob) {
 export async function fetchNewPages(kind, search, signal) {
     const response = await api.get(`/api/${kind}/new-pages`, { params: { search: search || undefined }, signal })
     return response.data
+}
+
+// Trust in a page's owner (kind: ARTIST | ORGANIZER | LABEL | FESTIVAL; key: slug, label name or festival id):
+// { owner, trusted }. A trusted owner's changes to their own page go live without an admin. For the owner and admins.
+export async function fetchPageTrust(kind, key, signal) {
+    const response = await api.get('/api/me/page-trust', { params: { kind, key }, signal })
+    return response.data
+}
+
+// Admins only
+export async function setPageTrust(kind, key, trusted) {
+    const response = await api.put('/api/admin/page-trust', { kind, key, trusted })
+    return response.data
+}
+
+// A trusted festival owner marks an event as an edition (true), as not one (false) or back to its name (null)
+export async function setOwnFestivalEdition(festivalId, eventId, edition) {
+    await api.put('/api/festivals/editions', { eventId, edition }, { params: { id: festivalId } })
 }

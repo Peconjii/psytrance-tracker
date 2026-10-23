@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { decideNewPageRequest, fetchNewPageRequests } from '../api/backend.js'
+import { TrustCheckbox } from './TrustPanel.jsx'
 import { reloadMapExtrasLater } from '../map/data/extras'
 import MapPlaceFields from './MapPlaceFields.jsx'
 import { emptyMapPlace, mapPlaceOf } from './mapPlace.js'
@@ -44,6 +45,9 @@ function NewPageRequests() {
         genres: (r.genres ?? '').split(',').map(g => g.trim()).filter(g => genreById[g]).slice(0, 6),
     }
 
+    // Requests whose new owner is trusted with the approval
+    const [trusted, setTrusted] = useState({})
+
     const decide = async (request, approve) => {
         setDeciding(request.id)
         setError('')
@@ -51,7 +55,7 @@ function NewPageRequests() {
             const place = placeOf(request)
             const addNow = approve && onTheMap(request.kind) && place.genres.length > 0
             const decided = await decideNewPageRequest(request.id, approve, reasons[request.id]?.trim() || null,
-                addNow ? mapPlaceOf(place) : null)
+                addNow ? mapPlaceOf(place) : null, approve && Boolean(trusted[request.id]))
             if (addNow) reloadMapExtrasLater()
             setRequests(list => list.filter(r => r.id !== request.id))
             if (approve) setMade(list => [decided, ...list])
@@ -123,6 +127,11 @@ function NewPageRequests() {
                             {onTheMap(r.kind) && (
                                 <MapPlaceFields kind={r.kind} idPrefix={`request-${r.id}`} value={place}
                                     onChange={(value) => setPlaces(x => ({ ...x, [r.id]: value }))} />
+                            )}
+                            {/* A label or festival gets its owner only when it goes on the map now */}
+                            {(!onTheMap(r.kind) || place.genres.length > 0) && (
+                                <TrustCheckbox kind={r.kind} id={`request-trust-${r.id}`} checked={Boolean(trusted[r.id])}
+                                    onChange={(on) => setTrusted(t => ({ ...t, [r.id]: on }))} />
                             )}
                             <div className="flex flex-wrap items-center gap-2">
                                 <button className="btn btn--primary" disabled={deciding !== null} onClick={() => decide(r, true)}>

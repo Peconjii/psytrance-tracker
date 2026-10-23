@@ -5,6 +5,7 @@ import {
 } from '../api/backend.js'
 import OwnerForm from '../components/OwnerForm.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
+import TrustPanel from '../components/TrustPanel.jsx'
 import LinkFields from '../components/LinkFields.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -89,6 +90,8 @@ function FestivalEdit() {
                     What you write here shows on <Link className="link" to={`/festivals/${id}`}>the festival's page</Link> right away.
                 </p>
             </header>
+
+            <TrustPanel kind="FESTIVAL" id={id} />
 
             <OwnerNumbers kind="festival" id={id} />
 

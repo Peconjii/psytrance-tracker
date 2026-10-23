@@ -7,6 +7,7 @@ import {
 } from '../api/backend.js'
 import TimetableEditor from '../components/TimetableEditor.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
+import TrustPanel from '../components/TrustPanel.jsx'
 import LinkFields from '../components/LinkFields.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { errorOf } from '../components/formErrors.js'
@@ -103,6 +104,8 @@ function OrganizerEdit() {
                     {statusLine('profile')}
                 </div>
             </form>
+
+            <TrustPanel kind="ORGANIZER" id={slug} />
 
             <OwnerNumbers kind="organizer" id={slug} />
 
