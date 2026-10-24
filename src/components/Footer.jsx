@@ -59,7 +59,8 @@ function Footer() {
                     </p>
                 </div>
                 <p className="m-0">
-                    © {new Date().getFullYear()} {AUTHOR_NAME} · Not affiliated with Goabase. The backend runs on a free tier, so the first load can take a minute.
+                    © {new Date().getFullYear()} {AUTHOR_NAME} · Event data from Goabase’s public API. Map of Psy is an independent
+                    project, not run by Goabase. The backend runs on a free tier, so the first load can take a minute.
                 </p>
             </div>
         </footer>
