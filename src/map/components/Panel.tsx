@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
 import { LabelCrew } from './LabelCrew';
-import { FixLink } from './FixLink';
+import { FixLink, SuggestTrackLink } from './FixLink';
 import { HeartButton } from './Playlist';
 import FollowButton from '../../components/FollowButton.jsx';
 import type { PlaylistApi } from '../hooks/usePlaylist';
@@ -231,7 +231,10 @@ export function Panel({
 
         <NextGigs name={artist} />
 
-        {tracks.length > 0 && (<><div className="hud__label">Tracks on the map</div>{trackList(tracks)}</>)}
+        {/* Shown even without tracks: listeners fill the gaps (Admin -> Feedback, then Admin -> Galaxy) */}
+        <div className="hud__label">Tracks on the map</div>
+        {tracks.length > 0 ? trackList(tracks) : <p className="hud__muted">No track on the map yet.</p>}
+        <SuggestTrackLink artist={artist} />
 
         <div className="hud__label">Albums</div>
         {p?.albums.length ? (

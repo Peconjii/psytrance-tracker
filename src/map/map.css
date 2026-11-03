@@ -573,3 +573,7 @@
 .hud__row > a.hud__fixrow { flex: 0 0 34px; }
 .hud__fixrow { flex-shrink: 0; width: 34px; display: grid; place-items: center; color: var(--muted); text-decoration: none; background: rgba(255,255,255,0.04); }
 .hud__fixrow:hover, .hud__fixrow:focus-visible { color: var(--fam); outline: none; }
+
+/* "+ Suggest a track" under an artist's tracks */
+.hud__suggest { display: inline-block; margin-top: 8px; padding: 6px 10px; font: 12px var(--mono); color: var(--fam, var(--accent)); text-decoration: none; border: 1px dashed var(--line); }
+.hud__suggest:hover, .hud__suggest:focus-visible { border-color: var(--fam, var(--accent)); outline: none; }

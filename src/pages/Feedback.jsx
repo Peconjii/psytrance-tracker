@@ -32,6 +32,10 @@ function Feedback() {
     const [kind, setKind] = useState(initialKind)
     const [about, setAbout] = useState(initialAbout)
     const [message, setMessage] = useState('')
+    // "+ Suggest a track" on an artist (the galaxy): fields for the track, put together into the message
+    const suggestingTrack = params.get('track') === '1' && initialAbout?.type === 'ARTIST'
+    const [track, setTrack] = useState({ title: '', link: '', year: '' })
+    const setTrackField = (field) => (e) => { setTrack(t => ({ ...t, [field]: e.target.value })); setError('') }
     const [email, setEmail] = useState(user?.email || '')
     // Never shown to people; bots fill it in (see the backend's FeedbackService)
     const [website, setWebsite] = useState('')
@@ -41,9 +45,20 @@ function Feedback() {
 
     async function handleSubmit(e) {
         e.preventDefault()
-        if (message.trim().length < 5) {
+        const suggestion = suggestingTrack && about?.type === 'ARTIST'
+        if (suggestion && track.title.trim().length < 2) {
+            return setError('Write the name of the track.')
+        }
+        if (suggestion && track.link.trim() && !/^https?:\/\/\S+$/.test(track.link.trim())) {
+            return setError('The link should start with https:// (YouTube, Bandcamp, SoundCloud...).')
+        }
+        if (!suggestion && message.trim().length < 5) {
             return setError('Write a few more words, so we know what to fix.')
         }
+        const text = suggestion
+            ? [`Track suggestion for ${about.ref}: "${track.title.trim()}"${track.year.trim() ? ` (${track.year.trim()})` : ''}`,
+                track.link.trim() && `Link: ${track.link.trim()}`, message.trim()].filter(Boolean).join('\n')
+            : message.trim()
         setSending(true)
         setError('')
         try {
@@ -52,7 +67,7 @@ function Feedback() {
                 aboutType: about?.type || null,
                 aboutRef: about?.ref || null,
                 pageUrl: from,
-                message: message.trim(),
+                message: text.slice(0, MAX_MESSAGE),
                 email: email.trim() || null,
                 website,
             })
@@ -118,6 +133,28 @@ function Feedback() {
                     </div>
                 )}
 
+                {suggestingTrack && about?.type === 'ARTIST' && (
+                    <fieldset className="grid gap-3 m-0 p-0 border-0">
+                        <legend className="field-label">The track by {about.ref}</legend>
+                        <div>
+                            <label htmlFor="track-title" className="field-label">Title</label>
+                            <input id="track-title" className="field" value={track.title} onChange={setTrackField('title')}
+                                placeholder="e.g. Shine On You Crazy Diamond" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="sm:col-span-2">
+                                <label htmlFor="track-link" className="field-label">Link <span className="muted">(YouTube, Bandcamp...)</span></label>
+                                <input id="track-link" type="url" inputMode="url" className="field" value={track.link}
+                                    onChange={setTrackField('link')} placeholder="https://www.youtube.com/watch?v=…" />
+                            </div>
+                            <div>
+                                <label htmlFor="track-year" className="field-label">Year</label>
+                                <input id="track-year" inputMode="numeric" className="field" value={track.year} onChange={setTrackField('year')} placeholder="1975" />
+                            </div>
+                        </div>
+                    </fieldset>
+                )}
+
                 <div>
                     <label htmlFor="feedback-message" className="field-label">
                         Message <span className="muted">({message.length} / {MAX_MESSAGE})</span>
@@ -128,7 +165,9 @@ function Feedback() {
                         maxLength={MAX_MESSAGE}
                         value={message}
                         onChange={(e) => { setMessage(e.target.value); setError('') }}
-                        placeholder={kind === 'CORRECTION'
+                        placeholder={suggestingTrack && about?.type === 'ARTIST'
+                            ? 'Optional: why it belongs here, which genre it fits...'
+                            : kind === 'CORRECTION'
                             ? 'e.g. Fungus Funk plays night full-on, not forest. Source: their Sangoma releases.'
                             : 'Tell us what you think...'}
                         className="field"

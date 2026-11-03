@@ -2,6 +2,16 @@ import { Link } from 'react-router-dom';
 
 /** "✎ Fix" in a HUD footer: opens the feedback form about this genre, artist, festival or label */
 // compact: only "✎", for a row in a list (a key track); name then says which track
+/** "+ Suggest a track" under an artist: the feedback form with the artist filled in and fields for the track */
+export function SuggestTrackLink({ artist }: { artist: string }) {
+  const params = new URLSearchParams({ kind: 'CORRECTION', about: 'ARTIST', ref: artist, track: '1', from: window.location.pathname + window.location.search });
+  return (
+    <Link className="hud__suggest" to={`/feedback?${params}`} title={`Know a track by ${artist} that belongs here? Tell us`}>
+      + Suggest a track
+    </Link>
+  );
+}
+
 export function FixLink({ about, name, compact = false }: { about: 'GENRE' | 'ARTIST' | 'FESTIVAL' | 'LABEL'; name: string; compact?: boolean }) {
   const params = new URLSearchParams({ kind: 'CORRECTION', about, ref: name, from: window.location.pathname + window.location.search });
   return (
