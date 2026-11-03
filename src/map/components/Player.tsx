@@ -5,7 +5,9 @@ import type { PlaylistApi } from '../hooks/usePlaylist';
 
 // Minimal typing for the YouTube IFrame Player API (loaded at runtime from youtube.com)
 interface YTPlayer {
-  loadVideoById: (id: string) => void;
+  loadVideoById: (video: string | { videoId: string; startSeconds?: number }) => void;
+  getDuration: () => number;
+  seekTo: (seconds: number, allowSeekAhead: boolean) => void;
   destroy: () => void;
 }
 interface YTNamespace {
@@ -33,6 +35,12 @@ function loadApi(): Promise<YTNamespace> {
 }
 
 const ENDED = 0;
+const PLAYING = 1;
+
+// The quiz plays the part before the drop, which tells the genre far better than the intro: from a little before
+// the drop admins wrote down (Admin -> Galaxy), or from somewhere between 30% and 60% of a track without one.
+const BEFORE_DROP_SECONDS = 18;
+const quizStart = (track: Track) => (track.drop != null ? Math.max(0, track.drop - BEFORE_DROP_SECONDS) : null);
 
 interface Props {
   track: Track | null;
@@ -55,11 +63,22 @@ export function Player({ track, hidden = false, playlist, hasPrev, hasNext, onPr
   const onEndedRef = useRef(onEnded);
   onEndedRef.current = onEnded;
   const id = track?.youtube;
+  // Read when a track loads: a quiz question starts mid-track, everything else from the beginning
+  const quizRef = useRef<{ hidden: boolean; track: Track | null }>({ hidden, track });
+  quizRef.current = { hidden, track };
+  // A quiz track without a written drop jumps to a random point once it plays and its length is known
+  const seekOnPlay = useRef(false);
 
   // One YouTube player for the lifetime of the mini player; new tracks are loaded into it
   useEffect(() => {
     if (!id) return;
-    if (playerRef.current) { playerRef.current.loadVideoById(id); return; }
+    const { hidden: quiz, track: current } = quizRef.current;
+    const start = quiz && current ? quizStart(current) : null;
+    seekOnPlay.current = quiz && start == null;
+    if (playerRef.current) {
+      playerRef.current.loadVideoById(start != null ? { videoId: id, startSeconds: start } : id);
+      return;
+    }
     let cancelled = false;
     loadApi().then((YT) => {
       if (cancelled || !wrapRef.current) return;
@@ -69,8 +88,17 @@ export function Player({ track, hidden = false, playlist, hasPrev, hasNext, onPr
       playerRef.current = new YT.Player(el, {
         host: 'https://www.youtube-nocookie.com',
         videoId: id,
-        playerVars: { autoplay: 1, playsinline: 1, rel: 0 },
-        events: { onStateChange: (e) => { if (e.data === ENDED) onEndedRef.current(); } },
+        playerVars: { autoplay: 1, playsinline: 1, rel: 0, ...(start != null ? { start } : {}) },
+        events: {
+          onStateChange: (e) => {
+            if (e.data === ENDED) onEndedRef.current();
+            if (e.data === PLAYING && seekOnPlay.current) {
+              seekOnPlay.current = false;
+              const length = playerRef.current?.getDuration() ?? 0;
+              if (length > 60) playerRef.current?.seekTo(length * (0.3 + Math.random() * 0.3), true);
+            }
+          },
+        },
       });
     });
     return () => { cancelled = true; };
