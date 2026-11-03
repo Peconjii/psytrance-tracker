@@ -24,7 +24,7 @@ const toForm = (c) => ({
     ...c,
     bass: c.bass ?? '', kick: c.kick ?? '', atmosphere: c.atmosphere ?? '',
     year: c.year ?? '', bpmMin: c.bpmMin ?? '', bpmMax: c.bpmMax ?? '',
-    tracks: c.tracks.map(t => ({ ...t, year: t.year ?? '', drop: dropText(t.drop) })),
+    tracks: c.tracks.map(t => ({ ...t, youtube: t.youtube ?? '', year: t.year ?? '', drop: dropText(t.drop) })),
 })
 const number = (v) => (String(v).trim() === '' ? null : Number(v))
 
@@ -54,7 +54,7 @@ function TrackCard({ track, index, count, onChange, onMove, onRemove }) {
                 <div>
                     <label className="field-label" htmlFor={id('youtube')}>YouTube link or id</label>
                     <input id={id('youtube')} className="field" value={track.youtube} onChange={set('youtube')}
-                        placeholder="https://www.youtube.com/watch?v=…" />
+                        placeholder="https://www.youtube.com/watch?v=… (optional)" />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                     <div>
