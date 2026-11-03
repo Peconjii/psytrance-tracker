@@ -89,6 +89,8 @@ function GoogleSignIn({ onNewAccount }) {
                 theme: 'filled_black',
                 size: 'large',
                 text: 'continue_with',
+                // In English like the rest of the site; otherwise Google uses the browser's language
+                locale: 'en',
                 width: Math.min(buttonRef.current.offsetWidth || 320, 400),
             })
         }).catch(() => {

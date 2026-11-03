@@ -135,6 +135,8 @@ a { color: inherit; }
 .btn--block { width: 100%; }
 /* Google draws its own "Continue with Google" button in here (components/GoogleSignIn); the height keeps the page from jumping */
 .google-button { display: flex; justify-content: center; min-height: 44px; }
+/* Google's iframe paints a white box around the button on a dark page unless it is told the page is light */
+.google-button iframe { color-scheme: light; }
 .btn.is-on { border-color: var(--accent); color: var(--accent); }
 .btn__count { font-variant-numeric: tabular-nums; color: var(--muted); }
 .btn.is-on .btn__count { color: inherit; }
