@@ -12,6 +12,16 @@ export function SuggestTrackLink({ artist }: { artist: string }) {
   );
 }
 
+/** "+ Suggest an artist" under a genre's artists: the feedback form with the genre filled in */
+export function SuggestArtistLink({ genre }: { genre: string }) {
+  const params = new URLSearchParams({ kind: 'CORRECTION', about: 'GENRE', ref: genre, artist: '1', from: window.location.pathname + window.location.search });
+  return (
+    <Link className="hud__suggest" to={`/feedback?${params}`} title={`Know an artist who belongs in ${genre}? Tell us`}>
+      + Suggest an artist
+    </Link>
+  );
+}
+
 export function FixLink({ about, name, compact = false }: { about: 'GENRE' | 'ARTIST' | 'FESTIVAL' | 'LABEL'; name: string; compact?: boolean }) {
   const params = new URLSearchParams({ kind: 'CORRECTION', about, ref: name, from: window.location.pathname + window.location.search });
   return (

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
 import { LabelCrew } from './LabelCrew';
-import { FixLink, SuggestTrackLink } from './FixLink';
+import { FixLink, SuggestArtistLink, SuggestTrackLink } from './FixLink';
 import { HeartButton } from './Playlist';
 import FollowButton from '../../components/FollowButton.jsx';
 import type { PlaylistApi } from '../hooks/usePlaylist';
@@ -357,6 +357,7 @@ export function Panel({
           </button>
         ))}
       </div>
+      <SuggestArtistLink genre={g.name} />
 
       {(g.labels.length > 0 || g.countries.length > 0 || stations.length > 0) && (
         <dl className="hud__specs hud__specs--meta">

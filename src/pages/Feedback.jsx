@@ -32,8 +32,10 @@ function Feedback() {
     const [kind, setKind] = useState(initialKind)
     const [about, setAbout] = useState(initialAbout)
     const [message, setMessage] = useState('')
-    // "+ Suggest a track" on an artist (the galaxy): fields for the track, put together into the message
-    const suggestingTrack = params.get('track') === '1' && initialAbout?.type === 'ARTIST'
+    // "+ Suggest a track" on an artist and "+ Suggest an artist" on a genre (the galaxy): fields for the track or
+    // the artist, put together into the message
+    const offered = params.get('track') === '1' && initialAbout?.type === 'ARTIST' ? 'track'
+        : params.get('artist') === '1' && initialAbout?.type === 'GENRE' ? 'artist' : null
     const [track, setTrack] = useState({ title: '', link: '', year: '' })
     const setTrackField = (field) => (e) => { setTrack(t => ({ ...t, [field]: e.target.value })); setError('') }
     const [email, setEmail] = useState(user?.email || '')
@@ -45,9 +47,10 @@ function Feedback() {
 
     async function handleSubmit(e) {
         e.preventDefault()
-        const suggestion = suggestingTrack && about?.type === 'ARTIST'
+        // "✕ Not about this" turns it back into plain feedback
+        const suggestion = about ? offered : null
         if (suggestion && track.title.trim().length < 2) {
-            return setError('Write the name of the track.')
+            return setError(suggestion === 'track' ? 'Write the name of the track.' : 'Write the name of the artist.')
         }
         if (suggestion && track.link.trim() && !/^https?:\/\/\S+$/.test(track.link.trim())) {
             return setError('The link should start with https:// (YouTube, Bandcamp, SoundCloud...).')
@@ -56,7 +59,9 @@ function Feedback() {
             return setError('Write a few more words, so we know what to fix.')
         }
         const text = suggestion
-            ? [`Track suggestion for ${about.ref}: "${track.title.trim()}"${track.year.trim() ? ` (${track.year.trim()})` : ''}`,
+            ? [suggestion === 'track'
+                ? `Track suggestion for ${about.ref}: "${track.title.trim()}"${track.year.trim() ? ` (${track.year.trim()})` : ''}`
+                : `Artist suggestion for ${about.ref}: "${track.title.trim()}"`,
                 track.link.trim() && `Link: ${track.link.trim()}`, message.trim()].filter(Boolean).join('\n')
             : message.trim()
         setSending(true)
@@ -133,7 +138,23 @@ function Feedback() {
                     </div>
                 )}
 
-                {suggestingTrack && about?.type === 'ARTIST' && (
+                {offered === 'artist' && about && (
+                    <fieldset className="grid gap-3 m-0 p-0 border-0">
+                        <legend className="field-label">An artist for {about.ref}</legend>
+                        <div>
+                            <label htmlFor="artist-name" className="field-label">Name</label>
+                            <input id="artist-name" className="field" value={track.title} onChange={setTrackField('title')}
+                                placeholder="e.g. Jimi Hendrix" />
+                        </div>
+                        <div>
+                            <label htmlFor="artist-link" className="field-label">Link <span className="muted">(SoundCloud, Bandcamp, YouTube...)</span></label>
+                            <input id="artist-link" type="url" inputMode="url" className="field" value={track.link}
+                                onChange={setTrackField('link')} placeholder="https://soundcloud.com/…" />
+                        </div>
+                    </fieldset>
+                )}
+
+                {offered === 'track' && about && (
                     <fieldset className="grid gap-3 m-0 p-0 border-0">
                         <legend className="field-label">The track by {about.ref}</legend>
                         <div>
@@ -165,7 +186,7 @@ function Feedback() {
                         maxLength={MAX_MESSAGE}
                         value={message}
                         onChange={(e) => { setMessage(e.target.value); setError('') }}
-                        placeholder={suggestingTrack && about?.type === 'ARTIST'
+                        placeholder={offered && about
                             ? 'Optional: why it belongs here, which genre it fits...'
                             : kind === 'CORRECTION'
                             ? 'e.g. Fungus Funk plays night full-on, not forest. Source: their Sangoma releases.'
