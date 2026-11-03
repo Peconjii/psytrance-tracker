@@ -364,10 +364,18 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
   .field { font-size: 16px; }
   /* About a finger tall */
   .btn { min-height: 44px; }
-  .chip { min-height: 40px; padding: 8px 12px; }
+  .chip { min-height: 40px; padding: 8px 12px; display: inline-flex; align-items: center; }
   .icon-btn { width: 44px; height: 44px; }
+  .site-nav__mobile .site-nav__link { padding: 13px 0; }
+  .switch { width: 54px; height: 32px; }
+  .switch::after { top: 4px; left: 4px; width: 22px; height: 22px; }
+  .switch[aria-checked='true']::after { transform: translateX(22px); }
   .page { padding: 20px 16px 40px; }
   .page-head { margin-bottom: 16px; }
+  /* "← Back": the text is small, the place to tap is not */
+  .back-link { padding: 12px 12px 12px 0; margin-bottom: 8px; }
+  /* Buttons that look like a text link ("Paste or write as text →"): a taller place to tap */
+  button.link { padding-top: 10px !important; padding-bottom: 10px !important; }
 
   /* Events: only the search until "Filters" is tapped, so the first events are on the first screen */
   .filters { padding: 14px 16px; }
