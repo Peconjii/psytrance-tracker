@@ -1,9 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import api from '../api/backend'
 
-// The OAuth client id from Google Cloud Console (on Vercel); without it there is no Google button
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+// The OAuth client id from Google Cloud Console comes from the backend (GOOGLE_CLIENT_ID on Render); while it is
+// empty, or the backend can't be reached, there is no Google button
+let clientIdRequest
+function loadClientId() {
+    clientIdRequest ??= api.get('/api/auth/google')
+        .then(response => response.data?.clientId || null)
+        .catch(() => {
+            clientIdRequest = null
+            return null
+        })
+    return clientIdRequest
+}
 
 let googleScript
 function loadGoogle() {
@@ -34,6 +45,13 @@ function GoogleSignIn({ onNewAccount }) {
     // Set when the Google account needs a username: { credential, email }
     const [newAccount, setNewAccount] = useState(null)
     const [username, setUsername] = useState('')
+    const [clientId, setClientId] = useState(null)
+
+    useEffect(() => {
+        let cancelled = false
+        loadClientId().then(id => !cancelled && setClientId(id))
+        return () => { cancelled = true }
+    }, [])
 
     async function handleCredential(credential) {
         setError('')
@@ -59,12 +77,12 @@ function GoogleSignIn({ onNewAccount }) {
 
     // The button is drawn by Google again each time it is on screen (also after "Back")
     useEffect(() => {
-        if (!CLIENT_ID || newAccount) return
+        if (!clientId || newAccount) return
         let cancelled = false
         loadGoogle().then(google => {
             if (cancelled || !buttonRef.current) return
             google.accounts.id.initialize({
-                client_id: CLIENT_ID,
+                client_id: clientId,
                 callback: ({ credential }) => onCredential.current(credential),
             })
             google.accounts.id.renderButton(buttonRef.current, {
@@ -77,7 +95,7 @@ function GoogleSignIn({ onNewAccount }) {
             if (!cancelled) setError('Google sign-in could not load. Use a username and password instead.')
         })
         return () => { cancelled = true }
-    }, [newAccount])
+    }, [clientId, newAccount])
 
     function back() {
         setNewAccount(null)
@@ -100,7 +118,7 @@ function GoogleSignIn({ onNewAccount }) {
         }
     }
 
-    if (!CLIENT_ID) return null
+    if (!clientId) return null
 
     if (newAccount) {
         return (
