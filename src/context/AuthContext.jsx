@@ -40,25 +40,36 @@ export function AuthProvider({ children }) {
         loadUser()
     }, [token])
 
+    async function startSession(receivedToken) {
+        if (!receivedToken) {
+            throw new Error("No token returned from server")
+        }
+        localStorage.setItem('token', receivedToken)
+        setToken(receivedToken)
+        const userResponse = await api.get('/api/auth/me')
+        setUser(userResponse.data)
+    }
+
     async function login(username, password) {
         try {
             const response = await api.post('/api/auth/login', { username, password })
-            const receivedToken = response.data?.token
-
-            if (!receivedToken) {
-                throw new Error("No token returned from server")
-            }
-
-            localStorage.setItem('token', receivedToken)
-            setToken(receivedToken)
-
-            const userResponse = await api.get('/api/auth/me')
-            setUser(userResponse.data)
+            await startSession(response.data?.token)
             return true
         } catch (error) {
             console.error("Login failed:", error)
             throw error
         }
+    }
+
+    // "Sign in with Google": logs in, or returns { needsUsername, suggestedUsername, email } for a Google account
+    // with no account yet; calling again with a username makes it
+    async function loginWithGoogle(credential, username) {
+        const response = await api.post('/api/auth/google', { credential, username })
+        if (response.data?.needsUsername) {
+            return response.data
+        }
+        await startSession(response.data?.token)
+        return null
     }
 
     async function register(username, email, password, website) {
@@ -78,7 +89,7 @@ export function AuthProvider({ children }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user, token, loading, login, register, logout, updateUser }}>
+        <AuthContext.Provider value={{ user, token, loading, login, loginWithGoogle, register, logout, updateUser }}>
             {children}
         </AuthContext.Provider>
     )

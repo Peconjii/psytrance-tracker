@@ -33,6 +33,9 @@ function Privacy() {
                         <li>What you do on the site: the artists and labels you follow, events you save or are going to, your
                             reviews, the events you add, the pages you own and the requests you send.</li>
                         <li>The date you made the account and whether you confirmed your email.</li>
+                        <li>With &ldquo;Continue with Google&rdquo;: Google tells us your email (confirmed by Google), your
+                            name and an id for your Google account. We keep the email and that id, and use the name only to
+                            suggest a username. We get nothing else from Google, and Google doesn&apos;t see what you do here.</li>
                     </ul>
                     <p>Your email is used for: confirming it, resetting a forgotten password, reminders before events you saved,
                         new gigs of artists you follow, the Monday email, and an answer when an admin decides about something you
@@ -50,6 +53,8 @@ function Privacy() {
                         <li><strong>Vercel</strong> serves the website, <strong>Render</strong> runs the server and
                             <strong> Neon</strong> keeps the database.</li>
                         <li>An email service sends the emails.</li>
+                        <li><strong>Google</strong>, only if you use &ldquo;Continue with Google&rdquo;: its button loads
+                            on the login and register pages.</li>
                         <li>Events come from <a className="link" href="https://www.goabase.net" target="_blank" rel="noopener noreferrer">Goabase</a>,
                             the weather from <a className="link" href="https://open-meteo.com" target="_blank" rel="noopener noreferrer">Open-Meteo</a>:
                             they don&apos;t get anything about you.</li>

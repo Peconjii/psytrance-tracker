@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import usePageMeta from '../hooks/usePageMeta.js'
 import BotTrap from '../components/BotTrap.jsx'
+import GoogleSignIn from '../components/GoogleSignIn.jsx'
 
 function Register() {
     usePageMeta({ title: 'Register', path: '/register', noindex: true })
@@ -13,6 +14,8 @@ function Register() {
     const [error, setError] = useState('')
     // Never shown to people; bots fill it in
     const [website, setWebsite] = useState('')
+    // A Google account without an account here is picking a username: this form is hidden meanwhile
+    const [googleStep, setGoogleStep] = useState(false)
     const { register } = useAuth()
     const navigate = useNavigate()
 
@@ -37,6 +40,8 @@ function Register() {
                 <div className="page-head__tag">// Join the crew</div>
                 <h1 className="page-title">Register</h1>
                 {error && <p className="notice mb-4">{error}</p>}
+                <GoogleSignIn onNewAccount={setGoogleStep} />
+                {!googleStep && <>
                 <form onSubmit={handleSubmit} className="grid gap-4 mt-4">
                     <div>
                         <label htmlFor="register-username" className="field-label">Username</label>
@@ -81,6 +86,7 @@ function Register() {
                 <p className="muted text-sm mt-6 mb-0">
                     Already have an account? <Link to="/login" className="link">Log in</Link>
                 </p>
+                </>}
             </div>
         </div>
     )

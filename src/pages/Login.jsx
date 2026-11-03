@@ -2,12 +2,15 @@ import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import usePageMeta from '../hooks/usePageMeta.js'
+import GoogleSignIn from '../components/GoogleSignIn.jsx'
 
 function Login() {
     usePageMeta({ title: 'Login', path: '/login', noindex: true })
     const [username, setUsername] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
+    // A Google account without an account here is picking a username: this form is hidden meanwhile
+    const [googleStep, setGoogleStep] = useState(false)
     const { login } = useAuth()
     const navigate = useNavigate()
     // Right after registering: the email the confirmation link went to
@@ -36,6 +39,8 @@ function Login() {
                     </p>
                 )}
                 {error && <p className="notice mb-4">{error}</p>}
+                <GoogleSignIn onNewAccount={setGoogleStep} />
+                {!googleStep && <>
                 <form onSubmit={handleSubmit} className="grid gap-4 mt-4">
                     <div>
                         <label htmlFor="login-username" className="field-label">Username</label>
@@ -67,6 +72,7 @@ function Login() {
                 <p className="muted text-sm m-0">
                     Forgot your password? <Link to="/forgot-password" className="link">Reset it</Link>
                 </p>
+                </>}
             </div>
         </div>
     )
