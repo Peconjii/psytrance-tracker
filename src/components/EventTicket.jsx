@@ -3,6 +3,7 @@ import FavoriteButton from './FavoriteButton'
 import GoingButton from './GoingButton'
 import { data, genreById } from '../map/data/types'
 import { parseDay } from './eventDates'
+import { forecastFor } from '../api/weather.js'
 
 const weekday = (date) => date.toLocaleDateString('en-GB', { weekday: 'short' })
 const month = (date) => date.toLocaleDateString('en-GB', { month: 'short' })
@@ -28,6 +29,7 @@ function Stub({ event }) {
 // `weather`, `going` ({ count, going }) and `genres` ([{ genreId, share }]) are fetched by the parent
 // for the whole list in one request each; without `onGoingChange` there is no "I'm going" button.
 function EventTicket({ event, weather, going, onGoingChange, genres = [] }) {
+    const forecast = forecastFor(event, weather)
     const linkProps = { to: `/events/${event.id}`, state: { event } }
     const known = genres.filter(g => genreById[g.genreId])
     const main = known[0] && genreById[known[0].genreId]
@@ -50,7 +52,7 @@ function EventTicket({ event, weather, going, onGoingChange, genres = [] }) {
                     <p className="ticket__place">{[event.nameTown, event.nameCountry].filter(Boolean).join(', ')}</p>
                     <p className="ticket__meta">
                         {event.nameType && <span>{event.nameType}</span>}
-                        {weather && <span>{Math.round(weather.temperature)}°C now</span>}
+                        {forecast && <span title="Forecast for the day">{forecast.min}–{forecast.max}°C</span>}
                         {isCancelled && <span className="text-[var(--danger)]">{event.nameStatus}</span>}
                     </p>
                 </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
 import { calendarUrl, fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent } from '../api/backend.js'
-import { fetchWeatherForEvents, weatherKey } from '../api/weather.js'
+import { fetchWeatherForEvents, forecastFor, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
 import FavoriteButton from '../components/FavoriteButton.jsx'
@@ -148,7 +148,7 @@ function EventDetails() {
     const details = loaded.id === id ? loaded.details : null
     const error = loaded.id === id ? loaded.error : null
     const event = details || preview
-    const currentWeather = weather.id === id ? weather.value : null
+    const forecast = weather.id === id && event ? forecastFor(event, weather.value) : null
     const currentAftermovie = aftermovie.id === id ? aftermovie.value : null
     const currentGoing = going.id === id ? going.value : null
     const currentTimetable = timetable.id === id ? timetable.value : null
@@ -282,10 +282,10 @@ function EventDetails() {
                                 </dd>
                             </>
                         )}
-                        {currentWeather && (
+                        {forecast && (
                             <>
                                 <dt className="field-label m-0 pt-0.5">Weather</dt>
-                                <dd className="m-0 soft">{Math.round(currentWeather.temperature)}°C at the venue right now</dd>
+                                <dd className="m-0 soft">{forecast.min}–{forecast.max}°C forecast for the day</dd>
                             </>
                         )}
                     </dl>

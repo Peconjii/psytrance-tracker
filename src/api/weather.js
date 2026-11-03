@@ -1,4 +1,5 @@
-// Current weather at event venues from Open-Meteo, cached per browser session.
+// The forecast for the day of an event, from Open-Meteo (daily, 16 days ahead), cached per browser session.
+// Events further away get none: the weather today says nothing about a festival next month.
 // Open-Meteo accepts comma-separated coordinates, so a whole page of events needs one request.
 
 export function eventCoords(event) {
@@ -16,7 +17,7 @@ export function weatherKey(event) {
 
 function readCached(key) {
     try {
-        return JSON.parse(sessionStorage.getItem(`weather_${key}`))
+        return JSON.parse(sessionStorage.getItem(`forecast_${key}`))
     } catch {
         return null
     }
@@ -24,13 +25,13 @@ function readCached(key) {
 
 function writeCached(key, weather) {
     try {
-        sessionStorage.setItem(`weather_${key}`, JSON.stringify(weather))
+        sessionStorage.setItem(`forecast_${key}`, JSON.stringify(weather))
     } catch {
         // Storage full or blocked: the forecast is still returned, just not cached
     }
 }
 
-// Returns { [weatherKey]: current_weather } for the given events. Cached forecasts are
+// Returns { [weatherKey]: daily forecast } for the given events (see forecastFor). Cached forecasts are
 // reused and everything else is fetched in a single request. Never throws: weather is a
 // nice extra, so on failure the cards simply have no weather badge.
 export async function fetchWeatherForEvents(events, signal) {
@@ -52,7 +53,7 @@ export async function fetchWeatherForEvents(events, signal) {
 
     try {
         const res = await fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current_weather=true`,
+            `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&daily=temperature_2m_max,temperature_2m_min&forecast_days=16&timezone=auto`,
             { signal }
         )
         if (!res.ok) throw new Error(`HTTP status ${res.status}`)
@@ -61,9 +62,9 @@ export async function fetchWeatherForEvents(events, signal) {
         const forecasts = Array.isArray(data) ? data : [data]
 
         forecasts.forEach((forecast, i) => {
-            if (forecast?.current_weather) {
-                result[missing[i]] = forecast.current_weather
-                writeCached(missing[i], forecast.current_weather)
+            if (forecast?.daily?.time) {
+                result[missing[i]] = forecast.daily
+                writeCached(missing[i], forecast.daily)
             }
         })
     } catch {
@@ -71,4 +72,17 @@ export async function fetchWeatherForEvents(events, signal) {
     }
 
     return result
+}
+
+// { min, max } in °C for the event's day from a daily forecast, or null when the day is beyond it. An event that
+// already started (a festival in full swing) gets today's. Dates are the venue's own, like the forecast's days.
+export function forecastFor(event, daily) {
+    if (!daily?.time?.length || !event?.dateStart) return null
+    const today = daily.time[0]
+    const start = String(event.dateStart).slice(0, 10)
+    const end = event.dateEnd ? String(event.dateEnd).slice(0, 10) : start
+    const day = start < today && end >= today ? today : start
+    const i = daily.time.indexOf(day)
+    if (i < 0 || daily.temperature_2m_max?.[i] == null) return null
+    return { min: Math.round(daily.temperature_2m_min[i]), max: Math.round(daily.temperature_2m_max[i]) }
 }

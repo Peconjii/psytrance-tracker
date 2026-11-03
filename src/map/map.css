@@ -550,3 +550,18 @@
   .is-touring .cockpit { display: none; }
   .is-touring .timeline__chip { bottom: var(--base); }
 }
+@media (max-width: 1100px), (max-height: 500px) {
+  /* Two equal columns whatever the buttons say: long labels wrap instead of widening one column past the screen */
+  .topbar__menu .topbar__tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .topbar__menu .tools__btn, .topbar__menu .tours__toggle { white-space: normal; min-width: 0; }
+  .topbar__menu .tools__btn--join { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) {
+  /* The folded ship console: one slim row */
+  .psy-map { --row: 36px; }
+  .cockpit.is-folded { padding-top: 9px; padding-bottom: 9px; }
+}
+@media (max-width: 1100px), (max-height: 500px) {
+  /* An opened list (Tours, Labels, Playlist) takes the whole width of the menu */
+  .topbar__menu .tours:has(> [aria-expanded='true']) { grid-column: 1 / -1; }
+}
