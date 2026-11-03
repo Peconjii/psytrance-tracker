@@ -353,3 +353,33 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 .user-pages__row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; }
 .user-pages__pick { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 8px; text-align: left; color: var(--fg); background: transparent; border: 1px solid var(--line); cursor: pointer; }
 .user-pages__pick:hover, .user-pages__pick:focus-visible { border-color: var(--accent); outline: none; }
+
+/* Events filters: the search with a "Filters" button beside it on phones (see below) */
+.filters__search { display: flex; gap: 8px; }
+.filters__toggle { display: none; }
+
+/* ---------- Phones ---------- */
+@media (max-width: 640px) {
+  /* 16px or more in fields, or iPhones zoom the page in when one is tapped */
+  .field { font-size: 16px; }
+  /* About a finger tall */
+  .btn { min-height: 44px; }
+  .chip { min-height: 40px; padding: 8px 12px; }
+  .icon-btn { width: 44px; height: 44px; }
+  .page { padding: 20px 16px 40px; }
+  .page-head { margin-bottom: 16px; }
+
+  /* Events: only the search until "Filters" is tapped, so the first events are on the first screen */
+  .filters { padding: 14px 16px; }
+  .filters__toggle { display: inline-flex; flex-shrink: 0; }
+  .filters:not(.is-open) .filters__more { display: none; }
+  .filters:not(.is-open) .filters__main { margin-bottom: 0; }
+  .filters.is-open .filters__toggle { border-color: var(--accent); color: var(--accent); }
+
+  /* The open call on the events list: the question and the buttons, without the longer text */
+  .join-strip--inline { margin-bottom: 16px; }
+  .join-strip--inline .join-strip__inner { padding: 14px 16px; gap: 12px; }
+  .join-strip--inline .join-strip__text { display: none; }
+  .join-strip__inner > .shrink-0 { flex-shrink: 1; width: 100%; }
+  .join-strip__inner .btn { flex: 1 1 auto; }
+}

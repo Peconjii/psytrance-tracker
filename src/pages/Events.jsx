@@ -87,6 +87,9 @@ function Events() {
     const feedKey = [debouncedSearch, debouncedCountry, genre, timeline, near ? `${near.lat},${near.lon},${near.km}` : ''].join('|')
 
     const filtered = search || country || (genre && genre !== 'All') || timeline !== 'ALL' || near
+    // Phones show only the search until "Filters" is tapped, so the events start on the first screen
+    const [filtersOpen, setFiltersOpen] = useState(false)
+    const extraFilters = [country, genre !== 'All', timeline !== 'ALL', near].filter(Boolean).length
 
     return (
         <div className="page page--wide">
@@ -101,21 +104,28 @@ function Events() {
 
             <JoinStrip inline />
 
-            <section className="panel mb-6" aria-label="Filters">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+            <section className={`panel mb-6 filters${filtersOpen ? ' is-open' : ''}`} aria-label="Filters">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5 filters__main">
                     <div>
                         <label htmlFor="event-search" className="field-label">Event or town</label>
-                        <input
-                            id="event-search"
-                            type="text"
-                            placeholder="Ozora, Lisbon..."
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                            className="field"
-                        />
+                        <div className="filters__search">
+                            <input
+                                id="event-search"
+                                type="search"
+                                enterKeyHint="search"
+                                placeholder="Ozora, Lisbon..."
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                                className="field"
+                            />
+                            <button type="button" className="btn filters__toggle" aria-expanded={filtersOpen}
+                                aria-controls="more-filters" onClick={() => setFiltersOpen(o => !o)}>
+                                Filters{extraFilters > 0 && <span className="btn__count"> · {extraFilters}</span>}
+                            </button>
+                        </div>
                     </div>
 
-                    <div>
+                    <div className="filters__more">
                         <label htmlFor="event-country" className="field-label">Country</label>
                         <input
                             id="event-country"
@@ -127,7 +137,7 @@ function Events() {
                         />
                     </div>
 
-                    <div>
+                    <div className="filters__more">
                         <span className="field-label">When</span>
                         <div className="flex flex-wrap gap-2">
                             {TIMELINES.map(t => (
@@ -144,7 +154,7 @@ function Events() {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 filters__more" id="more-filters">
                     <div>
                         <label htmlFor="event-genre" className="field-label">Sound on the map</label>
                         <div className="flex flex-wrap items-center gap-2">
