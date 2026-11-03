@@ -218,6 +218,23 @@ export async function setFeedbackStatus(id, status) {
 }
 
 // Which artists orbit which genre on the map: { genreId: [artist names] }
+// Each genre's texts and key tracks: { goa: { description, bass, kick, atmosphere, year, bpmMin, bpmMax, verified, tracks } }
+export async function fetchGalaxyContent(signal) {
+    const response = await api.get('/api/map/content', { signal })
+    return response.data
+}
+
+// A genre's content for Admin -> Galaxy, and saving it (the whole content at once)
+export async function fetchGenreContent(genreId) {
+    const response = await api.get(`/api/admin/map/content/${genreId}`)
+    return response.data
+}
+
+export async function saveGenreContent(genreId, content) {
+    const response = await api.put(`/api/admin/map/content/${genreId}`, content)
+    return response.data
+}
+
 export async function fetchPlacements(signal) {
     const response = await api.get('/api/map/placements', { signal })
     return response.data

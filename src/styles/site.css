@@ -391,3 +391,6 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
   .join-strip__inner > .shrink-0 { flex-shrink: 1; width: 100%; }
   .join-strip__inner .btn { flex: 1 1 auto; }
 }
+
+/* Admin -> Galaxy: Save stays in view at the bottom while the long form scrolls */
+.galaxy-save { position: sticky; bottom: 0; z-index: 5; padding: 12px 0; background: var(--bg); border-top: 1px solid var(--line); }

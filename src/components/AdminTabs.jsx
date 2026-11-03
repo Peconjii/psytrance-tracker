@@ -6,6 +6,7 @@ const TABS = [
     { to: '/admin', label: 'Dashboard', editors: true },
     { to: '/admin/feedback', label: 'Feedback inbox' },
     { to: '/admin/genres', label: 'Artist genres', editors: true },
+    { to: '/admin/galaxy', label: 'Galaxy', editors: true },
     { to: '/admin/events', label: 'Events', editors: true },
     { to: '/admin/our-events', label: 'Added events', editors: true },
     { to: '/admin/requests', label: 'Requests' },

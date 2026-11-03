@@ -29,6 +29,8 @@ export interface Genre {
   artists: string[];
   /** How it sounds: bass type, kick and atmosphere */
   production: { bass: string; kick: string; atmosphere: string };
+  /** Someone checked the texts (Admin -> Galaxy) */
+  verified?: boolean;
   labels: string[];
   countries: string[];
   festivals: string[];
@@ -44,6 +46,10 @@ export interface Track {
   youtube?: string;
   /** A well-known classic: used for a first-time quiz so newcomers get tracks they may recognise */
   famous?: boolean;
+  /** Someone checked this track belongs here (Admin -> Galaxy) */
+  verified?: boolean;
+  /** The second the drop comes, so the quiz can start just before it */
+  drop?: number;
 }
 
 export interface MapData {

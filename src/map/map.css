@@ -565,3 +565,11 @@
   /* An opened list (Tours, Labels, Playlist) takes the whole width of the menu */
   .topbar__menu .tours:has(> [aria-expanded='true']) { grid-column: 1 / -1; }
 }
+
+/* Checked in Admin -> Galaxy: "✓ verified" after a genre's name, "✓" before a key track */
+.hud__verified { font: normal 600 11px var(--mono); color: var(--accent); }
+.hud__verified--badge { margin-left: 10px; padding: 2px 6px; vertical-align: middle; border: 1px solid var(--accent); letter-spacing: 0.06em; }
+/* "✎" at the end of a key track: report a mistake about that one track */
+.hud__row > a.hud__fixrow { flex: 0 0 34px; }
+.hud__fixrow { flex-shrink: 0; width: 34px; display: grid; place-items: center; color: var(--muted); text-decoration: none; background: rgba(255,255,255,0.04); }
+.hud__fixrow:hover, .hud__fixrow:focus-visible { color: var(--fam); outline: none; }

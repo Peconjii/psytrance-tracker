@@ -84,7 +84,8 @@ export function Panel({
       <span className="hud__muted">—</span>
     );
 
-  const trackList = (tracks: Track[]) => {
+  // genre: set for a genre's key tracks, which get their own "✎" (the report then says which track and where)
+  const trackList = (tracks: Track[], genre?: string) => {
     const queue = tracks.filter((t) => t.youtube);
     return (
       <ul className="hud__list">
@@ -92,7 +93,7 @@ export function Panel({
           const now = !!t.youtube && playing?.youtube === t.youtube;
           const body = (
             <>
-              <span className="hud__track"><b>{t.title}</b> · {t.artist}</span>
+              <span className="hud__track">{t.verified && <i className="hud__verified" title="Checked">✓ </i>}<b>{t.title}</b> · {t.artist}</span>
               <span>{t.year ?? ''} {t.youtube ? (now ? '♪' : '▶') : '↗'}</span>
             </>
           );
@@ -105,6 +106,7 @@ export function Panel({
                 <a href={youtube(`${t.artist} ${t.title}`)} target="_blank" rel="noopener noreferrer">{body}</a>
               )}
               {t.youtube && <HeartButton track={t} playlist={playlist} />}
+              {genre && <FixLink compact about="GENRE" name={`${genre}: ${t.title} by ${t.artist}`} />}
             </li>
           );
         })}
@@ -324,7 +326,7 @@ export function Panel({
     <HudShell className="hud" style={{ ['--fam' as string]: fam.color }}>
       <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
       <div className="hud__tag">// SYSTEM · {fam.name.toUpperCase()}</div>
-      <h2>{g.name}</h2>
+      <h2>{g.name}{g.verified && <span className="hud__verified hud__verified--badge" title="Someone checked this text">✓ verified</span>}</h2>
       <button className="hud__compare" onClick={() => onCompare(g.id)}>⇄ Compare</button>
       <div className="hud__stats">
         <span>DISCOVERED <b>≈{g.year}</b></span>
@@ -341,7 +343,7 @@ export function Panel({
 
       <ProducerCorner genre={g} />
 
-      {g.tracks.length > 0 && (<><div className="hud__label">Key tracks</div>{trackList(g.tracks)}</>)}
+      {g.tracks.length > 0 && (<><div className="hud__label">Key tracks</div>{trackList(g.tracks, g.name)}</>)}
 
       {/* All of them here; the orbit on the map shows 12 at most (followed ones first) */}
       <div className="hud__label">Artists · {g.artists.length}</div>
