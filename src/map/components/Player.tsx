@@ -39,7 +39,7 @@ const PLAYING = 1;
 
 // The quiz plays the part before the drop, which tells the genre far better than the intro: from a little before
 // the drop admins wrote down (Admin -> Galaxy), or from somewhere between 30% and 60% of a track without one.
-const BEFORE_DROP_SECONDS = 18;
+const BEFORE_DROP_SECONDS = 9;
 const quizStart = (track: Track) => (track.drop != null ? Math.max(0, track.drop - BEFORE_DROP_SECONDS) : null);
 
 interface Props {
