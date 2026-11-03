@@ -32,6 +32,11 @@ function loadGoogle() {
     return googleScript
 }
 
+// Google warns when it is set up more than once, so it is set up once per client id; its callback calls the
+// handler of the button on screen
+let initializedFor = null
+let onCredential = null
+
 /**
  * "Continue with Google" on the login and register pages. A Google account with no account here yet picks a
  * username first (the backend suggests one from the Google name); onNewAccount(true) lets the page hide its own
@@ -69,10 +74,9 @@ function GoogleSignIn({ onNewAccount }) {
         }
     }
 
-    // Google keeps the first callback it is given, so that one calls this ref, which always holds the current code
-    const onCredential = useRef(null)
+    // Google is set up once per visit, so its callback calls whichever button is on screen now
     useEffect(() => {
-        onCredential.current = handleCredential
+        onCredential = handleCredential
     })
 
     // The button is drawn by Google again each time it is on screen (also after "Back")
@@ -81,10 +85,13 @@ function GoogleSignIn({ onNewAccount }) {
         let cancelled = false
         loadGoogle().then(google => {
             if (cancelled || !buttonRef.current) return
-            google.accounts.id.initialize({
-                client_id: clientId,
-                callback: ({ credential }) => onCredential.current(credential),
-            })
+            if (initializedFor !== clientId) {
+                google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: ({ credential }) => onCredential?.(credential),
+                })
+                initializedFor = clientId
+            }
             google.accounts.id.renderButton(buttonRef.current, {
                 theme: 'filled_black',
                 size: 'large',
