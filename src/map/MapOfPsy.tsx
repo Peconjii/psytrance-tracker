@@ -76,6 +76,8 @@ function MapOfPsy() {
   const [hidden, setHidden] = useState(false);
   const playlist = usePlaylist();
   const [timeTravel, setTimeTravel] = useState(false);
+  // Phones: the year slider stays folded into a small button until it is opened
+  const [yearOpen, setYearOpen] = useState(false);
   const [menu, setMenu] = useState(false);
   // Upcoming events as ships: which period, the events, and the open fleet or harbour
   // A shared ship may sail later than this week, so its link opens the month
@@ -187,6 +189,7 @@ function MapOfPsy() {
   const born = data.genres.filter((g) => g.year === year).map((g) => g.name);
   const toggleTimeTravel = () => {
     if (!timeTravel && year >= MAX_YEAR) setYear(MIN_YEAR);
+    if (!timeTravel) setYearOpen(true);
     setTimeTravel((t) => !t);
   };
 
@@ -307,7 +310,9 @@ function MapOfPsy() {
   };
 
   return (
-    <div className={tour || quiz || compare ? 'psy-map app is-touring' : 'psy-map app'}>
+    // has-player and year-open tell the phone layout what is stacked at the bottom (see map.css)
+    <div className={['psy-map app', (tour || quiz || compare) && 'is-touring', playing?.youtube && 'has-player',
+      yearOpen && 'year-open'].filter(Boolean).join(' ')}>
       <Galaxy selectedId={selectedId} artist={artist} year={year} onSelect={select} onSelectArtist={reveal}
         tourPath={tourPath} focus={focus} showStations={showStations} onSelectFestival={openFestival}
         showLabels={showLabels} onSelectLabel={openLabel}
@@ -415,7 +420,12 @@ function MapOfPsy() {
         <div className="timeline__born" key={year} aria-live="polite">✦ {born.join(' · ')}</div>
       )}
 
-      <footer className="timeline">
+      {/* Phones only (map.css): the year in a small button next to the ship console; it opens the slider */}
+      <button className="timeline__chip" onClick={() => setYearOpen((o) => !o)} aria-expanded={yearOpen}
+        aria-controls="timeline" aria-label={yearOpen ? 'Hide the year slider' : `Year ${year}: open the time machine`}>
+        ◷ {year}
+      </button>
+      <footer className="timeline" id="timeline">
         <button className="timeline__play" onClick={toggleTimeTravel} aria-pressed={timeTravel}
           aria-label={timeTravel ? 'Pause the time machine' : 'Play history from 1965'} title={timeTravel ? 'Pause' : 'Play history'}>
           {timeTravel ? '❚❚' : '▶'}

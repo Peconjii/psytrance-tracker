@@ -494,3 +494,59 @@
 .fleet__live { color: #ff6b8b; margin-left: 6px; }
 /* "Full profile →" under an artist's name in the HUD */
 .hud__profile { display: inline-block; margin: 2px 0 10px; font: 11px var(--mono); letter-spacing: 0.08em; color: var(--fam, var(--accent)); }
+
+/* ---------- Phones: one stack at the bottom ----------
+   From the bottom up: the folded ship console with the year button beside it, the year slider once opened, the
+   player while a track plays, then the info sheet (or a tour, quiz or comparison card). Each sits right above the
+   one below, so nothing covers anything else; the sizes come from the classes on .psy-map (MapOfPsy). */
+.timeline__chip { display: none; }
+@media (max-width: 700px) {
+  .psy-map {
+    --base: calc(12px + env(safe-area-inset-bottom, 0px)); /* above the iPhone home bar */
+    --row: 44px;                                         /* console and year button: one finger tall */
+    --year: 0px; --player: 0px;
+    --above-row: calc(var(--base) + var(--row) + 8px);
+    --above-player: calc(var(--above-row) + var(--year) + var(--player));
+  }
+  .psy-map.year-open { --year: 62px; }     /* the slider is 54px tall */
+  .psy-map.has-player { --player: 73px; }  /* the bar is 65px tall */
+
+  /* Ship console, folded to one row, with the year button on its right */
+  .cockpit, .player:not([hidden]) + .cockpit { left: 12px; right: 96px; bottom: var(--base); max-height: calc(100% - 80px - var(--base)); }
+  .cockpit.is-folded { padding-top: 13px; padding-bottom: 13px; }
+  /* Opened, it is a full-width sheet over the player and the year slider until it is folded again */
+  .cockpit:not(.is-folded), .player:not([hidden]) + .cockpit:not(.is-folded) { right: 12px; z-index: 6; background-color: #0e0c20; }
+  .timeline__chip {
+    display: block; position: absolute; right: 12px; bottom: var(--base); z-index: 4; width: 76px; height: var(--row);
+    font: 600 13px var(--mono); font-variant-numeric: tabular-nums; color: var(--fg); cursor: pointer;
+    background: rgba(14, 12, 32, 0.92); border: 1px solid var(--line); border-left: 2px solid var(--accent);
+  }
+  .year-open .timeline__chip { color: var(--bg); background: var(--accent); }
+
+  /* The year slider only while opened, right above that row */
+  .timeline { display: none; }
+  .year-open .timeline { display: flex; left: 12px; right: 12px; width: auto; bottom: var(--above-row); }
+  .timeline label { display: none; }
+  .timeline__play { width: 36px; height: 36px; }
+  .timeline__born { right: 12px; bottom: calc(var(--above-row) + var(--year)); }
+
+  /* Player: a compact bar (small video, title, buttons) instead of a box over the map */
+  .psy-map .player, .psy-map.is-touring .player {
+    top: auto; left: 12px; right: 12px; width: auto; bottom: calc(var(--above-row) + var(--year)); z-index: 3;
+    display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center;
+  }
+  .player[hidden] { display: none; }
+  .player__frame { grid-row: 1; grid-column: 1; }
+  .player__mount iframe, .player iframe { width: 112px; height: auto; aspect-ratio: 16 / 9; }
+  .player__head { grid-row: 1; grid-column: 2; flex-wrap: wrap; gap: 0 2px; padding: 4px 4px 4px 10px; }
+  .player__now { flex: 1 1 100%; font-size: 12px; }
+  .player__head a, .player__head button, .player__head .heart { min-width: 36px; min-height: 34px; display: inline-grid; place-items: center; font-size: 18px; padding: 0; }
+  .player__head > :last-child { margin-left: auto; }
+
+  /* Info sheet and the cards above everything stacked below them */
+  /* At most ~60% of the screen, so some of the galaxy stays in view above it */
+  .hud { bottom: var(--above-player); max-height: min(60%, calc(100% - 74px - var(--above-player))); }
+  .tourbar { bottom: var(--above-player); max-height: calc(100% - 74px - var(--above-player)); overflow: auto; }
+  .is-touring .cockpit { display: none; }
+  .is-touring .timeline__chip { bottom: var(--base); }
+}
