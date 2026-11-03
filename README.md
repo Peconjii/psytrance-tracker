@@ -40,7 +40,7 @@ genres the organizer ticked on Goabase. Admins can correct it by hand.
 | ![A genre's system: Full-on with its artists orbiting, its labels and the genre panel](docs/screenshots/genre-system.png) | ![An event: flyer, weather, timetable per stage, venue and organizer](docs/screenshots/event.png) |
 | **A genre's system**: artists orbit their star (12 at most, the rest one click away) | **An event**: timetable per stage, venue, organizer, "I'm going", calendar |
 | ![All upcoming events grouped by day with their map genres and the weather](docs/screenshots/events.png) | ![An artist's page: sound, labels, festivals, next gigs and numbers](docs/screenshots/artist.png) |
-| **Upcoming events** by day, with map genres and the weather at the venue | **An artist**: sound, labels, festivals played, next gigs, numbers |
+| **Upcoming events** by day, with map genres and the forecast for the day | **An artist**: sound, labels, festivals played, next gigs, numbers |
 | ![A label's page: its crew and where the crew plays next](docs/screenshots/label.png) | ![A festival's page: what it sounds like and its sets on video](docs/screenshots/festival.png) |
 | **A label**: its crew and the label's "tour" (where the crew plays next) | **A festival**: its sound, editions in the event lists, sets on video |
 
@@ -61,16 +61,22 @@ the site knows offered while typing.
 - Ships for the next 7 or 30 days, fleets, the harbour, and a **cockpit** with a radar of the whole galaxy and
   the next departures. Boarding a ship shows its captain and crew orbiting it.
 - **Live fleets** from timetables, with "Preview the night" (a whole night in 14 seconds).
-- Genre panels with tracks (YouTube player and playlists), labels, festivals, guided tours, a quiz, comparing
-  two genres, search, and a **producer cheat sheet** per genre to print (BPM, arrangement, kick/bass, tools,
-  reference tracks).
+- Genre panels with key tracks (YouTube player and playlists), labels, festivals, guided tours, comparing two
+  genres, search, and a **producer cheat sheet** per genre to print (BPM, arrangement, kick/bass, tools,
+  reference tracks). What someone checked is marked **✓ verified**.
+- A **quiz**: guess the genre of a mystery track. It plays the part just before the drop (9 seconds before the
+  drop written in the admin panel, or from 30–60% of a track without one), which tells a genre far better
+  than the intro.
 - Artist panels with tracks, labels, festivals and their **next gigs**.
 - Shareable links: `/?genre=forest&artist=Derango`, `/?ship=118537`.
-- **✎ Fix** on every star, artist, festival and label opens the feedback form about it.
+- **✎ Fix** on every star, artist, festival, label and key track opens the feedback form about it, and
+  **+ Suggest a track** (on an artist) and **+ Suggest an artist** (on a genre) open it with fields for the
+  track or artist, so listeners can fill the gaps.
 
 **Events**
-- All upcoming parties as tickets grouped by day, with their map genres, weather at the venue (Open-Meteo),
-  "I'm going" counts and favorites. Search, country, subgenre and "this weekend" filters, infinite scroll.
+- All upcoming parties as tickets grouped by day, with their map genres, the **weather forecast for the day**
+  of the party (Open-Meteo, up to 16 days ahead), "I'm going" counts and favorites. Search, country, subgenre
+  and "this weekend" filters, infinite scroll.
 - Event page: line-up with a link to every artist, **timetable per stage**, venue, entry, description,
   organizer, map, aftermovie, reviews.
 - World map of every party (Leaflet), with star pins in the site's style.
@@ -87,7 +93,8 @@ the site knows offered while typing.
   otherwise an admin checks the link you send. **"Not on the map yet?"** asks for a page the site doesn't have.
 
 **Accounts**
-- Register (the email is confirmed with a link), log in (JWT), reset a forgotten password by email.
+- Register (the email is confirmed with a link), log in (JWT), or **Continue with Google** (a new Google account
+  picks a username first), and reset a forgotten password by email.
 - Favorites, "I'm going", reviews, reminder emails before saved events.
 - **Follow artists** (☆ Follow): their ships get a spreading halo on the map, and an email arrives when they
   are added to a new line-up. The profile lists who you follow.
@@ -99,6 +106,8 @@ the site knows offered while typing.
   reviews). Admins give roles in Users; the ones in the backend's `ADMIN_USERNAMES` always stay admins.
 - **Dashboard** of what waits, **Feedback inbox** with replies by email, **Requests** (genre and name changes,
   label crews, page claims, new pages), **Users**, **Reviews** moderation.
+- **Galaxy**: a genre's description, how it sounds, tempo and key tracks (add, remove, reorder, the second of
+  the drop, verified), on the map at once without a deploy.
 - **Artist genres**: place an artist in genres (the map changes at once, events are worked out again), hide
   words that aren't artists, merge two spellings of one artist.
 - **Events**: the harbour queue, genres by hand, the timetable by stage, read the line-up again, hide an event,
@@ -108,7 +117,10 @@ the site knows offered while typing.
 **Everywhere**
 - One look for the whole site, the HUD style of the map (`src/styles/site.css`, `src/map/map.css`).
 - **Motion on/off**: a site-wide reduced motion switch that starts from the system setting.
-- Works on phones (one menu, folded panels), and installs as an app (PWA, with an offline page).
+- Made for phones: on the galaxy everything stacks at the bottom without covering anything (the ship console, a
+  small year button, the player as a compact bar, the info sheet); the events list starts on the first screen
+  with the filters folded; 16px fields so iPhones don't zoom in; finger-sized buttons. It also installs as an
+  app (PWA, with an offline page).
 
 ## Tech stack
 
@@ -150,7 +162,8 @@ Then open `http://localhost:5173`. To see the admin panel locally, start the bac
 The live site is deployed on [Vercel](https://vercel.com) from the `master` branch.
 The backend address is set at build time through the `VITE_API_URL` environment variable (without it, the app
 calls `http://localhost:8080`), so a change to it needs a redeploy. `vercel.json` sends every path to
-`index.html` so React Router can handle it.
+`index.html` so React Router can handle it. The Google client id for "Continue with Google" is not a build
+setting: the frontend asks the backend for it (`GOOGLE_CLIENT_ID` there), and without it there is no button.
 
 ## Project structure
 
@@ -164,7 +177,7 @@ src/
 │   ├── MapOfPsy.tsx    # the home page: state, URL, panels
 │   ├── galaxy/         # Galaxy.tsx: everything drawn with PixiJS (stars, satellites, ships, fleets)
 │   ├── components/     # HUD panels: genre/artist panel, cockpit, fleet panel, player, tours, quiz...
-│   └── data/           # genres.json and friends; events.ts (ships, fleets), liveFleet.ts, placements.ts
+│   └── data/           # genres.json and friends; events.ts (ships, fleets), liveFleet.ts, placements.ts, content.ts
 ├── pages/        # Events, EventDetails, GlobalMap, Artists, Artist, Feedback, Admin*, Profile, auth pages
 ├── styles/       # site.css: the site's HUD style
 └── motion.js     # the reduced motion switch
@@ -174,7 +187,7 @@ src/
 
 - **Placements from the backend.** Which artist orbits which star lives in the database, so admins can change
   it. `placements.ts` loads it before the galaxy is drawn, waits at most 4 seconds, and otherwise keeps the
-  placements bundled in `genres.json`.
+  placements bundled in `genres.json`. `content.ts` does the same for each genre's texts and key tracks.
 - **Ships.** `events.ts` places each party at the share-weighted middle of its genres' stars, moves it out of a
   star's glow, and groups parties within one grid cell into a fleet. The same fleets feed the cockpit radar.
 - **Live fleets.** `liveFleet.ts` turns a timetable into one ship per genre: each leaves the party's ship an
@@ -186,7 +199,8 @@ src/
 ## Data sources
 
 - Events: [Goabase](https://www.goabase.net) (through the backend)
-- Genres, artists, labels, festivals: hand-made for Map of Psy, corrected with feedback from the community
+- Genres, artists, labels, festivals: hand-made for Map of Psy, corrected in the admin panel with feedback from
+  the community; checked facts are marked verified
 - Weather: [Open-Meteo](https://open-meteo.com)
 - Maps: [OpenStreetMap](https://www.openstreetmap.org) data, [Esri](https://www.esri.com) dark gray tiles,
   [Nominatim](https://nominatim.org) geocoding
