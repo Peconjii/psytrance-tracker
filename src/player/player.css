@@ -1,0 +1,55 @@
+/* The site's mini player (Player.tsx): drawn once by the app, so it stays on screen from page to page.
+   Computers: a small video box in the bottom left corner. Phones: a bar with a small video across the bottom.
+   <html> gets .has-player while a track plays and .on-galaxy on the home page (the galaxy fits the window, so
+   the other pages get room at the bottom instead). */
+.player {
+  position: fixed; left: 20px; bottom: 20px; z-index: 45; width: 320px;
+  background: var(--hud); border: 1px solid var(--line); border-left: 2px solid var(--accent); backdrop-filter: blur(10px);
+  color: var(--fg); font-family: var(--body);
+}
+.player[hidden] { display: none; }
+.player__head { display: flex; align-items: center; gap: 8px; padding: 6px 8px 6px 10px; font: 12px var(--mono); color: var(--muted); }
+.player__now { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.player__now b { color: var(--fg); font-weight: 600; }
+.player__star { margin-left: 8px; color: var(--accent); text-decoration: none; }
+.player__star:hover, .player__star:focus-visible { text-decoration: underline; outline: none; }
+.player__head a, .player__head button { color: var(--muted); background: none; border: 0; font-size: 16px; cursor: pointer; text-decoration: none; padding: 0 4px; }
+.player__head a:hover, .player__head button:hover { color: var(--fg); }
+.player__head .player__star { font-size: 12px; padding: 0; color: var(--accent); }
+.player__head button:disabled { opacity: 0.3; cursor: default; }
+.player__head .heart { width: auto; background: none; padding: 0 4px; }
+.player__frame { position: relative; }
+.player__mount iframe { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 0; }
+/* Quiz: the track keeps playing behind a cover */
+.player__cover { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(circle, #2a1f55, #0b0918); }
+.player__cover span { font: 800 44px var(--display); color: var(--accent); animation: player-pulse 1.1s ease-in-out infinite; }
+@keyframes player-pulse { 50% { opacity: 0.35; transform: scale(0.9); } }
+@media (prefers-reduced-motion: reduce) { .player__cover span { animation: none; } }
+html[data-motion='reduced'] .player__cover span { animation: none; }
+
+/* Pages scroll past it: room at the bottom so it never covers the end of a page */
+html.has-player:not(.on-galaxy) body { padding-bottom: 250px; }
+
+@media (max-width: 1100px) {
+  .player { width: 260px; }
+  html.has-player:not(.on-galaxy) body { padding-bottom: 210px; }
+}
+
+/* Phones: a bar across the bottom, a small video on the left and the title and buttons beside it */
+@media (max-width: 700px) {
+  .player {
+    left: 12px; right: 12px; width: auto; bottom: calc(var(--bottom-nav, 0px) + 8px + env(safe-area-inset-bottom, 0px));
+    display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center;
+  }
+  .player[hidden] { display: none; }
+  /* On the galaxy it sits above the ship console */
+  html.on-galaxy .player { bottom: calc(var(--bottom-nav, 0px) + 64px + env(safe-area-inset-bottom, 0px)); }
+  .player__frame { grid-row: 1; grid-column: 1; }
+  .player__mount iframe { width: 112px; }
+  .player__head { grid-row: 1; grid-column: 2; flex-wrap: wrap; gap: 0 2px; padding: 4px 4px 4px 10px; }
+  .player__now { flex: 1 1 100%; font-size: 12px; }
+  .player__star { display: none; }
+  .player__head a, .player__head button, .player__head .heart { min-width: 36px; min-height: 34px; display: inline-grid; place-items: center; font-size: 18px; padding: 0; }
+  .player__head > :last-child { margin-left: auto; }
+  html.has-player:not(.on-galaxy) body { padding-bottom: 90px; }
+}

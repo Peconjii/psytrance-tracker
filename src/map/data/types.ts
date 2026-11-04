@@ -86,6 +86,8 @@ export const useMainGenres = (byArtist: Record<string, string>) => { mainGenres 
 export const mainGenreOf = (name: string): string | undefined => mainGenres[name] ?? genresOfArtist(name)[0]?.id;
 /** The artists that orbit this genre's star */
 export const orbitingArtists = (g: Genre) => g.artists.filter((name) => mainGenreOf(name) === g.id);
+/** The genres that have this track among their key tracks (the first is where "back to the star" goes) */
+export const genresOfTrack = (t: Track) => data.genres.filter((g) => g.tracks.some((x) => x.youtube === t.youtube));
 export const tracksOfArtist = (name: string) =>
   data.genres.flatMap((g) => g.tracks)
     .filter((t) => t.artist === name || t.artist.split(/ & |, | x | vs\.? | ft\.? | feat\.? /i).includes(name));

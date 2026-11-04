@@ -1,4 +1,4 @@
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -8,6 +8,8 @@ import { FollowsProvider } from './context/FollowsContext'
 import { AuthProvider } from './context/AuthContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
+import { PlayerProvider } from './player/PlayerContext'
+import { Player } from './player/Player'
 
 // Each page is its own chunk, loaded when it is first opened: the galaxy (PixiJS) and the admin panel stay out
 // of everyone else's first load
@@ -55,6 +57,10 @@ const ArtistEdit = lazy(() => import('./pages/ArtistEdit'))
 function Shell() {
   const { pathname } = useLocation()
   const isHome = pathname === '/'
+  // The mini player and the phone layout place themselves by this (src/player/player.css)
+  useEffect(() => {
+    document.documentElement.classList.toggle('on-galaxy', isHome)
+  }, [isHome])
   // Widgets for other websites (in an iframe) come without the site's menu and footer
   if (pathname.startsWith('/embed/')) {
     return (
@@ -137,6 +143,8 @@ function Shell() {
 
       {!isHome && <JoinStrip />}
       {!isHome && <Footer />}
+      {/* Outside the pages, so the music keeps playing from one page to the next */}
+      <Player />
     </div>
   )
 }
@@ -147,7 +155,9 @@ function App() {
       <FavoritesProvider>
         <FollowsProvider>
           <BrowserRouter>
-            <Shell />
+            <PlayerProvider>
+              <Shell />
+            </PlayerProvider>
           </BrowserRouter>
         </FollowsProvider>
       </FavoritesProvider>

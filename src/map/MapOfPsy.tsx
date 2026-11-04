@@ -8,7 +8,7 @@ import './map.css';
 import { Galaxy, type CrewMember, type Focus, type ViewBounds } from './galaxy/Galaxy';
 import { Cockpit } from './components/Cockpit';
 import { Panel } from './components/Panel';
-import { Player } from './components/Player';
+import { usePlayer } from '../player/PlayerContext';
 import { Search } from './components/Search';
 import { ToursMenu, TourBar } from './components/Tours';
 import { Quiz } from './components/Quiz';
@@ -21,9 +21,8 @@ import { loadMapExtras, mapExtrasApplied } from './data/extras';
 import { contentApplied, loadContent } from './data/content';
 import { fetchMapEvents, mapArtistBySlug, type Boarded, type EventPeriod, type MapEvent } from './data/events';
 import { buildLiveFleets, fetchMapTimetables, type Timetable } from './data/liveFleet';
-import { usePlaylist } from './hooks/usePlaylist';
 import {
-  data, festivalById, genreById, genresOfArtist, genresOfLabel, labels, randomTrack, stopTrack, type Tour, type Track,
+  data, festivalById, genreById, genresOfArtist, genresOfLabel, genresOfTrack, labels, randomTrack, stopTrack, type Tour, type Track,
 } from './data/types';
 
 const MIN_YEAR = 1965;
@@ -64,8 +63,13 @@ function MapOfPsy() {
   const [initial] = useState(readUrl);
   const [selectedId, setSelectedId] = useState<string | null>(initial.genre);
   const [year, setYear] = useState(MAX_YEAR);
-  const [playing, setPlaying] = useState<Track | null>(null);
-  const [queue, setQueue] = useState<Track[] | null>(null);
+  // The music is the site's (src/player), so it keeps playing when you leave the galaxy
+  const player = usePlayer();
+  const { playing, hidden, playlist } = player;
+  // A quiz question left playing on another page shows its name there: the quiz stays on the galaxy
+  const revealRef = useRef(player.reveal);
+  revealRef.current = player.reveal;
+  useEffect(() => () => revealRef.current(), []);
   const [artist, setArtist] = useState<string | null>(initial.artist);
   const [festival, setFestival] = useState<string | null>(initial.festival);
   const [label, setLabel] = useState<string | null>(initial.label);
@@ -74,8 +78,6 @@ function MapOfPsy() {
   const [showLabels, setShowLabels] = useState(true);
   const [tour, setTour] = useState<{ tour: Tour; index: number } | null>(null);
   const [quiz, setQuiz] = useState(false);
-  const [hidden, setHidden] = useState(false);
-  const playlist = usePlaylist();
   const [timeTravel, setTimeTravel] = useState(false);
   // Phones: the year slider stays folded into a small button until it is opened
   const [yearOpen, setYearOpen] = useState(false);
@@ -264,17 +266,10 @@ function MapOfPsy() {
 
   /** Plays a track; with a queue, the next one starts when it ends */
   const play = (t: Track | null, mystery = false, list: Track[] | null = null) => {
-    setPlaying(t);
-    setHidden(mystery);
-    setQueue(list);
+    const from = t ? genresOfTrack(t)[0] : undefined;
+    player.play(t, mystery, list, from ? { id: from.id, name: from.name } : null);
     // A new mystery track must not sit next to an open HUD that could give it away
     if (mystery) select(null);
-  };
-  const step = (dir: 1 | -1) => {
-    if (!queue || !playing) return;
-    const i = queue.findIndex((t) => t.youtube === playing.youtube);
-    const next = queue[i + dir];
-    if (next) setPlaying(next);
   };
 
   // Each stop flies to its system, moves the year slider forward and plays the stop's track
@@ -299,7 +294,7 @@ function MapOfPsy() {
   };
   const exitQuiz = () => {
     setQuiz(false);
-    setHidden(false);
+    player.reveal();
   };
   // Jump to a random system and play one of its tracks
   const surprise = () => {
@@ -312,7 +307,7 @@ function MapOfPsy() {
 
   return (
     // has-player and year-open tell the phone layout what is stacked at the bottom (see map.css)
-    <div className={['psy-map app', (tour || quiz || compare) && 'is-touring', playing?.youtube && 'has-player',
+    <div className={['psy-map app', (tour || quiz || compare) && 'is-touring',
       yearOpen && 'year-open'].filter(Boolean).join(' ')}>
       <Galaxy selectedId={selectedId} artist={artist} year={year} onSelect={select} onSelectArtist={reveal}
         tourPath={tourPath} focus={focus} showStations={showStations} onSelectFestival={openFestival}
@@ -399,10 +394,6 @@ function MapOfPsy() {
         onCompare={openCompare} onClose={() => select(null)} />
       )}
 
-      <Player track={playing} hidden={hidden} playlist={playlist}
-        hasPrev={!!queue && !!playing && queue.findIndex((t) => t.youtube === playing.youtube) > 0}
-        hasNext={!!queue && !!playing && queue.findIndex((t) => t.youtube === playing.youtube) < queue.length - 1}
-        onPrev={() => step(-1)} onNext={() => step(1)} onEnded={() => step(1)} onClose={() => play(null)} />
       <Cockpit period={period} events={events} view={view}
         onPeriod={(p) => { setPeriod(p); setFleet(null); setHarbour(false); }}
         onLook={(x, y) => cameraRef.current?.(x, y)} onBoard={(id) => openFleet([id])} onHarbour={openHarbour}

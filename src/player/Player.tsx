@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
-import type { Track } from '../data/types';
-import { HeartButton } from './Playlist';
-import type { PlaylistApi } from '../hooks/usePlaylist';
+import { Link } from 'react-router-dom';
+import type { Track } from '../map/data/types';
+import { HeartButton } from '../map/components/Playlist';
+import { usePlayer } from './PlayerContext';
+import './player.css';
 
 // Minimal typing for the YouTube IFrame Player API (loaded at runtime from youtube.com)
 interface YTPlayer {
@@ -42,22 +44,15 @@ const PLAYING = 1;
 const BEFORE_DROP_SECONDS = 9;
 const quizStart = (track: Track) => (track.drop != null ? Math.max(0, track.drop - BEFORE_DROP_SECONDS) : null);
 
-interface Props {
-  track: Track | null;
-  /** Quiz mode: keep playing but hide everything that would give the answer away */
-  hidden?: boolean;
-  playlist: PlaylistApi;
-  hasPrev: boolean;
-  hasNext: boolean;
-  onPrev: () => void;
-  onNext: () => void;
-  /** Fired when a video finishes, so a queue can move on */
-  onEnded: () => void;
-  onClose: () => void;
-}
-
-/** Mini player that keeps playing while you move around the map */
-export function Player({ track, hidden = false, playlist, hasPrev, hasNext, onPrev, onNext, onEnded, onClose }: Props) {
+/** The site's mini player: drawn once by the app, so it keeps playing from page to page */
+export function Player() {
+  const { playing: track, hidden, playlist, hasPrev, hasNext, step, play } = usePlayer();
+  const onPrev = () => step(-1);
+  const onNext = () => step(1);
+  const onEnded = () => step(1);
+  const onClose = () => play(null);
+  // Its genre on the galaxy, for "back to the star" from any page
+  const { genre } = usePlayer();
   const wrapRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YTPlayer | null>(null);
   const onEndedRef = useRef(onEnded);
@@ -118,7 +113,12 @@ export function Player({ track, hidden = false, playlist, hasPrev, hasNext, onPr
         <div className="player__head">
           {hidden
             ? <span className="player__now">♪ <b>Mystery track</b> · guess the genre</span>
-            : <span className="player__now">▶ <b>{track.title}</b> · {track.artist}</span>}
+            : (
+              <span className="player__now">
+                ▶ <b>{track.title}</b> · {track.artist}
+                {genre && <Link className="player__star" to={`/?genre=${genre.id}`} title={`Open ${genre.name} on the galaxy`}>✦ {genre.name}</Link>}
+              </span>
+            )}
           {!hidden && <HeartButton track={track} playlist={playlist} />}
           {(hasPrev || hasNext) && !hidden && (
             <>
