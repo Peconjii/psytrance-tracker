@@ -570,3 +570,27 @@ html[data-theme="contrast"] .radar__star { fill: #3d3a33; opacity: 1; }
   .topbar__menu .topbar__pages { display: none; }
   .timeline__born { bottom: calc(var(--above-row) + var(--player)); }
 }
+
+/* ---------- Phones: the info panel is a bottom sheet (HudShell in Panel.tsx) ----------
+   Peeking: the lower part of the screen, so the star and its artists stay in view. Full: up to the title bar.
+   While it is open the ship console steps aside (html.has-sheet) and comes back when it closes. */
+.hud__grab { display: none; }
+@media (max-width: 700px) {
+  html.has-sheet .cockpit { display: none; }
+  .hud.sheet-peek, .hud.sheet-full {
+    left: 0; right: 0; width: auto; bottom: calc(var(--base) - 8px + var(--player)); padding-top: 26px;
+    border-left: 0; border-right: 0; border-bottom: 0; border-top: 2px solid var(--fam);
+    border-radius: 14px 14px 0 0; clip-path: none; transition: max-height 0.25s ease;
+  }
+  .hud.sheet-peek { max-height: 40%; }
+  .hud.sheet-full { max-height: calc(100% - 64px - var(--base) - var(--player)); }
+  html[data-motion='reduced'] .hud.sheet-peek, html[data-motion='reduced'] .hud.sheet-full { transition: none; }
+  .hud__grab {
+    display: grid; place-items: center; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 96px; height: 26px; padding: 0; background: none; border: 0; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none;
+  }
+  .hud__grab span { width: 40px; height: 4px; border-radius: 2px; background: var(--muted); opacity: 0.7; }
+  .hud.sheet-peek .hud__close, .hud.sheet-full .hud__close { top: 4px; }
+  /* The player sits right on top of an open sheet */
+  html.has-sheet.on-galaxy .player { bottom: calc(var(--bottom-nav, 0px) + 8px); }
+}

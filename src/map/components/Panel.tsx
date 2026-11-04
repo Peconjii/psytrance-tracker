@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
@@ -31,15 +31,60 @@ interface Props {
   onClose: () => void;
 }
 
-/** HUD container; on phones it is a bottom sheet that can be folded down to its header */
-export function HudShell({ className, style, children, foldOnPhone = false }: { className: string; style?: CSSProperties; children: ReactNode; foldOnPhone?: boolean }) {
+const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
+
+/**
+ * HUD container. On phones it is a bottom sheet, like Google Maps: it opens peeking from the bottom (the star and
+ * its artists stay in view above it), a swipe up or a tap on the handle opens it all the way, a swipe down brings
+ * it back and one more swipe down closes it. The help panel (no onClose) only folds.
+ */
+export function HudShell({ className, style, children, foldOnPhone = false, onClose }: {
+  className: string; style?: CSSProperties; children: ReactNode; foldOnPhone?: boolean; onClose?: () => void;
+}) {
   // The help panel starts folded on phones, where open it would cover most of the map
-  const [folded, setFolded] = useState(() => foldOnPhone && window.matchMedia('(max-width: 700px)').matches);
+  const [folded, setFolded] = useState(() => foldOnPhone && isPhone());
+  const [full, setFull] = useState(false);
+  const sheet = Boolean(onClose);
+  const drag = useRef<{ y: number; at: number } | null>(null);
+  const ref = useRef<HTMLElement>(null);
+
+  // While a sheet is open the ship console steps aside on phones (map.css)
+  useEffect(() => {
+    if (!sheet) return;
+    document.documentElement.classList.add('has-sheet');
+    return () => document.documentElement.classList.remove('has-sheet');
+  }, [sheet]);
+
+  const down = (e: ReactPointerEvent) => {
+    // Keep getting the pointer while the finger slides off the handle
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.preventDefault();
+    drag.current = { y: e.clientY, at: Date.now() };
+  };
+  const up = (e: ReactPointerEvent) => {
+    const start = drag.current;
+    drag.current = null;
+    if (!start) return;
+    const dy = e.clientY - start.y;
+    if (Math.abs(dy) < 12) { setFull((f) => !f); return; }   // a tap
+    if (dy < 0) setFull(true);
+    else if (full) setFull(false);
+    else onClose?.();
+  };
+
+  const classes = [className, folded && 'is-folded', sheet && (full ? 'sheet-full' : 'sheet-peek')].filter(Boolean).join(' ');
   return (
-    <aside className={folded ? `${className} is-folded` : className} style={style}>
-      <button className="hud__fold" onClick={() => setFolded((f) => !f)} aria-expanded={!folded}>
-        {folded ? '▴ Show info' : '▾ Hide'}
-      </button>
+    <aside ref={ref} className={classes} style={style}>
+      {sheet ? (
+        <button type="button" className="hud__grab" onPointerDown={down} onPointerUp={up} onPointerCancel={() => { drag.current = null; }}
+          aria-expanded={full} aria-label={full ? 'Show less' : 'Show more'}>
+          <span aria-hidden="true" />
+        </button>
+      ) : (
+        <button className="hud__fold" onClick={() => setFolded((f) => !f)} aria-expanded={!folded}>
+          {folded ? '▴ Show info' : '▾ Hide'}
+        </button>
+      )}
       {children}
     </aside>
   );
@@ -118,7 +163,7 @@ export function Panel({
     const f = festivalById[festival];
     const seen = artistsAtFestival(f.id);
     return (
-      <HudShell className="hud">
+      <HudShell className="hud" onClose={onClose}>
         <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
         <div className="hud__tag">// STATION · FESTIVAL</div>
         <h2>{f.name}</h2>
@@ -153,7 +198,7 @@ export function Panel({
     const gs = genresOfLabel(label);
     const lp = labels[label];
     return (
-      <HudShell className="hud">
+      <HudShell className="hud" onClose={onClose}>
         <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
         <div className="hud__tag">// CONSTELLATION · LABEL</div>
         <h2>{label}</h2>
@@ -213,7 +258,7 @@ export function Panel({
     const artistLabels = labelsOfArtist(artist);
     const src = sources[artist];
     return (
-      <HudShell className="hud" style={{ ['--fam' as string]: fam.color }}>
+      <HudShell className="hud" style={{ ['--fam' as string]: fam.color }} onClose={onClose}>
         <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
         <button className="hud__back" onClick={() => onSelectArtist(null)}>← {g.name}</button>
         <div className="hud__tag">// SATELLITE · ARTIST</div>
@@ -326,7 +371,7 @@ export function Panel({
   const to = data.links.filter(([a]) => a === g.id).map(([, b]) => b);
 
   return (
-    <HudShell className="hud" style={{ ['--fam' as string]: fam.color }}>
+    <HudShell className="hud" style={{ ['--fam' as string]: fam.color }} onClose={onClose}>
       <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
       <div className="hud__tag">// SYSTEM · {fam.name.toUpperCase()}</div>
       <h2>{g.name}{g.verified && <span className="hud__verified hud__verified--badge" title="Someone checked this text">✓ verified</span>}</h2>

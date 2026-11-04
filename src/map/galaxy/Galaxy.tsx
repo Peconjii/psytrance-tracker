@@ -145,6 +145,10 @@ function layoutSatellites(star: StarNode, shown: Set<string>) {
   star.more.text = hidden > 0 ? `+${hidden} more · open the system` : '';
 }
 
+/** On phones the info panel opens from the bottom: the camera puts what it opens in the upper part of the screen */
+const onPhone = () => window.matchMedia('(max-width: 700px)').matches;
+const sheetLift = (scale: number) => (onPhone() ? (window.innerHeight * 0.22) / scale : 0);
+
 /** Zoom level from which every star shows its satellites, not just the selected one */
 const SAT_ZOOM = 1.6;
 /** Festival names appear from this zoom; in the full overview they crowd the centre of the map */
@@ -875,7 +879,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     const fleet = selectedFleet && fleetsRef.current.find((f) => f.events.some((e) => e.id === selectedFleet[0]));
     if (!vp || !fleet) return;
     const scale = Math.max(vp.scale.x, 1.3);
-    vp.animate({ position: { x: fleet.x + 180 / scale, y: fleet.y }, scale, time: flight(700), ease: 'easeInOutSine' });
+    vp.animate({ position: { x: fleet.x + (onPhone() ? 0 : 180 / scale), y: fleet.y + sheetLift(scale) }, scale, time: flight(700), ease: 'easeInOutSine' });
   }, [selectedFleet, events, ready]);
 
   // Crew of the boarded ship: its line-up as satellites on alternating orbits around it
@@ -948,7 +952,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     const vp = viewportRef.current;
     if (vp && selectedId) {
       const g = genreById[selectedId];
-      vp.animate({ position: { x: g.x, y: g.y }, scale: Math.max(vp.scale.x, 1.3), time: flight(700), ease: 'easeInOutSine' });
+      const scale = Math.max(vp.scale.x, 1.3);
+      vp.animate({ position: { x: g.x, y: g.y + sheetLift(scale) }, scale, time: flight(700), ease: 'easeInOutSine' });
     }
   }, [selectedId, ready]);
 

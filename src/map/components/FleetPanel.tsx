@@ -37,7 +37,7 @@ export function FleetPanel({ events, harbour, boarded, loadingCrew, onBoard, onS
   const { gigsByEvent } = useFollows();
   const followedSlugs = new Set<string>((boarded ? gigsByEvent.get(boarded.id) ?? [] : []).map((name: string) => artistSlug(name)));
   return (
-    <HudShell className="hud" style={{ ['--fam' as string]: color }}>
+    <HudShell className="hud" style={{ ['--fam' as string]: color }} onClose={onClose}>
       <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
       <div className="hud__tag">{harbour ? '// HARBOUR · GENRE UNKNOWN' : events.length > 1 ? `// FLEET · ${events.length} SHIPS` : '// SHIP · EVENT'}</div>
       <h2>{harbour ? 'Harbour' : events.length > 1 ? `${events.length} events` : events[0].nameParty}</h2>
