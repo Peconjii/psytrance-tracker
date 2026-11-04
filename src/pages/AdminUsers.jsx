@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { fetchAdminUsers, setUserRole } from '../api/backend.js'
+import { deleteUser, fetchAdminUsers, setUserRole } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import UserPages from '../components/UserPages.jsx'
 import { useAuth } from '../context/AuthContext'
@@ -57,6 +57,24 @@ function AdminUsers() {
             setLoaded(l => ({ ...l, data: { ...l.data, users: l.data.users.map(x => (x.id === u.id ? { ...x, role: saved.role } : x)) } }))
         } catch (err) {
             setError(err.response?.data?.message || 'Could not change the role.')
+        } finally {
+            setSaving(null)
+        }
+    }
+
+    // Deleting an account can't be undone, so it asks first and names what goes
+    const removeUser = async (u) => {
+        if (!window.confirm(`Delete the account "${u.username}" for good?
+
+Its follows, saved events, "I'm going", reviews, `
+            + 'requests and role go with it. Pages it owned stay without an owner; events it added move to you. This cannot be undone.')) return
+        setSaving(u.username)
+        setError('')
+        try {
+            await deleteUser(u.username)
+            setLoaded(l => ({ ...l, data: { ...l.data, total: l.data.total - 1, users: l.data.users.filter(x => x.id !== u.id) } }))
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not delete the account.')
         } finally {
             setSaving(null)
         }
@@ -140,6 +158,12 @@ function AdminUsers() {
                                             {PAGE_ROLES.map(r => <option key={r.kind} value={'PAGE:' + r.kind}>{r.label}</option>)}
                                         </optgroup>
                                     </select>
+                                )}
+                                {!u.roleOnServer && u.username !== user?.username && (
+                                    <button type="button" className="btn btn--danger shrink-0" disabled={saving !== null}
+                                        onClick={() => removeUser(u)} aria-label={`Delete the account ${u.username}`}>
+                                        Delete
+                                    </button>
                                 )}
                                 <UserPages user={u} onChanged={() => setVersion(v => v + 1)}
                                     linking={linking[u.id] ?? null} onLinking={(kind) => setLinking(l => ({ ...l, [u.id]: kind }))} />

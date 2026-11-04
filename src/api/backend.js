@@ -549,6 +549,12 @@ export async function fetchAdminUsers(search, team, signal) {
     return response.data
 }
 
+// Admin: deletes an account for good (what stays on the site: see the backend's UserDeletion)
+export async function deleteUser(username) {
+    const response = await api.delete('/api/admin/users/' + encodeURIComponent(username))
+    return response.data
+}
+
 // role: 'ADMIN', 'EDITOR' or null (a user again)
 export async function setUserRole(username, role) {
     const response = await api.put('/api/admin/users/' + encodeURIComponent(username) + '/role', { role })
