@@ -45,7 +45,7 @@
 .hud--idle p { color: var(--muted); line-height: 1.5; margin: 8px 0 0; }
 .hud__tag { font: 11px var(--mono); letter-spacing: 0.14em; color: var(--fam); padding-right: 28px; }
 .hud h2 { font-family: var(--display); font-weight: 500; font-size: 24px; margin: 8px 0 12px; text-wrap: balance; }
-.hud p { line-height: 1.6; color: #cfcaf2; }
+.hud p { line-height: 1.6; color: var(--soft, #cfcaf2); }
 .hud__stats { display: flex; gap: 16px; flex-wrap: wrap; font: 11px var(--mono); color: var(--muted); letter-spacing: 0.08em; }
 .hud__stats b { color: var(--fam); font-weight: 600; font-variant-numeric: tabular-nums; }
 .hud__label { font: 10px var(--mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin: 18px 0 8px; }
@@ -75,7 +75,7 @@
 /* Sound specs and metadata */
 .hud__specs { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 13px; line-height: 1.45; }
 .hud__specs dt { font: 10px var(--mono); letter-spacing: 0.14em; color: var(--fam); padding-top: 3px; }
-.hud__specs dd { margin: 0; color: #cfcaf2; min-width: 0; }
+.hud__specs dd { margin: 0; color: var(--soft, #cfcaf2); min-width: 0; }
 .hud__specs--meta { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--line); }
 .hud__specs--meta dt { color: var(--muted); }
 .hud__track { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -119,7 +119,7 @@
 .hud__back { background: none; border: 0; padding: 0; margin-bottom: 10px; font: 11px var(--mono); letter-spacing: 0.08em; color: var(--muted); cursor: pointer; }
 .hud__back:hover, .hud__back:focus-visible { color: var(--fam); outline: none; }
 .hud__albums { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; font-size: 13px; }
-.hud__albums li { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px dashed var(--line); color: #cfcaf2; }
+.hud__albums li { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px dashed var(--line); color: var(--soft, #cfcaf2); }
 .hud__albums li span:last-child { font: 12px var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
 .hud__ext { display: inline-block; margin-top: 18px; font: 12px var(--mono); color: var(--fam); text-decoration: none; }
 .hud__ext:hover { text-decoration: underline; }
@@ -144,7 +144,7 @@
 .tourbar__exit { background: none; border: 0; color: var(--muted); font-size: 20px; cursor: pointer; line-height: 1; }
 .tourbar__exit:hover { color: var(--fg); }
 .tourbar h3 { margin: 6px 0 4px; font-family: var(--display); font-weight: 500; font-size: 18px; }
-.tourbar p { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: #cfcaf2; }
+.tourbar p { margin: 0 0 12px; font-size: 14px; line-height: 1.55; color: var(--soft, #cfcaf2); }
 .tourbar__nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .tourbar__nav > button { padding: 6px 12px; font: 12px var(--mono); color: var(--fg); background: transparent; border: 1px solid var(--line); cursor: pointer; }
 .tourbar__nav > button:hover:not(:disabled) { border-color: var(--accent); }
@@ -180,7 +180,7 @@
 .producer[open] summary::before { content: '▾ '; }
 .producer summary small { color: var(--muted); letter-spacing: 0.06em; text-transform: none; margin-left: 6px; }
 .producer > .hud__specs, .producer__tip, .producer > .hud__share { margin: 0 12px 12px; }
-.producer__tip { padding: 10px 12px; font-size: 13px; line-height: 1.5; color: #cfcaf2; border-left: 2px solid var(--fam); background: rgba(255,255,255,0.04); }
+.producer__tip { padding: 10px 12px; font-size: 13px; line-height: 1.5; color: var(--soft, #cfcaf2); border-left: 2px solid var(--fam); background: rgba(255,255,255,0.04); }
 .producer__tip b { font: 10px var(--mono); letter-spacing: 0.14em; color: var(--fam); margin-right: 6px; text-transform: uppercase; }
 .producer > .hud__share { display: block; margin: 0 12px 12px auto; }
 
@@ -234,14 +234,14 @@
 /* Compare button and inline links in the HUD */
 .hud__compare { margin: -4px 0 12px; padding: 4px 10px; font: 11px var(--mono); color: var(--fam); background: transparent; border: 1px solid var(--line); cursor: pointer; }
 .hud__compare:hover, .hud__compare:focus-visible { border-color: var(--fam); outline: none; }
-.hud__link { background: none; border: 0; padding: 0; margin: 0 10px 2px 0; font: inherit; color: #cfcaf2; text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer; text-align: left; }
+.hud__link { background: none; border: 0; padding: 0; margin: 0 10px 2px 0; font: inherit; color: var(--soft, #cfcaf2); text-decoration: underline dotted; text-underline-offset: 3px; cursor: pointer; text-align: left; }
 .hud__link:hover, .hud__link:focus-visible { color: var(--fg); text-decoration-style: solid; outline: none; }
 
 /* Compare card */
 .compare { left: 20px; transform: none; width: min(720px, calc(100% - 420px)); }
 .compare__grid { display: grid; grid-template-columns: 92px 1fr 1fr; gap: 8px 14px; align-items: start; margin: 8px 0 12px; }
 .compare__row { display: contents; }
-.compare__row p { margin: 0; font-size: 13px; line-height: 1.45; color: #cfcaf2; }
+.compare__row p { margin: 0; font-size: 13px; line-height: 1.45; color: var(--soft, #cfcaf2); }
 .compare__label { font: 10px var(--mono); letter-spacing: 0.14em; color: var(--muted); padding-top: 3px; }
 .compare__pick select { width: 100%; padding: 6px 8px; font: 500 15px var(--display); color: var(--fg); background: rgba(255,255,255,0.05); border: 1px solid var(--line); border-left: 3px solid var(--c); }
 .compare__pick small { display: block; margin-top: 4px; font: 11px var(--mono); color: var(--muted); }
@@ -577,3 +577,21 @@
 /* "+ Suggest a track" under an artist's tracks */
 .hud__suggest { display: inline-block; margin-top: 8px; padding: 6px 10px; font: 12px var(--mono); color: var(--fam, var(--accent)); text-decoration: none; border: 1px dashed var(--line); }
 .hud__suggest:hover, .hud__suggest:focus-visible { border-color: var(--fam, var(--accent)); outline: none; }
+
+/* High contrast theme (src/theme.js): solid black panels, white text, thicker edges */
+html[data-theme="contrast"] .psy-map {
+  --bg: #000;
+  --hud: #000;
+  --line: #bdbdbd;
+  --fg: #fff;
+  --soft: #fff;
+  --muted: #e0e0e0;
+  --accent: #00f0c0;
+}
+html[data-theme="contrast"] .psy-map .hud,
+html[data-theme="contrast"] .psy-map .tourbar {
+  background-image: none; backdrop-filter: none; border-width: 2px; border-left-width: 4px;
+}
+html[data-theme="contrast"] .psy-map .legend i { box-shadow: 0 0 0 2px #fff; }
+html[data-theme="contrast"] .facts__related { border-left-color: #e0e0e0 !important; }
+html[data-theme="contrast"] .radar__star { fill: #e0e0e0; opacity: 1; }

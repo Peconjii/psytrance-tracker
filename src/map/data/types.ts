@@ -6,6 +6,7 @@ import festivalsRaw from './festivals.json';
 import appearancesRaw from './appearances.json';
 import labelsRaw from './labels.json';
 import sourcesRaw from './sources.json';
+import { CONTRAST_SCENES, highContrast } from '../../theme.js';
 
 export type FamilyId = 'roots' | 'goa' | 'prog' | 'dark' | 'chill';
 
@@ -59,6 +60,12 @@ export interface MapData {
 }
 
 export const data = raw as MapData;
+// High contrast theme: the same scenes, in brighter colors (everything that colors by scene reads them here)
+if (highContrast) {
+  for (const [id, color] of Object.entries(CONTRAST_SCENES)) {
+    if (data.families[id as FamilyId]) data.families[id as FamilyId].color = color;
+  }
+}
 export const genreById = Object.fromEntries(data.genres.map((g) => [g.id, g])) as Record<string, Genre>;
 
 /** Artist profile from MusicBrainz; fields are omitted when no reliable match was found */

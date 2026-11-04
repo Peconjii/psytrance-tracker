@@ -394,3 +394,28 @@ a.rows__item:hover, a.rows__item:focus-visible { background: rgba(255, 255, 255,
 
 /* Admin -> Galaxy: Save stays in view at the bottom while the long form scrolls */
 .galaxy-save { position: sticky; bottom: 0; z-index: 5; padding: 12px 0; background: var(--bg); border-top: 1px solid var(--line); }
+
+/* ---------- High contrast theme (src/theme.js) ----------
+   Black background, white text, bright scene colors, thicker lines, no see-through panels. */
+html[data-theme="contrast"] {
+  --bg: #000;
+  --hud: #000;
+  --hud-solid: #000;
+  --line: #bdbdbd;
+  --fg: #fff;
+  --soft: #fff;
+  --muted: #e0e0e0;
+  --accent: #00f0c0;
+  --danger: #ff7a9a;
+  --gold: #ffe14d;
+  --goa: #ffb020;
+  --prog: #00f0c0;
+  --dark: #ff5cf4;
+  --chill: #4db8ff;
+  --roots: #e6e6e6;
+}
+html[data-theme="contrast"] body { background-image: none; background-color: #000; }
+html[data-theme="contrast"] .site-nav { background: #000; border-bottom-width: 2px; backdrop-filter: none; }
+html[data-theme="contrast"] .link,
+html[data-theme="contrast"] a.btn--ghost { text-decoration: underline; text-underline-offset: 3px; }
+html[data-theme="contrast"] :focus-visible { outline: 3px solid #ffe14d; outline-offset: 2px; }

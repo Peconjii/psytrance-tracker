@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { fetchAdminWaiting } from '../api/backend.js'
 import { setReducedMotion, useReducedMotion } from '../motion.js'
+import { highContrast, setTheme } from '../theme.js'
 
 function Navbar() {
     const { user, logout } = useAuth()
@@ -45,6 +46,13 @@ function Navbar() {
             Motion {reducedMotion ? 'off' : 'on'}
         </button>
     )
+    // Site-wide high contrast theme; starts from the system setting
+    const themeButton = (
+        <button className="btn btn--ghost" onClick={() => setTheme(highContrast ? 'cosmic' : 'contrast')} aria-pressed={highContrast}
+            title={highContrast ? 'Back to the usual colors' : 'Black background, white text, bright colors: easier to read'}>
+            Contrast {highContrast ? 'on' : 'off'}
+        </button>
+    )
 
     const authLinks = user ? (
         <>
@@ -75,7 +83,7 @@ function Navbar() {
                     ))}
                 </div>
 
-                <div className="site-nav__auth">{motionButton}{authLinks}</div>
+                <div className="site-nav__auth">{themeButton}{motionButton}{authLinks}</div>
 
                 <button
                     onClick={() => setIsOpen(open => !open)}
@@ -94,7 +102,7 @@ function Navbar() {
                             {link.label}{link.count > 0 && <span className="site-nav__count">{link.count}</span>}
                         </Link>
                     ))}
-                    <div className="flex flex-wrap gap-2 pt-3">{motionButton}{authLinks}</div>
+                    <div className="flex flex-wrap gap-2 pt-3">{themeButton}{motionButton}{authLinks}</div>
                 </div>
             )}
         </nav>

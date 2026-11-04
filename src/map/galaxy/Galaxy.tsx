@@ -4,6 +4,7 @@ import { Viewport } from 'pixi-viewport';
 import { data, festivals, genreById, genresOfArtist, labels, WORLD, type Genre } from '../data/types';
 import { artistSlug, buildFleets, HARBOUR, type MapEvent } from '../data/events';
 import { shipState, type LiveFleet } from '../data/liveFleet';
+import { highContrast as HC } from '../../theme.js';
 
 interface Props {
   selectedId: string | null;
@@ -293,7 +294,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         nebula.circle(g.x, g.y, 220 * g.size).fill({ color: c, alpha: 0.08 });
       }
       nebula.filters = [new BlurFilter({ strength: 60, quality: 4 })];
-      vp.addChild(nebula);
+      if (!HC) vp.addChild(nebula);
 
       // Routes
       const routeLayer = new Container();
@@ -412,12 +413,13 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         const color = hex(data.families[g.family].color);
         const root = new Container();
         root.position.set(g.x, g.y);
-        const halo = new Graphics().circle(0, 0, 34 * g.size).fill({ color, alpha: 0.35 });
+        const halo = new Graphics().circle(0, 0, 34 * g.size).fill({ color, alpha: HC ? 0.2 : 0.35 });
         halo.filters = [new BlurFilter({ strength: 14 })];
         const core = new Graphics().circle(0, 0, 11 * g.size).fill(color).circle(0, 0, 5 * g.size).fill(0xffffff);
+        if (HC) core.circle(0, 0, 11 * g.size + 1.5).stroke({ width: 2.5, color: 0xffffff });
         const label = new Text({
           text: g.name.toUpperCase(),
-          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 15, fill: 0xe9e6ff, letterSpacing: 2 },
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 18 : 15, fontWeight: HC ? '700' : '400', fill: HC ? 0xffffff : 0xe9e6ff, letterSpacing: 2 },
         });
         label.anchor.set(0.5, 0);
         label.position.set(0, 30 * g.size);
@@ -441,15 +443,15 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         orbit.visible = false;
         const inner = 80 * g.size + 20;
         const rings = new Graphics()
-          .circle(0, 0, inner).stroke({ width: 1, color, alpha: 0.25 })
-          .circle(0, 0, inner + 26).stroke({ width: 1, color, alpha: 0.15 });
+          .circle(0, 0, inner).stroke({ width: HC ? 1.5 : 1, color, alpha: HC ? 0.6 : 0.25 })
+          .circle(0, 0, inner + 26).stroke({ width: HC ? 1.5 : 1, color, alpha: HC ? 0.45 : 0.15 });
         orbit.addChild(rings);
         const sats = g.artists.map((name, i) => {
           const node = new Container();
           const dot = new Graphics().circle(0, 0, 4).fill(0xffffff).circle(0, 0, 7).stroke({ width: 1.5, color, alpha: 0.8 });
           const text = new Text({
             text: name,
-            style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xcfcaf2 },
+            style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 13 : 11, fill: HC ? 0xffffff : 0xcfcaf2 },
           });
           text.anchor.set(0.5, 0);
           text.position.set(0, 9);
@@ -646,7 +648,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       r.line.clear();
       if (A.year > year || B.year > year) continue;
       r.line.moveTo(A.x, A.y).lineTo(B.x, B.y)
-        .stroke({ width: hot ? 3 : 1.5, color: hex(data.families[B.family].color), alpha: artist || focus ? 0.12 : hot ? 0.9 : 0.3 });
+        .stroke({ width: (hot ? 3 : 1.5) * (HC ? 1.6 : 1), color: hex(data.families[B.family].color), alpha: artist || focus ? (HC ? 0.25 : 0.12) : hot ? 1 : HC ? 0.7 : 0.3 });
     }
 
     // Dotted lines from the current system to the artist's other systems
@@ -886,7 +888,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       const node = new Container();
       const color = member.color ? hex(member.color) : 0xcfcaf2;
       const dot = new Graphics().circle(0, 0, 4).fill(color).circle(0, 0, 7).stroke({ width: 1.5, color: fleet.color, alpha: 0.8 });
-      const text = new Text({ text: member.name, style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xe9e6ff } });
+      const text = new Text({ text: member.name, style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 13 : 11, fill: HC ? 0xffffff : 0xe9e6ff } });
       text.anchor.set(0.5, 0);
       text.position.set(0, 9);
       node.addChild(dot, text);
