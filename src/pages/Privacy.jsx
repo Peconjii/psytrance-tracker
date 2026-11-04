@@ -52,12 +52,13 @@ function Privacy() {
                     <ul>
                         <li><strong>Vercel</strong> serves the website, <strong>Render</strong> runs the server and
                             <strong> Neon</strong> keeps the database.</li>
-                        <li>An email service sends the emails.</li>
+                        <li><strong>Brevo</strong> sends the emails; <strong>Cloudflare</strong> passes on mail written to hello@mapofpsy.com.</li>
                         <li><strong>Google</strong>, only if you use &ldquo;Continue with Google&rdquo;: its button loads
                             on the login and register pages.</li>
                         <li>Events come from <a className="link" href="https://www.goabase.net" target="_blank" rel="noopener noreferrer">Goabase</a>,
                             the weather from <a className="link" href="https://open-meteo.com" target="_blank" rel="noopener noreferrer">Open-Meteo</a>:
                             they don&apos;t get anything about you.</li>
+                        <li><strong>Vercel Web Analytics</strong> counts visits, without cookies (see above).</li>
                         <li>Videos play from YouTube in its no-cookie mode: YouTube only sets cookies once you play one.</li>
                     </ul>
                 </Part>
@@ -65,7 +66,8 @@ function Privacy() {
                 <Part title="Seeing and deleting your data">
                     <p>Everything the site keeps about you is on your <Link className="link" to="/profile">profile</Link>.
                         At its bottom, &ldquo;Delete my account&rdquo; deletes the account and everything that is yours, for good,
-                        right away. For anything else, write to us through the <Link className="link" to="/feedback">feedback form</Link>.</p>
+                        right away. For anything else, write to us through the <Link className="link" to="/feedback">feedback form</Link> or
+                        to <a className="link" href="mailto:hello@mapofpsy.com">hello@mapofpsy.com</a>.</p>
                 </Part>
             </div>
         </div>
