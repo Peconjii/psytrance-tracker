@@ -594,3 +594,11 @@ html[data-theme="contrast"] .radar__star { fill: #3d3a33; opacity: 1; }
   /* The player sits right on top of an open sheet */
   html.has-sheet.on-galaxy .player { bottom: calc(var(--bottom-nav, 0px) + 8px); }
 }
+
+/* In a genre's panel: its upcoming ships, one tap opens them */
+.hud__ships {
+  display: block; width: 100%; margin: 4px 0 14px; padding: 10px 12px; text-align: left; cursor: pointer;
+  font: 12px var(--mono); letter-spacing: 0.04em; color: var(--fam); background: rgb(var(--tint-rgb) / 0.04);
+  border: 1px solid var(--line); border-left: 2px solid var(--fam);
+}
+.hud__ships:hover, .hud__ships:focus-visible { border-color: var(--fam); outline: none; }

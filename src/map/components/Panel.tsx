@@ -29,6 +29,8 @@ interface Props {
   onSelect: (id: string) => void;
   onSelectArtist: (name: string | null) => void;
   onClose: () => void;
+  /** Upcoming ships of the open genre ("this week" / "this month"); a tap opens them as a fleet */
+  ships?: { count: number; when: string; onOpen: () => void } | null;
 }
 
 const isPhone = () => window.matchMedia('(max-width: 700px)').matches;
@@ -114,7 +116,7 @@ const youtube = (q: string) => `https://www.youtube.com/results?search_query=${e
 
 /** HUD panel styled as a ship's terminal */
 export function Panel({
-  genreId, artist, festival, label, playing, playlist, onPlay, onSelect, onSelectArtist, onOpenFestival, onOpenArtist, onOpenLabel, onCompare, onClose,
+  genreId, artist, festival, label, playing, playlist, onPlay, onSelect, onSelectArtist, onOpenFestival, onOpenArtist, onOpenLabel, onCompare, onClose, ships,
 }: Props) {
   const chips = (ids: string[], keepArtist = false) =>
     ids.length ? (
@@ -390,6 +392,12 @@ export function Panel({
       </dl>
 
       <ProducerCorner genre={g} />
+
+      {ships && ships.count > 0 && (
+        <button className="hud__ships" onClick={ships.onOpen}>
+          ▲ {ships.count} {ships.count === 1 ? 'ship' : 'ships'} {ships.when} play {g.name} →
+        </button>
+      )}
 
       {g.tracks.length > 0 && (<><div className="hud__label">Key tracks</div>{trackList(g.tracks, g.name)}</>)}
 

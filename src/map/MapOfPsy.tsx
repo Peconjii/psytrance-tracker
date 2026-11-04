@@ -23,7 +23,7 @@ import { contentApplied, loadContent } from './data/content';
 import { fetchMapEvents, mapArtistBySlug, type Boarded, type EventPeriod, type MapEvent } from './data/events';
 import { buildLiveFleets, fetchMapTimetables, type Timetable } from './data/liveFleet';
 import {
-  data, festivalById, genreById, genresOfArtist, genresOfLabel, genresOfTrack, labels, randomTrack, stopTrack, type Tour, type Track,
+  data, festivalById, genreById, genresOfArtist, genresOfLabel, genresOfTrack, labels, mainGenreOf, randomTrack, stopTrack, type Tour, type Track,
 } from './data/types';
 
 const MIN_YEAR = 1965;
@@ -287,6 +287,11 @@ function MapOfPsy() {
     select(null);
     setFleet(ids);
   };
+  // The ships of a genre, for the line in its panel (on phones the ship console steps aside while it is open)
+  const shipsOf = (genreId: string) => {
+    const ids = (events ?? []).filter((e) => e.genres.some((g) => g.genreId === genreId)).map((e) => e.id);
+    return { count: ids.length, when: period === 'MONTH' ? 'this month' : 'this week', onOpen: () => openFleet(ids) };
+  };
   const openHarbour = () => {
     select(null);
     setHarbour(true);
@@ -426,7 +431,8 @@ function MapOfPsy() {
         playing={hidden ? null : playing} playlist={playlist}
         onPlay={(t, list) => play(t, false, list ?? null)}
         onSelect={select} onSelectArtist={setArtist} onOpenFestival={openFestival} onOpenLabel={openLabel}
-        onOpenArtist={(name) => reveal(genresOfArtist(name)[0].id, name)}
+        onOpenArtist={(name) => reveal(mainGenreOf(name) ?? genresOfArtist(name)[0].id, name)}
+        ships={selectedId && !artist ? shipsOf(selectedId) : null}
         onCompare={openCompare} onClose={() => select(null)} />
       )}
 
