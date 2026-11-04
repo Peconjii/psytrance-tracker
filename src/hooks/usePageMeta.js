@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 export const SITE_URL = 'https://mapofpsy.com'
 const SITE_NAME = 'Map of Psy'
 const DEFAULT_DESCRIPTION =
-    'Find upcoming psytrance festivals and parties around the world. Browse psytrance events by country and subgenre, see them on a world map and check who plays where.'
+    'Psytrance as a galaxy: every genre a star, its artists orbiting it, and upcoming festivals and parties around the world as ships sailing between them. See who plays where.'
 
 function setMeta(attribute, key, content) {
     let tag = document.head.querySelector(`meta[${attribute}="${key}"]`)
