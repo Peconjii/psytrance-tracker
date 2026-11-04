@@ -225,10 +225,34 @@ function MapOfPsy() {
     if (label) q.set('label', label);
     if (fleet?.length === 1) q.set('ship', String(fleet[0]));
     const url = q.size ? `?${q}` : window.location.pathname;
-    window.history.replaceState(null, '', url);
+    // Keeps the history entry's state (the router's, and the open panel's mark below)
+    window.history.replaceState(window.history.state, '', url);
     const name = artist ?? (festival ? festivalById[festival].name : null) ?? label ?? (selectedId ? genreById[selectedId].name : null);
     document.title = name ? `${name} · Map of Psy` : 'Map of Psy · psy galaxy + event tracker';
   }, [selectedId, artist, festival, label, fleet]);
+
+  // Phones: the back button closes an open panel first, like in an app, instead of leaving the galaxy.
+  // Opening a panel adds a history entry marked "panel"; going back to the entry under it closes the panel.
+  const panelOpen = Boolean(selectedId || artist || festival || label || fleet || harbour);
+  const closeAllRef = useRef(() => {});
+  closeAllRef.current = () => { setFleet(null); setHarbour(false); setFestival(null); setLabel(null); setSelectedId(null); setArtist(null); };
+  useEffect(() => {
+    if (!window.matchMedia('(max-width: 700px)').matches) return;
+    const marked = Boolean(window.history.state?.panel);
+    if (panelOpen && !marked) {
+      // The entry under it is the galaxy with nothing open, so going back there shows a clean address
+      const href = window.location.href;
+      window.history.replaceState(window.history.state, '', window.location.pathname);
+      window.history.pushState({ ...window.history.state, panel: true }, '', href);
+    }
+    // Closed with ✕ or a swipe: drop the extra entry, so back doesn't need two presses
+    if (!panelOpen && marked) window.history.back();
+  }, [panelOpen]);
+  useEffect(() => {
+    const onPop = (e: PopStateEvent) => { if (!e.state?.panel) closeAllRef.current(); };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
   const clearFocus = () => {
     setFleet(null);
