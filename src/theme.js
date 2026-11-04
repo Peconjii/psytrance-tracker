@@ -8,6 +8,8 @@
 const KEY = 'theme'
 
 function read() {
+    // Outside a browser (tests) there is no page to color
+    if (typeof window === 'undefined') return 'cosmic'
     try {
         const saved = localStorage.getItem(KEY)
         if (saved === 'contrast' || saved === 'cosmic') return saved
@@ -19,7 +21,7 @@ function read() {
 
 export const theme = read()
 export const highContrast = theme === 'contrast'
-if (highContrast) document.documentElement.setAttribute('data-theme', 'contrast')
+if (highContrast && typeof document !== 'undefined') document.documentElement.setAttribute('data-theme', 'contrast')
 
 export function setTheme(value) {
     try {
