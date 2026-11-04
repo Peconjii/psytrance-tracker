@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type MutableRefObject } from 'react';
 import { Application, BlurFilter, Container, Graphics, Text } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
-import { data, festivals, genreById, genresOfArtist, labels, WORLD, type Genre } from '../data/types';
+import { data, festivals, genreById, genresOfArtist, labels, mainGenreOf, orbitingArtists, WORLD, type Genre } from '../data/types';
 import { artistSlug, buildFleets, HARBOUR, type MapEvent } from '../data/events';
 import { shipState, type LiveFleet } from '../data/liveFleet';
 import { highContrast as HC } from '../../theme.js';
@@ -140,7 +140,8 @@ function layoutSatellites(star: StarNode, shown: Set<string>) {
     sat.radius = inner + (i % 2) * 26;
     sat.phase = (i / visible.length) * Math.PI * 2;
   });
-  const hidden = star.sats.length - visible.length;
+  // Artists of this orbit that don't fit; the ones whose main genre is elsewhere orbit there instead
+  const hidden = star.sats.filter((sat) => !shown.has(sat.name) && mainGenreOf(sat.name) === star.genre.id).length;
   star.more.text = hidden > 0 ? `+${hidden} more · open the system` : '';
 }
 
@@ -476,7 +477,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         orbit.addChild(more);
         satLayer.addChild(orbit);
         starsRef.current[g.id] = { genre: g, root, halo, label, orbit, sats, more, count };
-        layoutSatellites(starsRef.current[g.id], pickSatellites(g.artists, null, undefined));
+        layoutSatellites(starsRef.current[g.id], pickSatellites(orbitingArtists(g), null, undefined));
       }
 
       // Animation: pulse on the beat (one pulse per bar), particles, orbiting satellites
@@ -689,7 +690,11 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   useEffect(() => {
     if (!ready) return;
     for (const s of Object.values(starsRef.current)) {
-      layoutSatellites(s, pickSatellites(s.genre.artists, s.genre.id === selectedId ? artist : null, followedArtists));
+      // Only the artists whose main genre this is; an artist opened from another genre's panel joins for the visit
+      const here = s.genre.id === selectedId ? artist : null;
+      const names = orbitingArtists(s.genre);
+      if (here && !names.includes(here) && s.genre.artists.includes(here)) names.unshift(here);
+      layoutSatellites(s, pickSatellites(names, here, followedArtists));
     }
   }, [selectedId, artist, followedArtists, ready]);
 

@@ -78,6 +78,14 @@ export interface ArtistProfile {
 
 export const artists = artistsRaw as Record<string, ArtistProfile>;
 export const genresOfArtist = (name: string) => data.genres.filter((g) => g.artists.includes(name));
+
+// An artist orbits one star only, their main genre (set by an admin: the first of their genres). The others still
+// count everywhere else. Without the backend's answer the first genre of the map that has them is the main one.
+let mainGenres: Record<string, string> = {};
+export const useMainGenres = (byArtist: Record<string, string>) => { mainGenres = byArtist; };
+export const mainGenreOf = (name: string): string | undefined => mainGenres[name] ?? genresOfArtist(name)[0]?.id;
+/** The artists that orbit this genre's star */
+export const orbitingArtists = (g: Genre) => g.artists.filter((name) => mainGenreOf(name) === g.id);
 export const tracksOfArtist = (name: string) =>
   data.genres.flatMap((g) => g.tracks)
     .filter((t) => t.artist === name || t.artist.split(/ & |, | x | vs\.? | ft\.? | feat\.? /i).includes(name));

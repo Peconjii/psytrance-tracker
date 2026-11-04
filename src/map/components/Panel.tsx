@@ -9,7 +9,7 @@ import FollowButton from '../../components/FollowButton.jsx';
 import type { PlaylistApi } from '../hooks/usePlaylist';
 import { artistSlug } from '../data/events';
 import {
-  appearances, artists, artistsAtFestival, data, labels, labelsOfArtist, sources, festivalById, festivals, genreById, genresOfArtist, genresOfLabel, tracksOfArtist,
+  appearances, artists, artistsAtFestival, data, labels, labelsOfArtist, sources, festivalById, festivals, genreById, genresOfArtist, genresOfLabel, mainGenreOf, orbitingArtists, tracksOfArtist,
   type Track,
 } from '../data/types';
 
@@ -349,14 +349,24 @@ export function Panel({
       {g.tracks.length > 0 && (<><div className="hud__label">Key tracks</div>{trackList(g.tracks, g.name)}</>)}
 
       {/* All of them here; the orbit on the map shows 12 at most (followed ones first) */}
-      <div className="hud__label">Artists · {g.artists.length}</div>
+      <div className="hud__label">Artists · {orbitingArtists(g).length}</div>
       <div className="hud__chips">
-        {g.artists.map((a) => (
+        {orbitingArtists(g).map((a) => (
           <button key={a} className="hud__chip" onClick={() => onSelectArtist(a)}>
             {a}{genresOfArtist(a).length > 1 && <sup> {genresOfArtist(a).length}</sup>}
           </button>
         ))}
       </div>
+      {/* Artists who play this genre too but orbit their main genre's star */}
+      {g.artists.length > orbitingArtists(g).length && (
+        <p className="hud__also">
+          Also plays it:{' '}
+          {g.artists.filter((a) => !orbitingArtists(g).includes(a)).map((a, i) => (
+            <span key={a}>{i > 0 && ', '}<button className="hud__link" onClick={() => onSelectArtist(a)}
+              title={`Orbits ${genreById[mainGenreOf(a) ?? '']?.name ?? 'another star'}`}>{a}</button></span>
+          ))}
+        </p>
+      )}
       <SuggestArtistLink genre={g.name} />
 
       {(g.labels.length > 0 || g.countries.length > 0 || stations.length > 0) && (

@@ -240,6 +240,12 @@ export async function fetchPlacements(signal) {
     return response.data
 }
 
+// { artist name: genre id }: the one star each artist orbits (their main genre)
+export async function fetchMainGenres(signal) {
+    const response = await api.get('/api/map/main-genres', { signal })
+    return response.data
+}
+
 // Every label of the map: [{ label, crew, upcomingGigs, followers }]
 export async function fetchLabelsOverview(signal) {
     const response = await api.get('/api/labels/overview', { signal })

@@ -603,3 +603,6 @@ html[data-theme="contrast"] .facts__confirmed small { color: #007a62; }
 html[data-theme="contrast"] .facts__unconfirmed small { color: #8a5a00; }
 html[data-theme="contrast"] .heart.is-on, html[data-theme="contrast"] .heart:hover { color: #b0002a; }
 html[data-theme="contrast"] .radar__star { fill: #3d3a33; opacity: 1; }
+
+/* Under a genre's artists: those who play it too but orbit their main genre's star */
+.hud__also { margin: 8px 0 0; font: 12px var(--mono); color: var(--muted); line-height: 1.6; }

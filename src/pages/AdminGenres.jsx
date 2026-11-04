@@ -42,9 +42,15 @@ function ArtistRow({ artist, onSaved, onGone }) {
             </div>
             <div className="flex flex-wrap items-center gap-2">
                 {artist.genres.length === 0 && <span className="muted text-sm">No genre: not on the map</span>}
-                {artist.genres.map(id => (
-                    <GenreChip key={id} id={id} disabled={saving}
-                        onRemove={() => save(artist.genres.filter(g => g !== id))} />
+                {artist.genres.map((id, i) => (
+                    <GenreChip key={id} id={id} disabled={saving} title={i === 0 ? 'Main genre: the star they orbit on the galaxy' : undefined}
+                        onRemove={() => save(artist.genres.filter(g => g !== id))}>
+                        {i === 0 ? <span className="mono text-xs">★ star</span> : (
+                            <button type="button" className="bg-transparent border-0 p-0 cursor-pointer mono text-xs muted" disabled={saving}
+                                onClick={() => save([id, ...artist.genres.filter(g => g !== id)])}
+                                title="Make this the star they orbit on the galaxy">☆ make star</button>
+                        )}
+                    </GenreChip>
                 ))}
                 <AddGenre exclude={artist.genres} disabled={saving} label={`Add a genre to ${artist.name}`}
                     onAdd={(id) => save([...artist.genres, id])} />
@@ -155,7 +161,7 @@ function AdminGenres() {
                 <p className="page-head__sub">
                     Place an artist in the genres they play. Changes apply at once: the map, and the genres of the
                     events they play, which are worked out again within a few minutes.
-                </p>
+                 The first genre (★ star) is the one star they orbit on the galaxy; the others count for ships, filters and the profile.</p>
             </header>
             <AdminTabs />
 

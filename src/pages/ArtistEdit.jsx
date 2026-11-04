@@ -211,13 +211,21 @@ function ArtistEdit() {
             </Part>
 
             <Part label="Genres on the map"
-                hint={isAdmin ? 'As an admin your change applies at once.' : 'Up to four. An admin checks it first, because it moves your satellite on the map for everyone.'}
+                hint={(isAdmin ? 'As an admin your change applies at once.' : 'Up to four. An admin checks it first, because it moves your satellite on the map for everyone.')
+                    + ' The first genre is your star: on the galaxy you orbit only that one. The others show on your profile and bring your gigs to their stars.'}
                 saving={genresSave.saving} status={genresSave.status}
                 onSave={() => genresSave.run(async () => { await requestArtistChange(slug, { kind: 'GENRES', genres }); await reload() },
                     isAdmin ? 'Saved.' : 'Sent to an admin.')}>
                 <div className="flex flex-wrap items-center gap-2">
                     {genres.length === 0 && <span className="muted text-sm">Not on the map yet</span>}
-                    {genres.map(id => <GenreChip key={id} id={id} onRemove={() => setGenres(prev => prev.filter(g => g !== id))} />)}
+                    {genres.map((id, i) => (
+                        <GenreChip key={id} id={id} onRemove={() => setGenres(prev => prev.filter(g => g !== id))}>
+                            {i === 0 ? <span className="mono text-xs">★ your star</span> : (
+                                <button type="button" className="bg-transparent border-0 p-0 cursor-pointer mono text-xs muted"
+                                    onClick={() => setGenres(prev => [id, ...prev.filter(g => g !== id)])}>☆ make star</button>
+                            )}
+                        </GenreChip>
+                    ))}
                     {genres.length < MAX_GENRES && <AddGenre exclude={genres} onAdd={(id) => setGenres(prev => [...prev, id])} />}
                 </div>
                 {pending('GENRES') && (

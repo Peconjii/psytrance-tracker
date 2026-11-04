@@ -1,5 +1,5 @@
-import { fetchPlacements } from '../../api/backend.js';
-import { data } from './types';
+import { fetchMainGenres, fetchPlacements } from '../../api/backend.js';
+import { data, useMainGenres } from './types';
 import { indexMapArtists } from './events';
 
 // Which artists orbit which star comes from the backend, where admins edit it; genres.json only has the
@@ -18,9 +18,11 @@ const WAIT_MS = 4000;
 export function loadPlacements(): Promise<void> {
   if (!loading) {
     // Aborted after WAIT_MS, so a late answer never changes the data under a galaxy that is already drawn
-    loading = fetchPlacements(AbortSignal.timeout(WAIT_MS))
-      .then((byGenre: Record<string, string[]>) => {
+    const signal = AbortSignal.timeout(WAIT_MS);
+    loading = Promise.all([fetchPlacements(signal), fetchMainGenres(signal)])
+      .then(([byGenre, main]: [Record<string, string[]>, Record<string, string>]) => {
         for (const genre of data.genres) genre.artists = byGenre[genre.id] ?? [];
+        useMainGenres(main);
         indexMapArtists();
       })
       .catch((err: unknown) => console.warn('Could not load map placements, using the ones in genres.json', err))
