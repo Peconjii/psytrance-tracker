@@ -6,7 +6,7 @@ A map of psytrance as a galaxy, with the parties that are happening right now sa
 Every genre is a star, artists orbit their genres as satellites, and every upcoming party from
 [Goabase](https://www.goabase.net) is a ship that sails to the stars of the genres it plays.
 
-**Live: [psyatlas-one.vercel.app](https://psyatlas-one.vercel.app)**
+**Live: [mapofpsy.com](https://mapofpsy.com)**
 
 > Hosted on free tiers (Vercel, Render, Neon). The backend can be asleep, so the first load may take a minute.
 > The galaxy itself never waits longer than 4 seconds: without the backend it is drawn from the bundled data.

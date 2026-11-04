@@ -11,4 +11,4 @@ Disallow: /events/added/
 Disallow: /new-page
 Disallow: /search
 
-Sitemap: https://psyatlas-one.vercel.app/sitemap.xml
+Sitemap: https://mapofpsy.com/sitemap.xml
