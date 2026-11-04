@@ -6,6 +6,9 @@ import { artistSlug, buildFleets, HARBOUR, type MapEvent } from '../data/events'
 import { shipState, type LiveFleet } from '../data/liveFleet';
 import { highContrast as HC } from '../../theme.js';
 
+/** The color of lines, marks and text: white on the night sky, ink on the paper chart (high contrast) */
+const INK = HC ? 0x111111 : 0xffffff;
+
 interface Props {
   selectedId: string | null;
   artist: string | null;
@@ -157,7 +160,7 @@ const HALO_PERIOD = 2.2;
  */
 function drawHalo(g: Graphics, color: number, t: number | null) {
   g.clear();
-  g.circle(0, 0, 15).stroke({ width: 1.2, color: 0xffffff, alpha: 0.55 });
+  g.circle(0, 0, 15).stroke({ width: 1.2, color: INK, alpha: 0.55 });
   // Reduced motion: one still ring a little further out
   if (t === null) {
     g.circle(0, 0, 24).stroke({ width: 1.5, color, alpha: 0.5 });
@@ -177,7 +180,7 @@ function drawFeatured(g: Graphics) {
 
 /** A small arrow-shaped ship pointing right, in the color of its main genre */
 function drawShip(g: Graphics, x: number, y: number, color: number) {
-  g.poly([x - 7, y - 9, x + 11, y, x - 7, y + 9, x - 3, y]).fill(color).stroke({ width: 1.5, color: 0xffffff, alpha: 0.7 });
+  g.poly([x - 7, y - 9, x + 11, y, x - 7, y + 9, x - 3, y]).fill(color).stroke({ width: 1.5, color: INK, alpha: 0.7 });
 }
 
 const TRAIL_LIFE = 0.8;
@@ -242,7 +245,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     let destroyed = false;
 
     (async () => {
-      await app.init({ resizeTo: host, background: '#05040d', antialias: true, autoDensity: true, resolution: window.devicePixelRatio });
+      await app.init({ resizeTo: host, background: HC ? '#f4efe2' : '#05040d', antialias: true, autoDensity: true, resolution: window.devicePixelRatio });
       if (destroyed) { app.destroy(true); return; }
       host.appendChild(app.canvas);
 
@@ -283,7 +286,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       const field = new Graphics();
       for (let i = 0; i < 900; i++) {
         field.circle(Math.random() * WORLD.width * 1.4 - 300, Math.random() * WORLD.height * 1.4 - 300, Math.random() * 1.6 + 0.2)
-          .fill({ color: 0xffffff, alpha: Math.random() * 0.6 + 0.1 });
+          .fill({ color: INK, alpha: Math.random() * 0.6 + 0.1 });
       }
       vp.addChild(field);
 
@@ -344,7 +347,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         .arc(0, 4, 11, 0.15 * Math.PI, 0.85 * Math.PI).stroke({ width: 2, color: 0x9a94b8 });
       const harbourText = new Text({
         text: '',
-        style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fill: 0xcfcaf2, letterSpacing: 1, align: 'center' },
+        style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fill: HC ? INK : 0xcfcaf2, letterSpacing: 1, align: 'center' },
       });
       harbourText.anchor.set(0.5, 0);
       harbourText.position.set(0, 22);
@@ -366,10 +369,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         const node = new Container();
         node.position.set(l.x, l.y);
         const hex6 = (r: number) => Array.from({ length: 6 }, (_, i) => [Math.cos((i * Math.PI) / 3) * r, Math.sin((i * Math.PI) / 3) * r]).flat();
-        const icon = new Graphics().poly(hex6(10)).stroke({ width: 2, color: 0xffd36e, alpha: 0.9 }).poly(hex6(4)).fill({ color: 0xffd36e, alpha: 0.9 });
+        const icon = new Graphics().poly(hex6(10)).stroke({ width: 2, color: HC ? 0x8a5a00 : 0xffd36e, alpha: 0.9 }).poly(hex6(4)).fill({ color: HC ? 0x8a5a00 : 0xffd36e, alpha: 0.9 });
         const text = new Text({
           text: name,
-          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fill: 0xffd36e, letterSpacing: 1 },
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fill: HC ? 0x8a5a00 : 0xffd36e, letterSpacing: 1 },
         });
         text.anchor.set(0.5, 0);
         text.position.set(0, 15);
@@ -390,12 +393,12 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         const node = new Container();
         node.position.set(fest.x, fest.y);
         const icon = new Graphics()
-          .rect(-9, -9, 18, 18).stroke({ width: 2, color: 0xffffff, alpha: 0.9 })
-          .rect(-4, -4, 8, 8).fill({ color: 0xffffff, alpha: 0.9 });
+          .rect(-9, -9, 18, 18).stroke({ width: 2, color: INK, alpha: 0.9 })
+          .rect(-4, -4, 8, 8).fill({ color: INK, alpha: 0.9 });
         icon.rotation = Math.PI / 4;
         const text = new Text({
           text: fest.name,
-          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fill: 0xffffff, letterSpacing: 1 },
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fill: INK, letterSpacing: 1 },
         });
         text.anchor.set(0.5, 0);
         text.position.set(0, 16);
@@ -416,10 +419,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         const halo = new Graphics().circle(0, 0, 34 * g.size).fill({ color, alpha: HC ? 0.2 : 0.35 });
         halo.filters = [new BlurFilter({ strength: 14 })];
         const core = new Graphics().circle(0, 0, 11 * g.size).fill(color).circle(0, 0, 5 * g.size).fill(0xffffff);
-        if (HC) core.circle(0, 0, 11 * g.size + 1.5).stroke({ width: 2.5, color: 0xffffff });
+        if (HC) core.circle(0, 0, 11 * g.size + 1.5).stroke({ width: 2.5, color: INK });
         const label = new Text({
           text: g.name.toUpperCase(),
-          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 18 : 15, fontWeight: HC ? '700' : '400', fill: HC ? 0xffffff : 0xe9e6ff, letterSpacing: 2 },
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 18 : 15, fontWeight: HC ? '700' : '400', fill: HC ? INK : 0xe9e6ff, letterSpacing: 2 },
         });
         label.anchor.set(0.5, 0);
         label.position.set(0, 30 * g.size);
@@ -448,10 +451,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         orbit.addChild(rings);
         const sats = g.artists.map((name, i) => {
           const node = new Container();
-          const dot = new Graphics().circle(0, 0, 4).fill(0xffffff).circle(0, 0, 7).stroke({ width: 1.5, color, alpha: 0.8 });
+          const dot = new Graphics().circle(0, 0, 4).fill(INK).circle(0, 0, 7).stroke({ width: 1.5, color, alpha: 0.8 });
           const text = new Text({
             text: name,
-            style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 13 : 11, fill: HC ? 0xffffff : 0xcfcaf2 },
+            style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 13 : 11, fill: HC ? INK : 0xcfcaf2 },
           });
           text.anchor.set(0.5, 0);
           text.position.set(0, 9);
@@ -664,7 +667,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           links.circle(from.x + (dx * d) / len, from.y + (dy * d) / len, 2);
         }
       }
-      links.fill({ color: 0xffffff, alpha: 0.7 });
+      links.fill({ color: INK, alpha: 0.7 });
     }
 
     // Focus lines: spokes from a festival station, or a chain through a label's systems in time order
@@ -678,7 +681,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         const chain = [...gs].sort((a, b) => a.year - b.year);
         chain.forEach((g, i) => (i ? fl.lineTo(g.x, g.y) : fl.moveTo(g.x, g.y)));
       }
-      fl.stroke({ width: 3, color: 0xffffff, alpha: 0.75 });
+      fl.stroke({ width: 3, color: INK, alpha: 0.75 });
     }
   }, [selectedId, artist, year, ready, focus]);
 
@@ -780,7 +783,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         addShip(0, 0);
         name = new Text({
           text: (featured ? '◆ ' : '') + (followed ? '★ ' : '') + shortName(fleetEvents[0].nameParty),
-          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: 0xe9e6ff },
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fill: HC ? INK : 0xe9e6ff },
         });
         name.anchor.set(0.5, 0);
         name.position.set(0, 14);
@@ -792,7 +795,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         addShip(-8, 10);
         const n = new Text({
           text: `×${fleetEvents.length}`,
-          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: '600', fill: 0xffffff },
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: '600', fill: INK },
         });
         n.anchor.set(0.5, 0);
         n.position.set(0, 16);
@@ -888,7 +891,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       const node = new Container();
       const color = member.color ? hex(member.color) : 0xcfcaf2;
       const dot = new Graphics().circle(0, 0, 4).fill(color).circle(0, 0, 7).stroke({ width: 1.5, color: fleet.color, alpha: 0.8 });
-      const text = new Text({ text: member.name, style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 13 : 11, fill: HC ? 0xffffff : 0xe9e6ff } });
+      const text = new Text({ text: member.name, style: { fontFamily: 'JetBrains Mono, monospace', fontSize: HC ? 13 : 11, fill: HC ? INK : 0xe9e6ff } });
       text.anchor.set(0.5, 0);
       text.position.set(0, 9);
       node.addChild(dot, text);
@@ -926,11 +929,11 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     for (let i = 1; i < pts.length; i++) {
       const a = pts[i - 1], b = pts[i];
       if (i <= tourPath.index) {
-        line.moveTo(a.x, a.y).lineTo(b.x, b.y).stroke({ width: 4, color: 0xffffff, alpha: 0.85 });
+        line.moveTo(a.x, a.y).lineTo(b.x, b.y).stroke({ width: 4, color: INK, alpha: 0.85 });
       } else {
         const len = Math.hypot(b.x - a.x, b.y - a.y);
         for (let d = 0; d < len; d += 18) line.circle(a.x + ((b.x - a.x) * d) / len, a.y + ((b.y - a.y) * d) / len, 2.5);
-        line.fill({ color: 0xffffff, alpha: 0.35 });
+        line.fill({ color: INK, alpha: 0.35 });
       }
     }
   }, [tourPath, ready]);

@@ -1,5 +1,6 @@
-// The site's color theme: "cosmic" (the usual look) or "contrast" (high contrast: black background, white
-// text, bright scene colors, thicker lines; easier to read for weaker eyes and outside in the sun).
+// The site's color theme: "cosmic" (the usual look, the night sky) or "contrast" (high contrast: a printed
+// star chart, black ink on light paper, dark strong scene colors, thicker lines; easy to read for weaker eyes
+// and outside in the sun).
 // It starts from the system setting (prefers-contrast: more) and the visitor can switch it in the navbar;
 // the choice is remembered in the browser. It shows as <html data-theme="contrast">.
 // The galaxy is drawn once with its colors, so switching reloads the page.
@@ -32,11 +33,11 @@ export function setTheme(value) {
     window.location.reload()
 }
 
-/** Scene colors in the high contrast theme: full and bright on black, still told apart from each other */
+/** Scene colors on the paper chart: dark, strong inks that stand out on light paper and from each other */
 export const CONTRAST_SCENES = {
-    goa: '#ffb020',
-    prog: '#00f0c0',
-    dark: '#ff5cf4',
-    chill: '#4db8ff',
-    roots: '#e6e6e6',
+    goa: '#c45200',
+    prog: '#007a62',
+    dark: '#9b1fc4',
+    chill: '#1652c8',
+    roots: '#55534c',
 }
