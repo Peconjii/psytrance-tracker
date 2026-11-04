@@ -20,9 +20,9 @@ function Privacy() {
                 <Part title="Without an account">
                     <p>You can use the map, the events and every page without an account. The site sets no cookies and
                         shows no ads. Your login, when you have one, is kept in your browser&apos;s storage, not in a cookie.</p>
-                    <p>If visit counting is on, it is done with <a className="link" href="https://umami.is" target="_blank" rel="noopener noreferrer">Umami</a>:
-                        without cookies, without following you around, and not at all when your browser asks not to be tracked.
-                        It only counts which pages are opened.</p>
+                    <p>Visits are counted with <a className="link" href="https://vercel.com/docs/analytics/privacy-policy" target="_blank" rel="noopener noreferrer">Vercel Web Analytics</a>:
+                        without cookies and without following you from site to site. It only counts which pages are opened,
+                        from which country and from which site you came.</p>
                     <p>&ldquo;Near me&rdquo; on the events page asks your browser where you are, rounds it to about a kilometre
                         and uses it for that one list. It is not stored.</p>
                 </Part>

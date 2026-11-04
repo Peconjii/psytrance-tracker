@@ -12,6 +12,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@vercel/analytics": "^1.6.1",
     "axios": "^1.17.0",
     "leaflet": "^1.9.4",
     "pixi-viewport": "^6.0.3",
