@@ -38,12 +38,12 @@ html.has-player:not(.on-galaxy) body { padding-bottom: 250px; }
 /* Phones: a bar across the bottom, a small video on the left and the title and buttons beside it */
 @media (max-width: 700px) {
   .player {
-    left: 12px; right: 12px; width: auto; bottom: calc(var(--bottom-nav, 0px) + 8px + env(safe-area-inset-bottom, 0px));
+    left: 12px; right: 12px; width: auto; bottom: calc(var(--bottom-nav, 0px) + 8px);
     display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center;
   }
   .player[hidden] { display: none; }
   /* On the galaxy it sits above the ship console */
-  html.on-galaxy .player { bottom: calc(var(--bottom-nav, 0px) + 64px + env(safe-area-inset-bottom, 0px)); }
+  html.on-galaxy .player { bottom: calc(var(--bottom-nav, 0px) + 64px); }
   .player__frame { grid-row: 1; grid-column: 1; }
   .player__mount iframe { width: 112px; }
   .player__head { grid-row: 1; grid-column: 2; flex-wrap: wrap; gap: 0 2px; padding: 4px 4px 4px 10px; }
@@ -51,5 +51,5 @@ html.has-player:not(.on-galaxy) body { padding-bottom: 250px; }
   .player__star { display: none; }
   .player__head a, .player__head button, .player__head .heart { min-width: 36px; min-height: 34px; display: inline-grid; place-items: center; font-size: 18px; padding: 0; }
   .player__head > :last-child { margin-left: auto; }
-  html.has-player:not(.on-galaxy) body { padding-bottom: 90px; }
+  html.has-player:not(.on-galaxy) body { padding-bottom: calc(var(--bottom-nav, 0px) + 90px); }
 }

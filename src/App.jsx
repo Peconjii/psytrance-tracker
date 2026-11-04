@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import AdminRoute from './components/AdminRoute'
 import { PlayerProvider } from './player/PlayerContext'
 import { Player } from './player/Player'
+import BottomNav from './components/BottomNav'
 
 // Each page is its own chunk, loaded when it is first opened: the galaxy (PixiJS) and the admin panel stay out
 // of everyone else's first load
@@ -145,6 +146,7 @@ function Shell() {
       {!isHome && <Footer />}
       {/* Outside the pages, so the music keeps playing from one page to the next */}
       <Player />
+      <BottomNav />
     </div>
   )
 }

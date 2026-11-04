@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useFollows } from '../context/FollowsContext';
 import { setReducedMotion, useReducedMotion } from '../motion.js';
+import { shareGalaxyYear } from '../galaxyYear.js';
 import { fetchEventDetails } from '../api/backend.js';
 import './map.css';
 import { Galaxy, type CrewMember, type Focus, type ViewBounds } from './galaxy/Galaxy';
@@ -195,6 +196,17 @@ function MapOfPsy() {
     if (!timeTravel) setYearOpen(true);
     setTimeTravel((t) => !t);
   };
+
+  // The phone menu ("More") has the year slider too
+  const toggleRef = useRef(toggleTimeTravel);
+  toggleRef.current = toggleTimeTravel;
+  useEffect(() => {
+    shareGalaxyYear({ active: true, year, min: MIN_YEAR, max: MAX_YEAR, traveling: timeTravel }, {
+      setYear: (y: number) => { setTimeTravel(false); setYear(y); },
+      toggleTravel: () => toggleRef.current(),
+    });
+  }, [year, timeTravel]);
+  useEffect(() => () => shareGalaxyYear({ active: false }), []);
 
   const tourPath = useMemo(() => (tour ? { ids: tour.tour.stops.map((s) => s.genre), index: tour.index } : null), [tour]);
   const focus = useMemo<Focus | null>(() => {
