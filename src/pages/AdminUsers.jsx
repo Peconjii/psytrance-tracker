@@ -4,8 +4,8 @@ import AdminTabs from '../components/AdminTabs'
 import UserPages from '../components/UserPages.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { DAY_YEAR as DAY } from '../dates.js'
 
-const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 const ROLES = [
     { id: '', label: 'User' },
     { id: 'EDITOR', label: 'Editor' },

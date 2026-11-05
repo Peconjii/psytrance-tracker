@@ -3,6 +3,7 @@ import { data, genreById, WORLD } from '../data/types';
 import { buildFleets, HARBOUR, type EventPeriod, type MapEvent } from '../data/events';
 import type { ViewBounds } from '../galaxy/Galaxy';
 import { useFollows } from '../../context/FollowsContext';
+import { startOfToday } from '../../dates.js';
 
 interface Props {
   period: EventPeriod | null;
@@ -27,11 +28,6 @@ const C = SIZE / 2;
 const R = SIZE / 2 - 2;
 const K = (R * 1.55) / Math.max(WORLD.width, WORLD.height);
 const toRadar = (x: number, y: number) => ({ x: C + (x - WORLD.width / 2) * K, y: C + (y - WORLD.height / 2) * K });
-
-function startOfToday() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-}
 
 // "TONIGHT" for today's parties (and ones that already started), else "THU 22"
 function departureLabel(dateStart: string | null): string {

@@ -7,8 +7,8 @@ import MapPlaceFields from './MapPlaceFields.jsx'
 import { emptyMapPlace, mapPlaceOf } from './mapPlace.js'
 import { GenreChip } from './AdminParts'
 import { genreById } from '../map/data/types'
+import { DAY_TIME as DATE } from '../dates.js'
 
-const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 const KIND = { ARTIST: 'Artist', ORGANIZER: 'Organizer', LABEL: 'Label', FESTIVAL: 'Festival' }
 const MADE = {
     ARTIST: (slug) => `/artists/${encodeURIComponent(slug)}`,

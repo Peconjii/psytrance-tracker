@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { replyToFeedback } from '../api/backend.js'
+import { DAY_TIME as DATE } from '../dates.js'
 
-const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 // An admin's answer to a feedback message, emailed to its sender: the one already sent, or a form for one
 function FeedbackReply({ item, onReplied }) {

@@ -4,10 +4,8 @@ import { fetchMyOrganizers, fetchOrganizer } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import ClaimPage from '../components/ClaimPage.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { WEEKDAY_DAY as GIG_DAY, DAY_YEAR as PAST_DAY, formatDay as day } from '../dates.js'
 
-const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-const PAST_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-const day = (iso, format) => (iso ? format.format(new Date(iso + 'T12:00:00')) : 'Date TBA')
 
 // An organizer's page: the events they run next and the ones they ran before
 function Organizer() {

@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { fetchTimetable } from '../api/backend.js'
 import { GenreOptions } from './AdminParts'
 import ArtistInput from './ArtistInput.jsx'
+import { toField } from '../dates.js'
 
 // Venue-clock times: the API sends "2026-10-24T22:00:00", a datetime-local field wants "2026-10-24T22:00"
-const toField = (value) => (value ? value.slice(0, 16) : '')
 const emptySet = (startsAt = '') => ({ stage: '', artist: '', startsAt, endsAt: '', genreId: '' })
 
 // The event's timetable: what was read from the line-up, to correct, or a new one written from scratch.

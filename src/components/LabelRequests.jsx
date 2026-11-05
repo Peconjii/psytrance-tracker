@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { decideLabelRequest, fetchLabelRequests } from '../api/backend.js'
+import { DAY_TIME as DATE } from '../dates.js'
 
-const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 // For admins: what label owners asked to change in their crew. Approving puts the artist on the label (or takes them
 // off) for the label's page, its followers and its numbers.

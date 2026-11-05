@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { decidePageClaim, fetchPageClaims } from '../api/backend.js'
 import { TrustCheckbox } from './TrustPanel.jsx'
+import { DAY_TIME as DATE } from '../dates.js'
 
-const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 const KIND = { ARTIST: 'Artist', ORGANIZER: 'Organizer', LABEL: 'Label', FESTIVAL: 'Festival' }
 const PAGE = {
     ARTIST: (t) => `/artists/${encodeURIComponent(t)}`,

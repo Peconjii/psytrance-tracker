@@ -1,8 +1,8 @@
 import { data, genreById } from '../map/data/types'
 import StatView, { StatViewToggle } from './StatView.jsx'
 import { useStatsView } from './statsView.js'
+import { MONTH_YEAR as SINCE } from '../dates.js'
 
-const SINCE = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
 const MONTH = new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' })
 
 // The numbers of an artist or a label: gigs (next, before, live), where and in which sound, and the followers month by

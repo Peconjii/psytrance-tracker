@@ -11,6 +11,7 @@ import TrustPanel from '../components/TrustPanel.jsx'
 import LinkFields from '../components/LinkFields.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { errorOf } from '../components/formErrors.js'
+import { WEEKDAY_DAY as DAY } from '../dates.js'
 
 const FIELDS = [
     { key: 'photoUrl', label: 'Photo or logo', placeholder: 'https://…', image: 'square' },
@@ -18,7 +19,6 @@ const FIELDS = [
     { key: 'websiteUrl', label: 'Website', placeholder: 'https://…' },
 ]
 const MAX_BIO = 1000
-const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 
 // Editing an organizer's page: by the organizer (an account an admin linked to them) or an admin. Besides the page,
 // they write the timetables of their own events, which send the events' live fleets across the map.

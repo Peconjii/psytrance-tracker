@@ -6,8 +6,8 @@ import useDebouncedValue from '../hooks/useDebouncedValue.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { data } from '../map/data/types'
+import { WEEKDAY_DAY as DAY } from '../dates.js'
 
-const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 const SHOWN = 8
 // Every artist on the map: they have a page even before a line-up names them
 const MAP_ARTISTS = [...new Set(data.genres.flatMap(g => g.artists))]

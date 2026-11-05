@@ -10,6 +10,7 @@ import VerifyEmailNotice from '../components/VerifyEmailNotice.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { errorOf } from '../components/formErrors.js'
+import { toField } from '../dates.js'
 
 // The kinds of event the backend accepts (OurEvents.TYPES), the same as on Goabase
 const TYPES = ['Festival', 'Open Air', 'Club', 'Indoor', 'In- & Outdoor']
@@ -25,7 +26,6 @@ const EMPTY = {
 }
 
 // "2026-11-14T22:00:00" from the backend -> "2026-11-14T22:00" for a datetime-local field
-const toField = (value) => (value ? value.slice(0, 16) : '')
 
 // Adding an event on our site, next to the ones from Goabase. Needs a confirmed email; an admin checks it before it
 // goes on the map (the organizer's own account and admins skip that). With an id (/events/added/7/edit) it changes

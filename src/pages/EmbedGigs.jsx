@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { fetchArtist } from '../api/backend.js'
 import { SITE_URL } from '../hooks/usePageMeta.js'
+import { WEEKDAY_DAY as DAY } from '../dates.js'
 
-const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 const SHOWN = 6
 
 // "My next gigs" for an artist's own website: a small page without the site's menu, meant for an iframe

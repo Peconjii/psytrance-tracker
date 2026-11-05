@@ -8,8 +8,8 @@ import ClaimRequests from '../components/ClaimRequests.jsx'
 import NewPageRequests from '../components/NewPageRequests.jsx'
 import AddToMap from '../components/AddToMap.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { DAY_TIME as DATE } from '../dates.js'
 
-const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 // Admin panel: what artists asked to change on their profile and need an admin for: their genres on the map
 // (approving moves their satellite for everyone, and is in the history with undo) or the name on their page.

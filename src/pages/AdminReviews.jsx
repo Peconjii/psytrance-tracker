@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { deleteReview, fetchNewestReviews } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { DAY_TIME as WHEN } from '../dates.js'
 
-const WHEN = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 // Admin panel: the newest reviews of the whole site, to catch spam and insults. A deleted review is in the history.
 function AdminReviews() {

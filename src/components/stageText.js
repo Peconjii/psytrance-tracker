@@ -1,4 +1,5 @@
 import { data, genreById } from '../map/data/types'
+import { WEEKDAY_DAY as DAY_LABEL } from '../dates.js'
 
 // The stage cards of the event form and the line-up text they stand for. The backend reads the text as it reads any
 // line-up (TimetableParser, its test theStageCardsOfOurEventFormAreReadAsWritten checks this format):
@@ -11,7 +12,6 @@ import { data, genreById } from '../map/data/types'
 // The weekday leaves no guessing whether 01:00 is the night after.
 
 export const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-const DAY_LABEL = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 
 export const emptySet = (day = '', start = '') => ({ day, start, end: '', artist: '', live: false })
 export const emptyStage = () => ({ name: '', genreId: '', sets: [emptySet()] })

@@ -13,8 +13,8 @@ import { useStatsView } from '../components/statsView.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { appearances, artistsAtFestival, data, festivalById, genreById } from '../map/data/types'
+import { DAY_YEAR as DAY } from '../dates.js'
 
-const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
 // The core of a festival's name, to find its editions among the events: "Hadra Trance Festival" -> "hadra",
 // "MoDem (Momento Demento)" -> "modem", "Universo Paralello" stays as it is

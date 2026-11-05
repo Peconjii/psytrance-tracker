@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchNewPages } from '../api/backend.js'
+import { initials } from '../text.js'
 
-const initials = (name) => name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()
 
 // Pages people made themselves that have no upcoming event yet: the lists above only know the line-ups, so this is
 // where a new artist or crew is found. kind: 'artists' | 'organizers'; keep: an optional filter (the role chips);

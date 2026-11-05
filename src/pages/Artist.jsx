@@ -13,10 +13,9 @@ import {
 import { mapArtistBySlug } from '../map/data/events'
 import { loadPlacements } from '../map/data/placements'
 import { ROLE_LABELS, roleOf } from '../components/artistRole.js'
+import { WEEKDAY_DAY as GIG_DAY, DAY_YEAR as PAST_DAY, formatDay as day } from '../dates.js'
+import { initials } from '../text.js'
 
-const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-const PAST_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-const day = (iso, format) => (iso ? format.format(new Date(iso + 'T12:00:00')) : 'Date TBA')
 
 // The links an artist's profile can have, in the order they are shown
 const PROFILE_LINKS = [
@@ -34,10 +33,6 @@ const SEARCH_LINKS = [
 const youtubeLink = (track) => track.youtube
     ? `https://www.youtube.com/watch?v=${track.youtube}`
     : `https://www.youtube.com/results?search_query=${encodeURIComponent(`${track.artist} ${track.title}`)}`
-
-function initials(name) {
-    return name.split(/\s+/).filter(Boolean).slice(0, 2).map(word => word[0]).join('').toUpperCase()
-}
 
 // One section of the profile, in the site's panel style
 function Section({ label, children }) {

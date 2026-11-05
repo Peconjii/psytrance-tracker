@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 import { hideEvent, setAdminEventGenres } from '../api/backend.js'
 import { fetchMapEvents } from '../map/data/events'
 import { AddGenre } from './AdminParts'
+import { WEEKDAY_DAY as DAY } from '../dates.js'
 
-const DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
 
 // The harbour as a work list for admins: the next 30 days' events whose genre isn't known, soonest first. Picking a
 // genre sets it by hand and the ship flies off the list; "More" opens the event in the editor above, and "Hide" takes

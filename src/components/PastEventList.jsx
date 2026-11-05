@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchPastEvents } from '../api/backend.js'
+import { DAY_YEAR as DAY, MONTH_YEAR as MONTH } from '../dates.js'
 
 const PAGE_SIZE = 24
-const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-const MONTH = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric' })
 
 // The archive on the events page: events that are over, newest first, by month. Only the search filters it.
 function PastEventList({ search }) {

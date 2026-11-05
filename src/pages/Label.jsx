@@ -10,9 +10,8 @@ import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { appearances, festivalById, genresOfLabel, labels } from '../map/data/types'
 import { GenreChip } from '../components/AdminParts'
+import { WEEKDAY_DAY as GIG_DAY, DAY_YEAR as PAST_DAY } from '../dates.js'
 
-const GIG_DAY = new Intl.DateTimeFormat('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
-const PAST_DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
 // The festivals of the map where artists of the crew played (sets on video): most of the crew first
 function festivalsOf(crew) {
@@ -151,43 +150,13 @@ function Label() {
                         {stats.upcoming.length === 0 ? (
                             <p className="muted text-sm m-0">No upcoming gigs of the crew right now.</p>
                         ) : (
-                            <ul className="rows">
-                                {stats.upcoming.map(gig => (
-                                    <li key={gig.eventId}>
-                                        <Link to={`/events/${gig.eventId}`} className="rows__item">
-                                            <span className="rows__name">
-                                                <span className="mono text-xs muted artist-gig__day">
-                                                    {gig.dateStart ? GIG_DAY.format(new Date(gig.dateStart + 'T12:00:00')) : 'Date TBA'}
-                                                </span>
-                                                {gig.name}
-                                                <span className="block mono text-xs muted">{gig.artists.join(', ')}</span>
-                                            </span>
-                                            <span className="rows__meta">{[gig.town, gig.country].filter(Boolean).join(', ')}</span>
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
+                            <CrewGigs gigs={stats.upcoming} format={GIG_DAY} missing="Date TBA" />
                         )}
                     </section>
                     {stats.past?.length > 0 && (
                         <section className="panel mb-4">
                             <h2 className="panel__label">The crew played · {stats.past.length}</h2>
-                            <ul className="rows">
-                                {stats.past.map(gig => (
-                                    <li key={gig.eventId}>
-                                        <Link to={`/events/${gig.eventId}`} className="rows__item">
-                                            <span className="rows__name">
-                                                <span className="mono text-xs muted artist-gig__day">
-                                                    {gig.dateStart ? PAST_DAY.format(new Date(gig.dateStart + 'T12:00:00')) : 'Date unknown'}
-                                                </span>
-                                                {gig.name}
-                                                <span className="block mono text-xs muted">{gig.artists.join(', ')}</span>
-                                            </span>
-                                            <span className="rows__meta">{[gig.town, gig.country].filter(Boolean).join(', ')}</span>
-                                        </Link>
-                                    </li>
-                                ))}
-                            </ul>
+                            <CrewGigs gigs={stats.past} format={PAST_DAY} missing="Date unknown" />
                         </section>
                     )}
                     <section className="panel mb-4">
@@ -201,6 +170,28 @@ function Label() {
             )}
             {!canEdit && <div className="mt-2"><ClaimPage kind="LABEL" target={name} name={name} /></div>}
         </div>
+    )
+}
+
+// The crew's gigs as rows: date, event, who of the crew plays, where
+function CrewGigs({ gigs, format, missing }) {
+    return (
+        <ul className="rows">
+            {gigs.map(gig => (
+                <li key={gig.eventId}>
+                    <Link to={`/events/${gig.eventId}`} className="rows__item">
+                        <span className="rows__name">
+                            <span className="mono text-xs muted artist-gig__day">
+                                {gig.dateStart ? format.format(new Date(gig.dateStart + 'T12:00:00')) : missing}
+                            </span>
+                            {gig.name}
+                            <span className="block mono text-xs muted">{gig.artists.join(', ')}</span>
+                        </span>
+                        <span className="rows__meta">{[gig.town, gig.country].filter(Boolean).join(', ')}</span>
+                    </Link>
+                </li>
+            ))}
+        </ul>
     )
 }
 

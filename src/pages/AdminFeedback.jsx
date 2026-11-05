@@ -5,6 +5,7 @@ import usePageMeta from '../hooks/usePageMeta.js'
 import AdminTabs from '../components/AdminTabs'
 import FeedbackReply from '../components/FeedbackReply.jsx'
 import { isSitePath } from '../components/sitePath.js'
+import { DAY_YEAR_TIME as DATE } from '../dates.js'
 
 const STATUSES = [
     { value: 'NEW', label: 'New' },
@@ -13,7 +14,6 @@ const STATUSES = [
     { value: 'REJECTED', label: 'Rejected' },
 ]
 const KIND_LABELS = { CORRECTION: 'Correction', COMPLAINT: 'Broken', SUGGESTION: 'Improvement', IDEA: 'Idea', OTHER: 'Other' }
-const DATE = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
 // Admins read and sort the feedback here (the route is admin only, see AdminRoute)
 function AdminFeedback() {

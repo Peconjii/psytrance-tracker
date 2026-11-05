@@ -4,8 +4,8 @@ import { fetchAdminDashboard } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
+import { DAY_TIME as WHEN } from '../dates.js'
 
-const WHEN = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 const when = (iso) => (iso ? WHEN.format(new Date(iso)) : 'not since the last restart')
 
 // Admin panel home: what waits for an admin, the crew, the ships, the artist index and the most followed artists

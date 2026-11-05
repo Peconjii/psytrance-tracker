@@ -1,11 +1,7 @@
 import { parseDay } from './eventDates'
+import { startOfToday } from '../dates.js'
 
 const DAY_TITLE = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })
-
-function startOfToday() {
-    const now = new Date()
-    return new Date(now.getFullYear(), now.getMonth(), now.getDate())
-}
 
 // Events in date order, cut into days: [{ key, date, events }]. Consecutive events of the same start
 // day share a group; events without a date end up in their own group.

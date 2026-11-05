@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { fetchHiddenEvents, showEvent } from '../api/backend.js'
+import { DAY_YEAR as WHEN } from '../dates.js'
 
-const WHEN = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
 // The events admins hid from the site, with "Show again". `version` changes when one was just hidden, to reload.
 function HiddenEvents({ version }) {

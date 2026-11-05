@@ -5,8 +5,8 @@ import {
 } from '../api/backend.js'
 import StatView, { StatViewToggle } from './StatView.jsx'
 import { useStatsView } from './statsView.js'
+import { DAY_YEAR as DAY } from '../dates.js'
 
-const DAY = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 
 // What each kind of page loads, calls its events and counts as reach
 const KINDS = {
