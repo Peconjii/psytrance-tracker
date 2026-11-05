@@ -959,7 +959,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     if (vp && selectedId) {
       const g = genreById[selectedId];
       const scale = Math.max(vp.scale.x, 1.3);
-      vp.animate({ position: { x: g.x, y: g.y + sheetLift(scale) }, scale, time: flight(700), ease: 'easeInOutSine' });
+      // Computers and tablets: the panel is on the right, so the star goes to the middle of what is left of the map
+      vp.animate({ position: { x: g.x + (onPhone() ? 0 : 190 / scale), y: g.y + sheetLift(scale) }, scale, time: flight(700), ease: 'easeInOutSine' });
     }
   }, [selectedId, ready]);
 

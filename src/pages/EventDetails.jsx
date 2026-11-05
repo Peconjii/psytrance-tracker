@@ -222,9 +222,9 @@ function EventDetails() {
                         <button onClick={retry} className="btn">Try again</button>
                     </div>
                 ) : (
-                    <div className="panel grid lg:grid-cols-5 gap-6" aria-busy="true">
-                        <div className="lg:col-span-2 h-72 skeleton" />
-                        <div className="lg:col-span-3 grid gap-3 content-start">
+                    <div className="panel grid md:grid-cols-5 gap-6" aria-busy="true">
+                        <div className="md:col-span-2 h-72 skeleton" />
+                        <div className="md:col-span-3 grid gap-3 content-start">
                             <div className="skeleton h-8 w-3/4" />
                             <div className="skeleton h-4 w-1/2" />
                             <div className="skeleton h-4 w-1/3" />
@@ -250,8 +250,8 @@ function EventDetails() {
             {backButton}
 
             {/* Header: flyer and the key facts */}
-            <div className="panel grid lg:grid-cols-5 gap-6">
-                <div className="lg:col-span-2 map-frame flex items-center justify-center">
+            <div className="panel grid md:grid-cols-5 gap-6">
+                <div className="md:col-span-2 map-frame flex items-center justify-center">
                     <img
                         src={details?.urlImageLarge || event.urlImageMedium || FALLBACK_IMAGE}
                         alt={event.nameParty}
@@ -260,7 +260,7 @@ function EventDetails() {
                     />
                 </div>
 
-                <div className="lg:col-span-3 flex flex-col gap-4 min-w-0">
+                <div className="md:col-span-3 flex flex-col gap-4 min-w-0">
                     <div className="page-head__tag">// Ship · Event</div>
                     <div className="flex flex-wrap gap-2">
                         {event.nameType && <span className="badge">{event.nameType}</span>}
