@@ -612,7 +612,7 @@ html[data-theme="contrast"] .radar__star { fill: #3d3a33; opacity: 1; }
     position: sticky; top: -26px; display: grid; margin: -26px auto 0; transform: none; z-index: 3;
   }
   .hud.sheet-peek .hud__close, .hud.sheet-full .hud__close {
-    position: sticky; top: -20px; float: right; z-index: 3; margin: -24px -8px 0 0;
+    position: sticky; top: -20px; float: right; z-index: 3; margin: -30px -38px 0 0;
     width: 40px; height: 40px; display: grid; place-items: center; padding: 0;
     background: rgb(var(--hud-rgb) / 0.92); border: 1px solid var(--line); border-radius: 50%; color: var(--fg);
   }
