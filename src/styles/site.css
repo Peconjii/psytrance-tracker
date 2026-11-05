@@ -473,3 +473,20 @@ html[data-theme="contrast"] :focus-visible { outline: 3px solid #111; outline-of
   .more-sheet__settings, .more-sheet__account { display: flex; flex-wrap: wrap; gap: 8px; }
   .more-sheet__settings .btn, .more-sheet__account .btn { flex: 1; justify-content: center; min-height: 44px; }
 }
+
+/* About (pages/About.jsx): a manifesto, the story and a quiet support box */
+.about { max-width: 680px; }
+.about p { margin: 0 0 14px; line-height: 1.75; color: var(--soft, var(--fg)); }
+.about__manifest { border-left: 2px solid var(--accent); padding-left: 18px; margin-bottom: 32px; font-size: 1.05rem; }
+.about__part { margin-bottom: 28px; }
+.about__label { font: 11px var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 0 0 10px; }
+.about__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.about__support { border: 1px solid var(--line); padding: 16px 18px; margin-bottom: 18px; scroll-margin-top: 90px; }
+.about__support p { font-size: 0.95rem; margin: 0; }
+.about__crypto { margin-top: 12px; }
+.about__crypto summary { cursor: pointer; font: 12px var(--mono); color: var(--accent); }
+.about__crypto ul { list-style: none; padding: 0; margin: 10px 0 0; display: grid; gap: 8px; }
+.about__crypto li { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.about__coin { font: 12px var(--mono); min-width: 110px; }
+.about__crypto code { font-size: 12px; word-break: break-all; flex: 1 1 220px; }
+.about__links a { color: var(--muted); }

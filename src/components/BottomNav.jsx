@@ -60,6 +60,7 @@ function MoreSheet({ onClose }) {
         { path: '/events/new', label: '+ Add an event' },
         ...(user ? [{ path: '/favorites', label: 'Favorites' }] : []),
         { path: '/feedback', label: 'Feedback' },
+        { path: '/about', label: 'About' },
         ...(user?.editor ? [{ path: '/admin', label: 'Admin' }] : []),
     ]
 
