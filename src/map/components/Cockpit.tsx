@@ -76,7 +76,11 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
 
   return (
     <section className={open ? 'cockpit' : 'cockpit is-folded'} aria-label="Ship navigation: upcoming events">
-      <button className="cockpit__head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+      <button className="cockpit__head" onClick={() => {
+        // Opening it on a phone shrinks a playing track to its bubble (Player.tsx)
+        if (!open) window.dispatchEvent(new Event('player:shrink'));
+        setOpen((o) => !o);
+      }} aria-expanded={open}>
         <span className="cockpit__tag">// SHIP NAVIGATION · EVENTS</span>
         {!open && period && events && <span className="cockpit__mini">▲ {shipCount} · ⚓ {inHarbour}</span>}
         <span aria-hidden="true">{open ? '▾' : '▴'}</span>

@@ -434,7 +434,7 @@ html[data-theme="contrast"] :focus-visible { outline: 3px solid #111; outline-of
    the galaxy and the pages how much room the bar takes. */
 .bottom-nav, .more-sheet, .more-sheet__scrim { display: none; }
 @media (max-width: 700px) {
-  :root { --bottom-nav: calc(58px + env(safe-area-inset-bottom, 0px)); }
+  :root { --bottom-nav: calc(46px + env(safe-area-inset-bottom, 0px)); }
   html:not(.on-galaxy) body { padding-bottom: var(--bottom-nav); }
   .btn.site-nav__burger, .site-nav__mobile { display: none !important; }
   /* On the galaxy its own title bar is the top of the screen */
@@ -446,11 +446,11 @@ html[data-theme="contrast"] :focus-visible { outline: 3px solid #111; outline-of
     background: rgb(var(--bg-rgb) / 0.96); border-top: 1px solid var(--line); backdrop-filter: blur(8px);
   }
   .bottom-nav__tab {
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-    font: 10px var(--mono); letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0;
+    font: 9px var(--mono); letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none;
     color: var(--muted); background: none; border: 0; cursor: pointer; padding: 0;
   }
-  .bottom-nav__tab span { font-size: 18px; line-height: 1; }
+  .bottom-nav__tab span { font-size: 16px; line-height: 1.1; }
   .bottom-nav__tab.is-active { color: var(--accent); }
   .bottom-nav__tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
 
@@ -490,3 +490,9 @@ html[data-theme="contrast"] :focus-visible { outline: 3px solid #111; outline-of
 .about__coin { font: 12px var(--mono); min-width: 110px; }
 .about__crypto code { font-size: 12px; word-break: break-all; flex: 1 1 220px; }
 .about__links a { color: var(--muted); }
+
+/* Phones: the admin galaxy's save bar sits above the bottom bar and an open player, not under them */
+@media (max-width: 700px) {
+  .galaxy-save { bottom: var(--bottom-nav, 0px); }
+  html.has-player:not(.player-mini) .galaxy-save { bottom: calc(var(--bottom-nav, 0px) + 90px); }
+}

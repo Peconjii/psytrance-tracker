@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Track } from '../map/data/types';
 import { HeartButton } from '../map/components/Playlist';
@@ -107,8 +107,80 @@ export function Player() {
   }, [id]);
   useEffect(() => () => { playerRef.current?.destroy(); playerRef.current = null; }, []);
 
+  // Phones, pages other than the galaxy: scrolling down shrinks the bar to a small bubble in the corner so it stops
+  // covering the list; it stays a bubble until a tap on it opens the bar again
+  const [mini, setMini] = useState(false);
+  useEffect(() => {
+    if (!id) { setMini(false); return; }
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const phone = window.matchMedia('(max-width: 700px)').matches;
+      const galaxy = document.documentElement.classList.contains('on-galaxy');
+      // The galaxy doesn't scroll: there the bar's ▾ button makes the bubble
+      if (galaxy) return;
+      // Back at the top it stays a bubble: only a tap on it opens the bar again
+      if (!phone) setMini(false);
+      else if (y > 40 && y - last > 24) setMini(true);
+      // Small moves (a finger resting) change nothing
+      if (Math.abs(y - last) > 24) last = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [id]);
+  // Where the bubble sits: dragged with a finger like a chat head, then it snaps to the nearer side edge.
+  // Remembered in this browser; without a spot it sits in the bottom right corner (player.css).
+  const [spot, setSpot] = useState<{ x: number; y: number } | null>(() => {
+    try { return JSON.parse(localStorage.getItem('player-bubble') ?? 'null'); } catch { return null; }
+  });
+  const drag = useRef<{ dx: number; dy: number; sx: number; sy: number; moved: boolean } | null>(null);
+  const SIZE = 48;
+  const MARGIN = 12;
+  const keepIn = (x: number, y: number) => ({
+    x: Math.min(Math.max(MARGIN, x), window.innerWidth - SIZE - MARGIN),
+    y: Math.min(Math.max(MARGIN, y), window.innerHeight - SIZE - MARGIN),
+  });
+  const onBubbleDown = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const box = e.currentTarget.parentElement!.getBoundingClientRect();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    drag.current = { dx: e.clientX - box.left, dy: e.clientY - box.top, sx: e.clientX, sy: e.clientY, moved: false };
+  };
+  const onBubbleMove = (e: React.PointerEvent<HTMLButtonElement>) => {
+    const d = drag.current;
+    if (!d) return;
+    if (!d.moved && Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 8) return;
+    d.moved = true;
+    setSpot(keepIn(e.clientX - d.dx, e.clientY - d.dy));
+  };
+  const onBubbleUp = () => {
+    const d = drag.current;
+    drag.current = null;
+    if (!d) return;
+    if (!d.moved) { setMini(false); return; }   // a tap opens the bar
+    setSpot((p) => {
+      if (!p) return p;
+      const snapped = keepIn(p.x + SIZE / 2 < window.innerWidth / 2 ? MARGIN : window.innerWidth, p.y);
+      try { localStorage.setItem('player-bubble', JSON.stringify(snapped)); } catch { /* private window */ }
+      return snapped;
+    });
+  };
+  const bubbleStyle = mini && spot ? { ...keepIn(spot.x, spot.y) } : null;
+
+  // Opening the ship console or the help panel on a phone shrinks the bar to the bubble so it covers neither
+  useEffect(() => {
+    const shrink = () => { if (id && window.matchMedia('(max-width: 700px)').matches) setMini(true); };
+    window.addEventListener('player:shrink', shrink);
+    return () => window.removeEventListener('player:shrink', shrink);
+  }, [id]);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('player-mini', mini);
+    return () => document.documentElement.classList.remove('player-mini');
+  }, [mini]);
+
   return (
-    <section className={hidden ? 'player is-hidden' : 'player'} aria-label="Player" hidden={!track?.youtube}>
+    <section className={['player', hidden && 'is-hidden', mini && 'is-mini', drag.current?.moved && 'is-dragged'].filter(Boolean).join(' ')}
+      style={bubbleStyle ? { left: bubbleStyle.x, top: bubbleStyle.y, right: 'auto', bottom: 'auto' } : undefined} aria-label="Player" hidden={!track?.youtube}>
       {track?.youtube && (
         <div className="player__head">
           {hidden
@@ -129,6 +201,7 @@ export function Player() {
           {!hidden && (
             <a href={`https://www.youtube.com/watch?v=${track.youtube}`} target="_blank" rel="noopener noreferrer" title="Open on YouTube">↗</a>
           )}
+          <button className="player__shrink" onClick={() => setMini(true)} aria-label="Shrink the player to a bubble">▾</button>
           <button onClick={onClose} aria-label="Close player">×</button>
         </div>
       )}
@@ -136,6 +209,10 @@ export function Player() {
         <div ref={wrapRef} className="player__mount" />
         {hidden && <div className="player__cover" aria-hidden="true"><span>?</span></div>}
       </div>
+      {mini && <button type="button" className="player__bubble" aria-label="Open the player (drag to move it)"
+        onPointerDown={onBubbleDown} onPointerMove={onBubbleMove} onPointerUp={onBubbleUp}
+        onPointerCancel={() => { drag.current = null; }}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMini(false); } }}><span aria-hidden="true">♪</span></button>}
     </section>
   );
 }

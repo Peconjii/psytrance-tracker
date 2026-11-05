@@ -53,3 +53,36 @@ html.has-player:not(.on-galaxy) body { padding-bottom: 250px; }
   .player__head > :last-child { margin-left: auto; }
   html.has-player:not(.on-galaxy) body { padding-bottom: calc(var(--bottom-nav, 0px) + 90px); }
 }
+
+/* Phones, scrolled down a page: the bar shrinks to a bubble in the corner (Player.tsx), the music keeps playing.
+   A ring pulses around it and a ♪ badge sits on it so it reads as the player; a tap opens the bar again. */
+.player__bubble, .player__shrink { display: none; }
+@media (max-width: 700px) {
+  .player.is-mini {
+    left: auto; right: 12px; bottom: calc(var(--bottom-nav, 0px) + 12px); width: 48px; height: 48px;
+    display: block; padding: 0; border: 2px solid var(--accent); border-radius: 50%; overflow: visible;
+    box-shadow: 0 6px 20px rgb(0 0 0 / 0.45); animation: player-shrink 0.28s ease-out;
+  }
+  .player.is-mini .player__head { display: none; }
+  .player.is-mini .player__frame { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; }
+  .player.is-mini .player__mount iframe { width: 86px; height: 48px; margin-left: -19px; pointer-events: none; }
+  .player.is-mini::after {
+    content: ''; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--accent);
+    animation: player-ring 1.8s ease-out infinite; pointer-events: none;
+  }
+  .player__head .player__shrink { display: inline-grid; }
+  .player.is-mini.is-dragged { animation: none; transition: none; }
+  .player__bubble {
+    touch-action: none; user-select: none; -webkit-user-select: none;
+    display: grid; position: absolute; inset: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; padding: 0;
+  }
+  .player__bubble span {
+    position: absolute; top: -5px; right: -5px; width: 18px; height: 18px; display: grid; place-items: center;
+    font-size: 10px; color: var(--bg, #0b0918); background: var(--accent); border-radius: 50%;
+  }
+  html.has-player.player-mini:not(.on-galaxy) body { padding-bottom: calc(var(--bottom-nav, 0px) + 20px); }
+}
+@keyframes player-shrink { from { transform: scale(2.2) translateX(-40%); opacity: 0.4; } to { transform: none; opacity: 1; } }
+@keyframes player-ring { from { transform: scale(0.95); opacity: 0.8; } to { transform: scale(1.35); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .player.is-mini, .player.is-mini::after { animation: none; } }
+html[data-motion='reduced'] .player.is-mini, html[data-motion='reduced'] .player.is-mini::after { animation: none; }

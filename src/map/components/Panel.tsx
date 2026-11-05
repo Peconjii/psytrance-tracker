@@ -83,7 +83,10 @@ export function HudShell({ className, style, children, foldOnPhone = false, onCl
           <span aria-hidden="true" />
         </button>
       ) : (
-        <button className="hud__fold" onClick={() => setFolded((f) => !f)} aria-expanded={!folded}>
+        <button className="hud__fold" onClick={() => {
+          if (folded) window.dispatchEvent(new Event('player:shrink'));   // a playing track becomes its bubble
+          setFolded((f) => !f);
+        }} aria-expanded={!folded}>
           {folded ? '▴ Show info' : '▾ Hide'}
         </button>
       )}
