@@ -388,6 +388,7 @@ function MapOfPsy() {
           <Link to="/artists">Artists</Link>
           <Link to="/search">Search</Link>
           <Link to="/feedback">Feedback</Link>
+          <Link to="/about">About</Link>
           <button onClick={() => setReducedMotion(!reducedMotion)} aria-pressed={!reducedMotion}>
             Motion {reducedMotion ? 'off' : 'on'}
           </button>

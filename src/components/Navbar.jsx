@@ -29,6 +29,7 @@ function Navbar() {
         { path: '/artists', label: 'Artists' },
         { path: '/search', label: 'Search' },
         { path: '/feedback', label: 'Feedback' },
+        { path: '/about', label: 'About' },
         // Profile is the username button on the right
         ...(user ? [{ path: '/favorites', label: 'Favorites' }] : []),
         // Admins and editors see the admin panel (the backend checks it again)
