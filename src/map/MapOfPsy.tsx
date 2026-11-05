@@ -354,6 +354,7 @@ function MapOfPsy() {
         tourPath={tourPath} focus={focus} showStations={showStations} onSelectFestival={openFestival}
         showLabels={showLabels} onSelectLabel={openLabel}
         events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour}
+        onBackground={() => { if (window.matchMedia('(max-width: 700px)').matches) closeAllRef.current(); }}
         crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew}
         onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion}
         liveFleets={liveFleets} clockRef={clockRef}

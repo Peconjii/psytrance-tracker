@@ -29,6 +29,8 @@ interface Props {
   selectedFleet: number[] | null;
   onSelectFleet: (ids: number[]) => void;
   onSelectHarbour: () => void;
+  /** A tap on empty space (not a star, ship or label): phones close the open panel with it */
+  onBackground?: () => void;
   /** Line-up of the boarded ship (one event selected): drawn as satellites orbiting it */
   crew: CrewMember[] | null;
   onSelectCrew: (member: CrewMember) => void;
@@ -192,7 +194,7 @@ const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null, followedEvents, followedArtists }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, onBackground, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null, followedEvents, followedArtists }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -218,6 +220,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   onSelectFleetRef.current = onSelectFleet;
   const onSelectHarbourRef = useRef(onSelectHarbour);
   onSelectHarbourRef.current = onSelectHarbour;
+  const onBackgroundRef = useRef(onBackground);
+  onBackgroundRef.current = onBackground;
   const onSelectCrewRef = useRef(onSelectCrew);
   onSelectCrewRef.current = onSelectCrew;
   const reducedMotionRef = useRef(reducedMotion);
@@ -262,6 +266,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         events: app.renderer.events,
       });
       vp.drag().pinch().wheel().decelerate().clampZoom({ minScale: 0.23, maxScale: 3 });
+      // A tap (not a drag) that lands on nothing but space
+      vp.on('clicked', (e: { event: { target: unknown } }) => { if (e.event.target === vp) onBackgroundRef.current?.(); });
       // Leave room for the top bar so the northern stars are not hidden under it
       vp.fit(true, WORLD.width * 1.06, WORLD.height * 1.18);
       vp.moveCenter(WORLD.width / 2, WORLD.height * 0.46);

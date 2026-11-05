@@ -227,7 +227,7 @@ export function Panel({
 
   if (!genreId) {
     return (
-      <HudShell className="hud hud--idle" foldOnPhone>
+      <HudShell key="idle" className="hud hud--idle" foldOnPhone>
         <div className="hud__tag">// NAVIGATION</div>
         <p>Drag to move, scroll or pinch to zoom. Click anything on the map to open it here.</p>
         <dl className="hud__specs hud__legend">
