@@ -6,6 +6,7 @@ import {
 import OwnerForm from '../components/OwnerForm.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
 import TrustPanel from '../components/TrustPanel.jsx'
+import StationDetailsEditor from '../components/StationDetailsEditor.jsx'
 import LinkFields from '../components/LinkFields.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -91,6 +92,8 @@ function LabelEdit() {
             </header>
 
             <TrustPanel kind="LABEL" id={name} />
+
+            <StationDetailsEditor kind="LABEL" stationKey={name} />
 
             <OwnerNumbers kind="label" id={name} />
 

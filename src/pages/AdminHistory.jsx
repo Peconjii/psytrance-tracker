@@ -6,7 +6,7 @@ import AdminTabs from '../components/AdminTabs'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { DAY_YEAR_TIME as DATE } from '../dates.js'
 
-const KIND_LABELS = { ARTIST_GENRES: 'Artist genres', EVENT_GENRES: 'Event genres', ARTIST_HIDDEN: 'Not an artist', ARTIST_MERGED: 'Merged', EVENT_TIMETABLE: 'Timetable', ARTIST_PROFILE: 'Artist profile', ARTIST_TRACKS: 'Artist tracks', ARTIST_FESTIVALS: 'Artist festivals', ARTIST_OWNER: 'Profile owner', ARTIST_NAME: 'Artist name', ARTIST_ROLE: 'Artist role', ORGANIZER_PROFILE: 'Organizer page', ORGANIZER_OWNER: 'Organizer owner', OUR_EVENT: 'Added event', OUR_EVENT_EDITED: 'Added event changed', REVIEW_DELETED: 'Review deleted', EVENT_HIDDEN: 'Event hidden', EVENT_FEATURED: 'Event featured', LABEL_PROFILE: 'Label page', LABEL_OWNER: 'Label owner', LABEL_CREW: 'Label crew', FESTIVAL_PROFILE: 'Festival page', FESTIVAL_OWNER: 'Festival owner', USER_ROLE: 'Role', USER_DELETED: 'Account deleted', FESTIVAL_EDITION: 'Festival edition', MAP_ADDED: 'Added to the map', MAP_REMOVED: 'Taken off the map', GENRE_CONTENT: 'Galaxy texts' }
+const KIND_LABELS = { ARTIST_GENRES: 'Artist genres', EVENT_GENRES: 'Event genres', ARTIST_HIDDEN: 'Not an artist', ARTIST_MERGED: 'Merged', EVENT_TIMETABLE: 'Timetable', ARTIST_PROFILE: 'Artist profile', ARTIST_TRACKS: 'Artist tracks', ARTIST_FESTIVALS: 'Artist festivals', ARTIST_OWNER: 'Profile owner', ARTIST_NAME: 'Artist name', ARTIST_ROLE: 'Artist role', ORGANIZER_PROFILE: 'Organizer page', ORGANIZER_OWNER: 'Organizer owner', OUR_EVENT: 'Added event', OUR_EVENT_EDITED: 'Added event changed', REVIEW_DELETED: 'Review deleted', EVENT_HIDDEN: 'Event hidden', EVENT_FEATURED: 'Event featured', LABEL_PROFILE: 'Label page', LABEL_OWNER: 'Label owner', LABEL_CREW: 'Label crew', FESTIVAL_PROFILE: 'Festival page', FESTIVAL_OWNER: 'Festival owner', USER_ROLE: 'Role', USER_DELETED: 'Account deleted', FESTIVAL_EDITION: 'Festival edition', MAP_ADDED: 'Added to the map', MAP_REMOVED: 'Taken off the map', GENRE_CONTENT: 'Galaxy texts', STATION_DETAILS: 'Map details' }
 // Merges move events between artists, and timetables and profiles are too long to keep a copy of: none can be undone
 const NO_UNDO = ['ARTIST_MERGED', 'EVENT_TIMETABLE', 'ARTIST_PROFILE', 'ARTIST_TRACKS', 'ARTIST_FESTIVALS', 'ARTIST_OWNER', 'ARTIST_NAME', 'ARTIST_ROLE', 'ORGANIZER_PROFILE', 'ORGANIZER_OWNER', 'OUR_EVENT', 'OUR_EVENT_EDITED', 'REVIEW_DELETED', 'EVENT_HIDDEN', 'EVENT_FEATURED', 'LABEL_PROFILE', 'LABEL_OWNER', 'LABEL_CREW', 'FESTIVAL_PROFILE', 'FESTIVAL_OWNER', 'USER_ROLE', 'USER_DELETED', 'FESTIVAL_EDITION', 'MAP_ADDED', 'MAP_REMOVED']
 // An empty value means: the artist isn't on the map, or the event's genres come from its line-up
@@ -14,6 +14,9 @@ const EMPTY = { ARTIST_GENRES: 'not on the map', EVENT_GENRES: 'from the line-up
 // Event changes are about "<id> · <name>"
 const targetLink = (change) => change.kind === 'GENRE_CONTENT'
     ? `/admin/galaxy?genre=${encodeURIComponent(change.target)}`
+    : change.kind === 'STATION_DETAILS'
+        ? (change.target.startsWith('FESTIVAL:') ? `/festivals/${encodeURIComponent(change.target.slice(9))}/edit`
+            : `/labels/${encodeURIComponent(change.target.slice(6))}/edit`)
     : change.kind.startsWith('EVENT_')
         ? `/admin/events?id=${change.target.split(' ')[0]}`
         : `/admin/genres?artist=${encodeURIComponent(change.target)}`
@@ -43,6 +46,21 @@ function contentChanges(before, after) {
     const order = b.tracks.map(key).filter(k => was.has(k))
     if (out.length === 0 && order.join() !== a.tracks.map(key).filter(k => now.has(k)).join()) out.push('track order')
     return [...new Set(out)].join(' · ') || 'nothing'
+}
+
+// A label's or festival's map details are logged whole (JSON): say which fields changed
+function detailsChanges(before, after) {
+    let a, b
+    try {
+        a = before && before !== 'null' ? JSON.parse(before) : {}
+        b = after && after !== 'null' ? JSON.parse(after) : {}
+    } catch {
+        return 'changed'
+    }
+    const out = ['name', 'country', 'since', 'description', 'genres']
+        .filter(k => JSON.stringify(a[k] ?? null) !== JSON.stringify(b[k] ?? null))
+        .map(k => k === 'name' && b.name ? `name → ${b.name}` : k === 'genres' && b.genres ? `genres → ${b.genres.join(', ')}` : k)
+    return out.join(' · ') || 'back to the map file'
 }
 
 // Every change made in the admin panel, newest first, with an undo for each one that still stands.
@@ -110,8 +128,8 @@ function AdminHistory() {
                                     #{change.id} · @{change.username} · {DATE.format(new Date(change.createdAt))}
                                 </span>
                             </div>
-                            {change.kind === 'GENRE_CONTENT' ? (
-                                <p className="soft m-0">{contentChanges(change.before, change.after)}</p>
+                            {change.kind === 'GENRE_CONTENT' || change.kind === 'STATION_DETAILS' ? (
+                                <p className="soft m-0">{change.kind === 'GENRE_CONTENT' ? contentChanges(change.before, change.after) : detailsChanges(change.before, change.after)}</p>
                             ) : (
                                 <p className="soft m-0">
                                     <span className="muted">{change.before || EMPTY[change.kind]}</span>

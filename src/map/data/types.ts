@@ -139,6 +139,8 @@ export const famousTracks = () =>
 export interface Festival {
   id: string;
   name: string;
+  /** Former names (the festival was renamed), so pages that still write them match it */
+  aliases?: string[];
   country: string;
   /** First edition, only where it is well documented */
   since?: number;

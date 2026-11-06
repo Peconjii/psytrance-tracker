@@ -1,10 +1,49 @@
-import { fetchMapExtras } from '../../api/backend.js';
+import { fetchMapDetails, fetchMapExtras } from '../../api/backend.js';
 import { festivalById, festivals, genreById, labels, type Festival } from './types';
 
 // Labels and festivals admins added to the map from the admin panel (the backend's MapExtras), put next to the ones
 // in labels.json and festivals.json before the galaxy is drawn or a label / festival page looks one up.
 
 interface AddedLabel { name: string; country?: string; since?: number; genres: string[]; x: number; y: number }
+// What someone changed about a label or festival from its edit page (null: as the map file has it)
+interface Details { name?: string | null; country?: string | null; since?: number | null; description?: string | null; genres?: string[] | null }
+interface Station { kind: 'LABEL' | 'FESTIVAL'; key: string; details: Details }
+
+// The map files' values, kept the first time a station is changed, so an undone change goes back to them
+const original = new Map<string, { name?: string; country?: string; since?: number; description?: string; genres: string[] }>();
+
+/** Puts a label's or festival's changed details over what the map files say */
+export function applyStationDetails(kind: 'LABEL' | 'FESTIVAL', key: string, d: Details) {
+  const id = `${kind}:${key}`;
+  if (kind === 'FESTIVAL') {
+    const f = festivalById[key];
+    if (!f) return;
+    if (!original.has(id)) original.set(id, { name: f.name, country: f.country, since: f.since, description: f.description, genres: [...f.genres] });
+    const o = original.get(id)!;
+    const oldGenres = f.genres;
+    f.name = d.name ?? o.name ?? f.name;
+    f.country = d.country ?? o.country ?? '';
+    f.since = d.since ?? o.since;
+    f.description = d.description ?? o.description ?? '';
+    f.genres = d.genres ?? o.genres;
+    for (const g of oldGenres) { const genre = genreById[g]; if (genre) genre.festivals = genre.festivals.filter((x) => x !== key); }
+    for (const g of f.genres) genreById[g]?.festivals.push(key);
+  } else {
+    const l = labels[key];
+    if (!l) return;
+    const memberOf = Object.values(genreById).filter((g) => g.labels.includes(key)).map((g) => g.id);
+    if (!original.has(id)) original.set(id, { country: l.country, since: l.since, genres: memberOf });
+    const o = original.get(id)!;
+    l.country = d.country ?? o.country;
+    l.since = d.since ?? o.since;
+    const genres = d.genres ?? o.genres;
+    for (const genre of Object.values(genreById)) {
+      const has = genre.labels.includes(key);
+      if (has && !genres.includes(genre.id)) genre.labels = genre.labels.filter((x) => x !== key);
+      if (!has && genres.includes(genre.id)) genre.labels.push(key);
+    }
+  }
+}
 
 let applied = false;
 let loading: Promise<void> | null = null;
@@ -32,6 +71,11 @@ export function loadMapExtras(): Promise<void> {
           festivalById[f.id] = festival;
           for (const id of f.genres) genreById[id]?.festivals.push(f.id);
         }
+      })
+      // Then what was changed about any of them (the bundled ones too)
+      .then(() => fetchMapDetails(AbortSignal.timeout(WAIT_MS)))
+      .then((stations: Station[]) => {
+        for (const s of stations) applyStationDetails(s.kind, s.key, s.details);
       })
       .catch((err: unknown) => console.warn('Could not load the labels and festivals added to the map', err))
       .finally(() => { applied = true; });

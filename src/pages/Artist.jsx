@@ -82,7 +82,10 @@ function Artist() {
     const ownFestivals = artist?.festivals ?? []
     const tracks = ownTracks.length > 0 ? [] : mapTracks
     const named = new Set(ownFestivals.map(f => f.name.toLowerCase()))
-    const festivals = mapFestivals.filter(x => !named.has(festivalById[x.festival].name.toLowerCase()))
+    const festivals = mapFestivals.filter(x => {
+        const f = festivalById[x.festival]
+        return ![f.name, ...(f.aliases ?? [])].some(n => named.has(n.toLowerCase()))
+    })
     const canEdit = Boolean(artist && (user?.admin || mine.some(a => a.slug === artist.slug)))
     const role = artist ? roleOf(artist) : null
     const origin = mapName ? mapProfiles[mapName]?.country : null

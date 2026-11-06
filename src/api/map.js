@@ -26,6 +26,23 @@ export async function fetchMainGenres(signal) {
 }
 
 // The labels and festivals admins added to the map: { labels: [{ name, country, since, genres, x, y }], festivals: [...] }
+// Labels and festivals whose map details someone changed (name, country, year, description, genres)
+export async function fetchMapDetails(signal) {
+    const response = await api.get('/api/map/details', { signal })
+    return response.data
+}
+
+// One label's or festival's changed details, and whether this account may change them (kind: LABEL or FESTIVAL)
+export async function fetchStationDetails(kind, key, signal) {
+    const response = await api.get(`/api/map/details/${kind}`, { params: { key }, signal })
+    return response.data
+}
+
+export async function saveStationDetails(kind, key, details) {
+    const response = await api.put(`/api/map/details/${kind}`, details, { params: { key } })
+    return response.data
+}
+
 export async function fetchMapExtras(signal) {
     const response = await api.get('/api/map/extras', { signal })
     return response.data
