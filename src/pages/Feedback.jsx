@@ -149,6 +149,21 @@ function Feedback() {
                 <p className="page-head__sub">
                     A wrong genre, a missing artist, a bug or an idea: tell us. You don't need an account.
                 </p>
+                {/* The other ways to add to the map, the same buttons the galaxy and the pages have */}
+                <nav className="flex flex-wrap gap-2 mt-4" aria-label="Other ways to help">
+                    <Link className="chip no-underline" to="/new-page"
+                        title="An artist, label, festival or crew that isn't on the map yet? Ask for your page">+ Not on the map? Add yourself</Link>
+                    {!(newGenre && !about) && (
+                        <Link className="chip no-underline" to={`/feedback?${new URLSearchParams({ kind: 'SUGGESTION', newgenre: '1', ...(from ? { from } : {}) })}`}
+                            onClick={() => { setAbout(null); setKind('SUGGESTION') }}
+                            title="Know a style that has no star yet? Tell us">+ Suggest a genre</Link>
+                    )}
+                    <Link className="chip no-underline" to="/events/new" title="A party or festival that isn't listed yet">+ Add an event</Link>
+                    <Link className="chip no-underline" to="/"
+                        title="Open a star (genre) or an artist on the galaxy: the panel has + Suggest an artist and + Suggest a track">
+                        ✦ Suggest a track or artist
+                    </Link>
+                </nav>
             </header>
 
             <form onSubmit={handleSubmit} className="panel grid gap-5" noValidate>
