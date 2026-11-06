@@ -7,6 +7,12 @@ export async function fetchFeedback(status, signal) {
     return response.data
 }
 
+// A track or artist suggestion from the feedback form, added to the map with one click (genreId: where it goes)
+export async function acceptFeedback(id, genreId) {
+    const response = await api.post(`/api/admin/feedback/${id}/accept`, { genreId })
+    return response.data
+}
+
 export async function setFeedbackStatus(id, status) {
     const response = await api.patch(`/api/admin/feedback/${id}`, { status })
     return response.data
@@ -301,5 +307,21 @@ export async function fetchPageTrust(kind, key, signal) {
 // Admins only
 export async function setPageTrust(kind, key, trusted) {
     const response = await api.put('/api/admin/page-trust', { kind, key, trusted })
+    return response.data
+}
+
+// Admin -> Upkeep: key tracks whose video is gone (null before the first daily check) and probable duplicate artists
+export async function fetchDeadTracks(signal) {
+    const response = await api.get('/api/admin/upkeep/dead-tracks', { signal })
+    return response.data || null
+}
+
+export async function checkDeadTracks() {
+    const response = await api.post('/api/admin/upkeep/dead-tracks', null, { timeout: 300000 })
+    return response.data
+}
+
+export async function fetchDuplicateArtists(signal) {
+    const response = await api.get('/api/admin/upkeep/duplicate-artists', { signal })
     return response.data
 }

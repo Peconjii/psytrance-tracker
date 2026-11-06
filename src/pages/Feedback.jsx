@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { sendFeedback } from '../api/backend.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { isSitePath } from '../components/sitePath.js'
+import { data } from '../map/data/types'
 
 const KINDS = [
     { value: 'CORRECTION', label: 'Correct the data', hint: 'A genre, artist, festival or event is wrong or missing' },
@@ -14,6 +15,15 @@ const KINDS = [
 ]
 const ABOUT_LABELS = { GENRE: 'Genre', ARTIST: 'Artist', EVENT: 'Event', FESTIVAL: 'Festival', LABEL: 'Label', PAGE: 'Page' }
 const MAX_MESSAGE = 2000
+const GENRE_NAMES = data.genres.map(g => g.name).sort((a, b) => a.localeCompare(b))
+// What an event correction is about. A genre the inbox can set with one click; the rest comes from Goabase
+const EVENT_FIELDS = [
+    { value: 'genre', label: 'Genre' },
+    { value: 'date', label: 'Date' },
+    { value: 'place', label: 'Place' },
+    { value: 'name', label: 'Name' },
+    { value: 'other', label: 'Something else' },
+]
 
 // The feedback form. Links from the map ("✎ Fix") and event pages open it with what it is about filled in:
 // /feedback?kind=CORRECTION&about=ARTIST&ref=Ajja&from=/?genre=twilight
@@ -37,6 +47,12 @@ function Feedback() {
     const offered = params.get('track') === '1' && initialAbout?.type === 'ARTIST' ? 'track'
         : params.get('artist') === '1' && initialAbout?.type === 'GENRE' ? 'artist' : null
     const [track, setTrack] = useState({ title: '', link: '', year: '' })
+    // "+ Suggest a genre" on the galaxy: a genre the map doesn't have yet
+    const newGenre = params.get('newgenre') === '1'
+    const [genre, setGenre] = useState({ name: '', from: '', year: '', artists: '', link: '' })
+    const setGenreField = (field) => (e) => { setGenre(g => ({ ...g, [field]: e.target.value })); setError('') }
+    // A correction of an event: which field is wrong and what is right
+    const [fix, setFix] = useState({ field: 'genre', genres: [], value: '' })
     const setTrackField = (field) => (e) => { setTrack(t => ({ ...t, [field]: e.target.value })); setError('') }
     const [email, setEmail] = useState(user?.email || '')
     // Never shown to people; bots fill it in (see the backend's FeedbackService)
@@ -49,16 +65,35 @@ function Feedback() {
         e.preventDefault()
         // "✕ Not about this" turns it back into plain feedback
         const suggestion = about ? offered : null
+        const eventFix = about?.type === 'EVENT' && kind === 'CORRECTION'
+        if (newGenre && !about && genre.name.trim().length < 2) {
+            return setError('Write the name of the genre.')
+        }
+        if (newGenre && !about && genre.link.trim() && !/^https?:\/\/\S+$/.test(genre.link.trim())) {
+            return setError('The link should start with https:// (YouTube, Bandcamp, SoundCloud...).')
+        }
         if (suggestion && track.title.trim().length < 2) {
             return setError(suggestion === 'track' ? 'Write the name of the track.' : 'Write the name of the artist.')
         }
         if (suggestion && track.link.trim() && !/^https?:\/\/\S+$/.test(track.link.trim())) {
             return setError('The link should start with https:// (YouTube, Bandcamp, SoundCloud...).')
         }
-        if (!suggestion && message.trim().length < 5) {
+        // Only what the chosen field shows counts: genres picked before switching to "Date" don't
+        const filled = (newGenre && !about) || (eventFix && (fix.field === 'genre' ? fix.genres.length > 0 : Boolean(fix.value.trim())))
+        if (!suggestion && !filled && message.trim().length < 5) {
             return setError('Write a few more words, so we know what to fix.')
         }
-        const text = suggestion
+        const text = newGenre && !about
+            ? [`Genre suggestion: "${genre.name.trim()}"`,
+                genre.from.trim() && `Grew out of: ${genre.from.trim()}`,
+                genre.year.trim() && `Since: ${genre.year.trim()}`,
+                genre.artists.trim() && `Artists: ${genre.artists.trim()}`,
+                genre.link.trim() && `Example: ${genre.link.trim()}`, message.trim()].filter(Boolean).join('\n')
+            : eventFix && fix.field === 'genre' && fix.genres.length > 0
+            ? [`Event correction · genre: "${fix.genres.join(', ')}"`, message.trim()].filter(Boolean).join('\n')
+            : eventFix && fix.field !== 'genre' && fix.value.trim()
+            ? [`Event correction · ${fix.field}: "${fix.value.trim()}"`, message.trim()].filter(Boolean).join('\n')
+            : suggestion
             ? [suggestion === 'track'
                 ? `Track suggestion for ${about.ref}: "${track.title.trim()}"${track.year.trim() ? ` (${track.year.trim()})` : ''}`
                 : `Artist suggestion for ${about.ref}: "${track.title.trim()}"`,
@@ -138,6 +173,77 @@ function Feedback() {
                     </div>
                 )}
 
+                {newGenre && !about && (
+                    <fieldset className="grid gap-3 m-0 p-0 border-0">
+                        <legend className="field-label">A genre the map is missing</legend>
+                        <div>
+                            <label htmlFor="genre-name" className="field-label">Name</label>
+                            <input id="genre-name" className="field" value={genre.name} onChange={setGenreField('name')}
+                                placeholder="e.g. Psybient" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="sm:col-span-2">
+                                <label htmlFor="genre-from" className="field-label">Grew out of <span className="muted">(optional)</span></label>
+                                <input id="genre-from" className="field" list="genre-names" value={genre.from}
+                                    onChange={setGenreField('from')} placeholder="e.g. Goa trance and ambient" />
+                                <datalist id="genre-names">{GENRE_NAMES.map(n => <option key={n} value={n} />)}</datalist>
+                            </div>
+                            <div>
+                                <label htmlFor="genre-year" className="field-label">Since <span className="muted">(year)</span></label>
+                                <input id="genre-year" inputMode="numeric" className="field" value={genre.year} onChange={setGenreField('year')} placeholder="1995" />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="genre-artists" className="field-label">A few artists <span className="muted">(optional)</span></label>
+                            <input id="genre-artists" className="field" value={genre.artists} onChange={setGenreField('artists')}
+                                placeholder="e.g. Shpongle, Ott, Entheogenic" />
+                        </div>
+                        <div>
+                            <label htmlFor="genre-link" className="field-label">A track that shows it <span className="muted">(link, optional)</span></label>
+                            <input id="genre-link" type="url" inputMode="url" className="field" value={genre.link}
+                                onChange={setGenreField('link')} placeholder="https://www.youtube.com/watch?v=…" />
+                        </div>
+                    </fieldset>
+                )}
+
+                {about?.type === 'EVENT' && kind === 'CORRECTION' && (
+                    <fieldset className="grid gap-3 m-0 p-0 border-0">
+                        <legend className="field-label">What is wrong?</legend>
+                        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="What is wrong">
+                            {EVENT_FIELDS.map(f => (
+                                <button key={f.value} type="button" role="radio" aria-checked={fix.field === f.value}
+                                    className={`chip${fix.field === f.value ? ' is-on' : ''}`}
+                                    onClick={() => { setFix(x => ({ ...x, field: f.value })); setError('') }}>{f.label}</button>
+                            ))}
+                        </div>
+                        {fix.field === 'genre' ? (
+                            <div>
+                                <label htmlFor="fix-genre" className="field-label">The right genre <span className="muted">(one or more)</span></label>
+                                <select id="fix-genre" className="field" value=""
+                                    onChange={(e) => { const g = e.target.value; if (g) setFix(x => ({ ...x, genres: x.genres.includes(g) ? x.genres : [...x.genres, g].slice(0, 4) })) }}>
+                                    <option value="">Pick a genre…</option>
+                                    {GENRE_NAMES.map(n => <option key={n} value={n}>{n}</option>)}
+                                </select>
+                                {fix.genres.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {fix.genres.map(g => (
+                                            <button key={g} type="button" className="chip is-on" aria-label={`Remove ${g}`}
+                                                onClick={() => setFix(x => ({ ...x, genres: x.genres.filter(y => y !== g) }))}>{g} ✕</button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        ) : fix.field !== 'other' && (
+                            <div>
+                                <label htmlFor="fix-value" className="field-label">What is right</label>
+                                <input id="fix-value" className="field" value={fix.value}
+                                    onChange={(e) => { setFix(x => ({ ...x, value: e.target.value })); setError('') }}
+                                    placeholder={fix.field === 'date' ? 'e.g. 12–14 June 2027' : fix.field === 'place' ? 'e.g. Lisbon, Portugal' : 'The right name'} />
+                            </div>
+                        )}
+                    </fieldset>
+                )}
+
                 {offered === 'artist' && about && (
                     <fieldset className="grid gap-3 m-0 p-0 border-0">
                         <legend className="field-label">An artist for {about.ref}</legend>
@@ -186,7 +292,7 @@ function Feedback() {
                         maxLength={MAX_MESSAGE}
                         value={message}
                         onChange={(e) => { setMessage(e.target.value); setError('') }}
-                        placeholder={offered && about
+                        placeholder={(offered && about) || (newGenre && !about) || (about?.type === 'EVENT' && kind === 'CORRECTION')
                             ? 'Optional: why it belongs here, which genre it fits...'
                             : kind === 'CORRECTION'
                             ? 'e.g. Fungus Funk plays night full-on, not forest. Source: their Sangoma releases.'

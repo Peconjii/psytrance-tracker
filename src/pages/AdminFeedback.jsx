@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchFeedback, setFeedbackStatus } from '../api/backend.js'
+import { acceptFeedback, fetchFeedback, replyToFeedback, setFeedbackStatus } from '../api/backend.js'
+import { data } from '../map/data/types'
+import { reloadContentLater } from '../map/data/content'
 import usePageMeta from '../hooks/usePageMeta.js'
 import AdminTabs from '../components/AdminTabs'
 import FeedbackReply from '../components/FeedbackReply.jsx'
@@ -103,6 +105,12 @@ function AdminFeedback() {
                                         Fix in the panel →
                                     </Link>
                                 )}
+                                {/* Genre feedback is about "<genre>" or, on a key track, "<genre>: <track> by <artist>" */}
+                                {item.aboutType === 'GENRE' && genreOfRef(item.aboutRef) && (
+                                    <Link className="link mono text-xs" to={`/admin/galaxy?genre=${genreOfRef(item.aboutRef)}`}>
+                                        Fix in the panel →
+                                    </Link>
+                                )}
                                 <label className="ml-auto flex items-center gap-2">
                                     <span className="field-label m-0">Status</span>
                                     <select className="field w-auto py-1" value={item.status} disabled={saving === item.id}
@@ -111,6 +119,19 @@ function AdminFeedback() {
                                     </select>
                                 </label>
                             </div>
+                            {item.aboutType === 'EVENT' && /^Event correction · (date|place|name):/m.test(item.message) && (
+                                <p className="mono text-xs muted mt-3 mb-0">
+                                    Dates, places and names come from Goabase: they change when the organizer fixes them there.
+                                    Answer the sender, or check the event in the panel.
+                                </p>
+                            )}
+                            {item.accept && (
+                                <AcceptSuggestion item={item}
+                                    onAccepted={(updated) => setLoaded(prev => ({
+                                        ...prev,
+                                        items: prev.items.map(i => (i.id === updated.id ? updated : i)).filter(i => !filter || i.status === filter),
+                                    }))} />
+                            )}
                             <FeedbackReply item={item}
                                 onReplied={(updated) => setLoaded(prev => ({ ...prev, items: prev.items.map(i => (i.id === updated.id ? updated : i)) }))} />
                         </li>
@@ -119,6 +140,106 @@ function AdminFeedback() {
             )}
         </div>
     )
+}
+
+const GENRE_NAMES = Object.fromEntries(data.genres.map(g => [g.id, g.name]))
+const genreOfRef = (ref) => {
+    const name = (ref ?? '').split(':')[0].trim().toLowerCase()
+    return data.genres.find(g => g.name.toLowerCase() === name || g.id === name)?.id ?? null
+}
+
+/**
+ * "✓ Add track" / "✓ Add to the star" under a suggestion from the feedback form: the track goes into the genre's key
+ * tracks (as in Admin -> Galaxy), the artist onto the genre's star (as in Admin -> Artists), and the message is done.
+ * Both show up in Admin -> History, where they can be undone.
+ */
+function AcceptSuggestion({ item, onAccepted }) {
+    const { accept } = item
+    const track = accept.type === 'TRACK'
+    const eventGenres = accept.type === 'EVENT_GENRE'
+    // A short thank-you to the sender, when there is an address to write to
+    const [thank, setThank] = useState(Boolean(item.replyTo) && !item.replyText)
+    const [genreId, setGenreId] = useState(accept.genres[0] ?? '')
+    const [busy, setBusy] = useState(false)
+    const [error, setError] = useState('')
+    const [done, setDone] = useState(false)
+
+    const add = async () => {
+        setBusy(true)
+        setError('')
+        try {
+            let updated = await acceptFeedback(item.id, eventGenres ? null : genreId)
+            reloadContentLater()
+            if (thank) {
+                try {
+                    updated = await replyToFeedback(item.id, thankYou(accept, GENRE_NAMES[genreId] ?? genreId))
+                } catch {
+                    setError('Added, but the thank-you email could not be sent.')
+                }
+            }
+            setDone(true)
+            onAccepted(updated)
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not add it. Try again.')
+        } finally {
+            setBusy(false)
+        }
+    }
+
+    const what = eventGenres
+        ? <>Set the event&apos;s genres to <b>{accept.genres.map(g => GENRE_NAMES[g] ?? g).join(', ')}</b></>
+        : track
+        ? <><b>{accept.artist}</b> – “{accept.title}”{accept.year ? ` (${accept.year})` : ''}{accept.youtube ? ' · ▶ YouTube' : ' · no YouTube link'}</>
+        : <><b>{accept.artist}</b> on the star</>
+    return (
+        <div className="flex flex-wrap items-center gap-3 mt-3 text-sm" style={{ borderTop: '1px dashed var(--line)', paddingTop: 10 }}>
+            <span className="mono text-xs muted">{eventGenres ? 'Event genre' : track ? 'Key track' : 'New artist'}:</span>
+            <span className="soft">{what}</span>
+            {done ? (
+                <span className="mono text-xs" style={{ color: 'var(--accent)' }}>✓ Added</span>
+            ) : accept.genres.length === 0 ? (
+                <span className="mono text-xs muted">
+                    {track ? `${accept.artist} isn't on the map yet: put them on a star first (Fix in the panel), then add the track.`
+                        : 'Already on that star.'}
+                </span>
+            ) : (
+                <>
+                    {eventGenres ? null : accept.genres.length > 1 ? (
+                        <select className="field w-auto py-1" value={genreId} onChange={(e) => setGenreId(e.target.value)}
+                            aria-label="Genre">
+                            {accept.genres.map(g => <option key={g} value={g}>{GENRE_NAMES[g] ?? g}</option>)}
+                        </select>
+                    ) : (
+                        <span className="mono text-xs muted">→ {GENRE_NAMES[genreId] ?? genreId}</span>
+                    )}
+                    {youtubePreview(accept.youtube)}
+                    {item.replyTo && !item.replyText && (
+                        <label className="flex items-center gap-2 mono text-xs muted">
+                            <input type="checkbox" checked={thank} onChange={(e) => setThank(e.target.checked)} />
+                            Email a thank-you
+                        </label>
+                    )}
+                    <button type="button" className="btn" onClick={add} disabled={busy}>
+                        {busy ? 'Adding…' : eventGenres ? '✓ Set genres' : track ? '✓ Add track' : '✓ Add to the star'}
+                    </button>
+                </>
+            )}
+            {error && <span className="notice w-full m-0">{error}</span>}
+        </div>
+    )
+}
+
+// The thank-you the sender gets after an Accept (sent as the inbox's normal answer, so it shows under the message)
+function thankYou(accept, genreName) {
+    const what = accept.type === 'TRACK' ? `"${accept.title}" by ${accept.artist} is now a key track of ${genreName}`
+        : accept.type === 'ARTIST' ? `${accept.artist} now orbits the ${genreName} star`
+        : 'the event now shows the genres you suggested'
+    return `Thanks for your suggestion: ${what} on Map of Psy. Every fix like yours makes the map truer for everyone. Keep them coming!\n\nhttps://mapofpsy.com`
+}
+
+// "Listen" before adding, so a wrong link is caught
+function youtubePreview(id) {
+    return id ? <a className="link mono text-xs" href={`https://www.youtube.com/watch?v=${id}`} target="_blank" rel="noopener noreferrer">Listen ↗</a> : null
 }
 
 export default AdminFeedback

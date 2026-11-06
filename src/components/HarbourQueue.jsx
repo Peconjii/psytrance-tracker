@@ -4,6 +4,24 @@ import { hideEvent, setAdminEventGenres } from '../api/backend.js'
 import { fetchMapEvents } from '../map/data/events'
 import { AddGenre } from './AdminParts'
 import { WEEKDAY_DAY as DAY } from '../dates.js'
+import { data } from '../map/data/types'
+
+// Genres whose name stands as whole words in the event's name ("FOREST GATHERING" -> Forest), longest names first so
+// "Dark progressive" wins over "Progressive psy"; a guess to take with one click, nothing is set by itself
+const BY_LENGTH = [...data.genres].sort((a, b) => b.name.length - a.name.length)
+const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+function guessGenres(name) {
+    let rest = ` ${(name ?? '').toLowerCase()} `
+    const found = []
+    for (const g of BY_LENGTH) {
+        const words = new RegExp(`[^a-z0-9]${escape(g.name.toLowerCase())}[^a-z0-9]`)
+        if (words.test(rest)) {
+            found.push(g)
+            rest = rest.replace(words, ' ')
+        }
+    }
+    return found.slice(0, 2)
+}
 
 
 // The harbour as a work list for admins: the next 30 days' events whose genre isn't known, soonest first. Picking a
@@ -74,6 +92,10 @@ function HarbourQueue({ onOpen, onHidden }) {
                             </span>
                             <AddGenre exclude={[]} disabled={saving === e.id} label={`Genre of ${e.nameParty}`}
                                 onAdd={(genreId) => setGenre(e, genreId)} />
+                            {guessGenres(e.nameParty).map(g => (
+                                <button key={g.id} type="button" className="btn" disabled={saving === e.id}
+                                    title={`The name says ${g.name}: set it`} onClick={() => setGenre(e, g.id)}>✓ {g.name}</button>
+                            ))}
                             <button type="button" className="btn btn--ghost" onClick={() => onOpen(e.id)}>More</button>
                             <button type="button" className="btn btn--ghost btn--danger" disabled={saving === e.id}
                                 onClick={() => hide(e)}>Hide</button>

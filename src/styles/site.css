@@ -496,3 +496,13 @@ html[data-theme="contrast"] :focus-visible { outline: 3px solid #111; outline-of
   .galaxy-save { bottom: var(--bottom-nav, 0px); }
   html.has-player:not(.player-mini) .galaxy-save { bottom: calc(var(--bottom-nav, 0px) + 90px); }
 }
+
+/* Phones: event tickets take less height so more fit on the screen. "I'm going" and ♡ are slimmer (34px, still
+   easy to tap), the genres and the buttons share one row, and the gap above them is smaller. */
+@media (max-width: 700px) {
+  .ticket__body { gap: 8px 12px; padding: 10px 12px; }
+  .ticket__foot { padding-top: 8px; gap: 6px; flex-wrap: nowrap; }
+  .ticket__genres { flex-wrap: nowrap; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+  .ticket__actions .btn { min-height: 34px; padding: 4px 12px; font-size: 11px; }
+  .ticket__actions .icon-btn { width: 34px; height: 34px; }
+}

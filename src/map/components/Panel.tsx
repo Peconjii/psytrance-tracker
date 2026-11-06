@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ProducerCorner } from './ProducerCorner';
 import { NextGigs } from './NextGigs';
 import { LabelCrew } from './LabelCrew';
-import { FixLink, SuggestArtistLink, SuggestTrackLink } from './FixLink';
+import { FixLink, SuggestArtistLink, SuggestGenreLink, SuggestTrackLink } from './FixLink';
 import { HeartButton } from './Playlist';
 import FollowButton from '../../components/FollowButton.jsx';
 import type { PlaylistApi } from '../hooks/usePlaylist';
@@ -249,6 +249,7 @@ export function Panel({
           <dt>▶ ♡</dt>
           <dd>Play a track while you explore; save it to your playlist.</dd>
         </dl>
+        <SuggestGenreLink />
       </HudShell>
     );
   }

@@ -35,3 +35,13 @@ export function FixLink({ about, name, compact = false }: { about: 'GENRE' | 'AR
     )
   );
 }
+
+/** "+ Suggest a genre" on the galaxy: the feedback form with fields for a genre the map doesn't have yet */
+export function SuggestGenreLink({ label = '+ Suggest a genre the map is missing' }: { label?: string }) {
+  const params = new URLSearchParams({ kind: 'SUGGESTION', newgenre: '1', from: window.location.pathname + window.location.search });
+  return (
+    <Link className="hud__suggest" to={`/feedback?${params}`} title="Know a style that has no star yet? Tell us">
+      {label}
+    </Link>
+  );
+}

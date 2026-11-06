@@ -39,6 +39,7 @@ const AdminFeedback = lazy(() => import('./pages/AdminFeedback'))
 const AdminGenres = lazy(() => import('./pages/AdminGenres'))
 const AdminGalaxy = lazy(() => import('./pages/AdminGalaxy'))
 const AdminHistory = lazy(() => import('./pages/AdminHistory'))
+const AdminUpkeep = lazy(() => import('./pages/AdminUpkeep'))
 const AdminEvents = lazy(() => import('./pages/AdminEvents'))
 const AdminRequests = lazy(() => import('./pages/AdminRequests'))
 const AdminOurEvents = lazy(() => import('./pages/AdminOurEvents'))
@@ -129,6 +130,7 @@ function Shell() {
           <Route path="/admin/galaxy" element={<AdminRoute editors><AdminGalaxy /></AdminRoute>} />
           <Route path="/admin/events" element={<AdminRoute editors><AdminEvents /></AdminRoute>} />
           <Route path="/admin/history" element={<AdminRoute><AdminHistory /></AdminRoute>} />
+          <Route path="/admin/upkeep" element={<AdminRoute><AdminUpkeep /></AdminRoute>} />
           <Route path="/admin/requests" element={<AdminRoute><AdminRequests /></AdminRoute>} />
           <Route path="/admin/our-events" element={<AdminRoute editors><AdminOurEvents /></AdminRoute>} />
           <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />

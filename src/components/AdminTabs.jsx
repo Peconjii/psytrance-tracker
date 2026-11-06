@@ -12,6 +12,7 @@ const TABS = [
     { to: '/admin/requests', label: 'Requests' },
     { to: '/admin/users', label: 'Users' },
     { to: '/admin/reviews', label: 'Reviews', editors: true },
+    { to: '/admin/upkeep', label: 'Upkeep' },
     { to: '/admin/history', label: 'History' },
 ]
 
