@@ -506,3 +506,10 @@ html[data-theme="contrast"] :focus-visible { outline: 3px solid #111; outline-of
   .ticket__actions .btn { min-height: 34px; padding: 4px 12px; font-size: 11px; }
   .ticket__actions .icon-btn { width: 34px; height: 34px; }
 }
+
+/* Phones: in a row (an artist's next gigs, lists) a long town moves to a second line, so the name never shrinks to "…" */
+@media (max-width: 700px) {
+  .rows__item { flex-wrap: wrap; row-gap: 2px; }
+  .rows__name { flex: 1 1 auto; min-width: 45%; }
+  .rows__meta { flex-shrink: 1; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
