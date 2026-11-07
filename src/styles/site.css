@@ -136,7 +136,9 @@ a { color: inherit; }
   padding: 8px 14px; color: var(--fg); background: transparent; border: 1px solid var(--line); cursor: pointer;
 }
 .btn:hover, .btn:focus-visible { border-color: var(--accent); color: var(--accent); outline: none; }
-.btn:disabled { opacity: 0.55; cursor: wait; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; }
+/* Only a button that is working (saving, sending) shows the busy cursor */
+.btn:disabled[aria-busy="true"] { cursor: wait; }
 .btn--primary { background: var(--accent); border-color: var(--accent); color: var(--bg); font-weight: 600; }
 .btn--primary:hover, .btn--primary:focus-visible { background: #7af2da; color: var(--bg); }
 .btn--ghost { border-color: transparent; color: var(--muted); }

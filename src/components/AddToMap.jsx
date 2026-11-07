@@ -68,9 +68,13 @@ function AddToMap() {
                     maxLength={60} required value={name} onChange={(e) => setName(e.target.value)} />
                 <MapPlaceFields kind={kind} idPrefix="add-to-map" value={place} onChange={setPlace} />
                 <div>
-                    <button type="submit" className="btn btn--primary" disabled={state.saving || place.genres.length === 0}>
+                    <button type="submit" className="btn btn--primary" disabled={state.saving || place.genres.length === 0}
+                        aria-busy={state.saving}>
                         {state.saving ? 'Adding…' : 'Add to the map'}
                     </button>
+                    {place.genres.length === 0 && !state.saving && (
+                        <span className="mono text-xs muted">Add at least one genre first: it decides where it sits.</span>
+                    )}
                 </div>
                 {state.error && <p className="notice m-0">{state.error}</p>}
                 {state.added && (
