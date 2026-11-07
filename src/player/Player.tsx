@@ -9,6 +9,7 @@ import './player.css';
 interface YTPlayer {
   loadVideoById: (video: string | { videoId: string; startSeconds?: number }) => void;
   getDuration: () => number;
+  getCurrentTime: () => number;
   seekTo: (seconds: number, allowSeekAhead: boolean) => void;
   destroy: () => void;
 }
@@ -34,6 +35,40 @@ function loadApi(): Promise<YTNamespace> {
     document.head.appendChild(s);
   });
   return apiPromise;
+}
+
+const clock = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+
+/**
+ * A wide seek bar under the video: the video's own bar is too narrow to use on a phone. It follows the track twice a
+ * second; dragging it shows the time and jumps there on release.
+ */
+function SeekBar({ playerRef, trackId }: { playerRef: { current: YTPlayer | null }; trackId: string }) {
+  const [time, setTime] = useState({ now: 0, length: 0 });
+  const [dragging, setDragging] = useState<number | null>(null);
+  useEffect(() => {
+    setTime({ now: 0, length: 0 });
+    const tick = setInterval(() => {
+      const p = playerRef.current;
+      if (!p?.getDuration) return;
+      try { setTime({ now: p.getCurrentTime() ?? 0, length: p.getDuration() ?? 0 }); } catch { /* not ready yet */ }
+    }, 500);
+    return () => clearInterval(tick);
+  }, [playerRef, trackId]);
+  if (!time.length) return null;
+  const shown = dragging ?? time.now;
+  const jump = (sec: number) => { playerRef.current?.seekTo(sec, true); setTime((t) => ({ ...t, now: sec })); setDragging(null); };
+  return (
+    <div className="player__seek">
+      <span>{clock(shown)}</span>
+      <input type="range" min={0} max={Math.floor(time.length)} step={1} value={Math.floor(shown)} aria-label="Jump to a point in the track"
+        aria-valuetext={`${clock(shown)} of ${clock(time.length)}`}
+        onChange={(e) => setDragging(Number(e.target.value))}
+        onPointerUp={(e) => jump(Number((e.target as HTMLInputElement).value))}
+        onKeyUp={(e) => jump(Number((e.target as HTMLInputElement).value))} />
+      <span>{clock(time.length)}</span>
+    </div>
+  );
 }
 
 const ENDED = 0;
@@ -202,6 +237,7 @@ export function Player() {
             <a href={`https://www.youtube.com/watch?v=${track.youtube}`} target="_blank" rel="noopener noreferrer" title="Open on YouTube">↗</a>
           )}
           <button className="player__shrink" onClick={() => setMini(true)} aria-label="Shrink the player to a bubble">▾</button>
+          {!hidden && !mini && <SeekBar playerRef={playerRef} trackId={track.youtube} />}
           <button onClick={onClose} aria-label="Close player">×</button>
         </div>
       )}

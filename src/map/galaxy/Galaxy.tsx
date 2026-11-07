@@ -996,7 +996,13 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   useEffect(() => {
     const vp = viewportRef.current;
     if (!vp || !focus) return;
-    const pts = [...focus.ids.map((id) => genreById[id]), ...(focus.hub ? [focus.hub] : [])];
+    // A festival station or a label: fly to it and put it in the middle, like a star; its spokes lead to the rest
+    if (focus.hub) {
+      const scale = Math.max(vp.scale.x, 1.3);
+      vp.animate({ position: { x: focus.hub.x + (onPhone() ? 0 : 190 / scale), y: focus.hub.y + sheetLift(scale) }, scale, time: flight(700), ease: 'easeInOutSine' });
+      return;
+    }
+    const pts = focus.ids.map((id) => genreById[id]);
     const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
     const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)];
     // Leave room on the right for the HUD

@@ -62,6 +62,42 @@ function ArtistRow({ artist, onSaved, onGone }) {
     )
 }
 
+// Names compared the way the backend's slugs do: no case, accents or symbols
+const nameKey = (name) => (name ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
+
+// An artist the site doesn't know yet (no line-up, not on the map), e.g. one just given a key track in Galaxy:
+// picking a genre puts them on the map, orbiting that star.
+function NewArtistRow({ name, onSaved }) {
+    const [saving, setSaving] = useState(false)
+    const [error, setError] = useState('')
+    const add = async (id) => {
+        setSaving(true)
+        setError('')
+        try {
+            onSaved(await setArtistGenres(name, [id]))
+            reloadPlacementsLater()
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not save. Try again.')
+        } finally {
+            setSaving(false)
+        }
+    }
+    return (
+        <li className="rows__item admin-artist">
+            <div className="flex flex-wrap items-center gap-3">
+                <span className="font-medium">{name}</span>
+                <span className="badge">New: not on the site yet</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+                <span className="muted text-sm">Put them on the map: pick the star they orbit</span>
+                <AddGenre exclude={[]} disabled={saving} label={`Add a genre to ${name}`} onAdd={add} />
+                {saving && <span className="mono text-xs muted">Saving…</span>}
+            </div>
+            {error && <p className="notice m-0">{error}</p>}
+        </li>
+    )
+}
+
 // For words found in line-ups: "not an artist" (skipped from now on, undo in the history) or a merge into
 // the artist's other spelling (can't be undone). Either way the row leaves the list.
 function CleanupTools({ artist, onGone }) {
@@ -181,12 +217,19 @@ function AdminGenres() {
                 <p className="mono text-xs muted">Searching…</p>
             ) : result.error ? (
                 <p className="notice">{result.error}</p>
-            ) : result.artists.length === 0 ? (
-                <div className="empty"><p><strong>No artist with that name on the map or in the line-ups.</strong></p></div>
             ) : (
-                <ul className="rows">
-                    {result.artists.map(artist => <ArtistRow key={artist.slug} artist={artist} onSaved={replace} onGone={remove} />)}
-                </ul>
+                <>
+                    {result.artists.length === 0 && (
+                        <p className="muted mb-3">No artist with that name on the map or in the line-ups yet.</p>
+                    )}
+                    <ul className="rows">
+                        {result.artists.map(artist => <ArtistRow key={artist.slug} artist={artist} onSaved={replace} onGone={remove} />)}
+                        {!result.artists.some(a => nameKey(a.name) === nameKey(debounced)) && (
+                            <NewArtistRow key={nameKey(debounced)} name={debounced.trim()}
+                                onSaved={(added) => { setFixed(true); setResult(prev => ({ ...prev, artists: [...prev.artists, added] })) }} />
+                        )}
+                    </ul>
+                </>
             )}
         </div>
     )

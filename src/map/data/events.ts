@@ -142,9 +142,47 @@ export function buildFleets(events: MapEvent[]): FleetSpot[] {
     group.events.push(e);
     groups.set(key, group);
   }
-  return [...groups.values()].map((group) => {
+  const spots = [...groups.values()].map((group) => {
     const weight: Record<string, number> = {};
     for (const e of group.events) for (const g of e.genres) weight[g.genreId] = (weight[g.genreId] ?? 0) + g.share;
     return { ...group, mainGenre: Object.entries(weight).sort((a, b) => b[1] - a[1])[0][0] };
   });
+  return keepApart(spots);
+}
+
+/** How much room a spot needs around it: a festival is drawn bigger than a fleet, a fleet bigger than one ship */
+const roomOf = (spot: FleetSpot) => (spot.events.length === 1 && spot.events[0].festival ? 34 : spot.events.length > 1 ? 20 : 14);
+/** How hard a spot is to push: a festival barely moves, so the parties around it make way */
+const weightOf = (spot: FleetSpot) => (spot.events.length === 1 && spot.events[0].festival ? 4 : spot.events.length > 1 ? 2 : 1);
+const APART_ROUNDS = 24;
+
+/**
+ * Spots that would cover each other (a festival over a party, two fleets side by side) are pushed apart until each
+ * has its room, the lighter one moving more. Every ship stays close to where its genres put it. Deterministic, so
+ * the map and the radar agree and a ship doesn't jump between renders.
+ */
+export function keepApart(spots: FleetSpot[]): FleetSpot[] {
+  const out = spots.map((s) => ({ ...s }));
+  for (let round = 0; round < APART_ROUNDS; round++) {
+    let moved = false;
+    for (let i = 0; i < out.length; i++) {
+      for (let j = i + 1; j < out.length; j++) {
+        const a = out[i], b = out[j];
+        const need = roomOf(a) + roomOf(b);
+        let dx = b.x - a.x, dy = b.y - a.y;
+        let d = Math.hypot(dx, dy);
+        if (d >= need) continue;
+        // Right on top of each other: part them along a fixed direction that depends on the pair
+        if (d < 0.01) { const t = (i * 7 + j * 13) % 8 * (Math.PI / 4); dx = Math.cos(t); dy = Math.sin(t); d = 1; }
+        const push = need - d;
+        const wa = weightOf(a), wb = weightOf(b);
+        const ux = dx / d, uy = dy / d;
+        a.x -= ux * push * (wb / (wa + wb)); a.y -= uy * push * (wb / (wa + wb));
+        b.x += ux * push * (wa / (wa + wb)); b.y += uy * push * (wa / (wa + wb));
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+  return out;
 }

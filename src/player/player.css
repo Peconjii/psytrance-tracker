@@ -27,6 +27,12 @@
 @media (prefers-reduced-motion: reduce) { .player__cover span { animation: none; } }
 html[data-motion='reduced'] .player__cover span { animation: none; }
 
+/* The wide seek bar under the video (the video's own bar is too narrow on a phone) */
+.player__head { flex-wrap: wrap; }
+/* Computers: its own row under the title and buttons */
+.player__seek { order: 99; flex: 1 1 100%; display: flex; align-items: center; gap: 8px; padding: 2px 2px 0; font: 11px var(--mono); color: var(--muted); }
+.player__seek input { flex: 1; min-width: 0; accent-color: var(--accent); height: 28px; margin: 0; cursor: pointer; }
+
 /* Pages scroll past it: room at the bottom so it never covers the end of a page */
 html.has-player:not(.on-galaxy) body { padding-bottom: 250px; }
 
@@ -46,6 +52,10 @@ html.has-player:not(.on-galaxy) body { padding-bottom: 250px; }
   html.on-galaxy .player { bottom: calc(var(--bottom-nav, 0px) + 64px); }
   .player__frame { grid-row: 1; grid-column: 1; }
   .player__mount iframe { width: 112px; }
+  /* Phones: narrow, in the row of the close button, just left of it */
+  .player__seek { order: 0; flex: 1 1 0; gap: 6px; padding: 0 4px 0 0; font-size: 10px; }
+  .player__seek input { height: 30px; }
+  .player__seek span:last-child { display: none; }
   .player__head { grid-row: 1; grid-column: 2; flex-wrap: wrap; gap: 0 2px; padding: 4px 4px 4px 10px; }
   .player__now { flex: 1 1 100%; font-size: 12px; }
   .player__star { display: none; }
