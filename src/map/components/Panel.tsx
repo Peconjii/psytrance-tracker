@@ -24,6 +24,8 @@ interface Props {
   onPlay: (t: Track, list?: Track[]) => void;
   onOpenFestival: (id: string) => void;
   onOpenArtist: (name: string) => void;
+  /** The label artist the pointer is on (null when it leaves): the galaxy draws a line to it */
+  onPointArtist?: (name: string | null) => void;
   onOpenLabel: (name: string) => void;
   onCompare: (genreId: string) => void;
   onSelect: (id: string) => void;
@@ -119,7 +121,7 @@ const youtube = (q: string) => `https://www.youtube.com/results?search_query=${e
 
 /** HUD panel styled as a ship's terminal */
 export function Panel({
-  genreId, artist, festival, label, playing, playlist, onPlay, onSelect, onSelectArtist, onOpenFestival, onOpenArtist, onOpenLabel, onCompare, onClose, ships,
+  genreId, artist, festival, label, playing, playlist, onPlay, onSelect, onSelectArtist, onOpenFestival, onOpenArtist, onOpenLabel, onPointArtist, onCompare, onClose, ships,
 }: Props) {
   const chips = (ids: string[], keepArtist = false) =>
     ids.length ? (
@@ -213,10 +215,10 @@ export function Panel({
             {lp.since && <span>SINCE <b>{lp.since}</b></span>}
           </div>
         )}
-        <p>The systems this label is known for, linked in the order they appeared. Labels often define a sound: follow the line to hear what connects them.</p>
+        <LabelCrew label={label} mapCrew={lp?.artists ?? []} onOpenArtist={onOpenArtist} onPoint={onPointArtist} />
+        <p style={{ marginTop: 14 }}>The systems this label is known for, linked in the order they appeared. Labels often define a sound: follow the line to hear what connects them.</p>
         <div className="hud__label">Systems in this constellation</div>
         {chips([...gs].sort((x, y) => x.year - y.year).map((x) => x.id))}
-        <LabelCrew label={label} mapCrew={lp?.artists ?? []} onOpenArtist={onOpenArtist} />
         <div className="hud__footer">
           <a className="hud__ext" href={youtube(label)} target="_blank" rel="noopener noreferrer">Search on YouTube ↗</a>
           <FixLink about="LABEL" name={label} />

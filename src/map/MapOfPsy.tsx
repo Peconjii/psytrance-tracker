@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useFollows } from '../context/FollowsContext';
 import { setReducedMotion, useReducedMotion } from '../motion.js';
 import { shareGalaxyYear } from '../galaxyYear.js';
-import { fetchEventDetails } from '../api/backend.js';
+import { fetchEventDetails, fetchLabelPage } from '../api/backend.js';
 import './map.css';
 import { Galaxy, type CrewMember, type Focus, type ViewBounds } from './galaxy/Galaxy';
 import { Cockpit } from './components/Cockpit';
@@ -219,12 +219,24 @@ function MapOfPsy() {
   useEffect(() => () => shareGalaxyYear({ active: false }), []);
 
   const tourPath = useMemo(() => (tour ? { ids: tour.tour.stops.map((s) => s.genre), index: tour.index } : null), [tour]);
+  // The open label's artists as the site has them now (the map's own list until they load)
+  const [pointedArtist, setPointedArtist] = useState<string | null>(null);
+  useEffect(() => setPointedArtist(null), [label]);
+  const [labelCrew, setLabelCrew] = useState<{ label: string; crew: string[] } | null>(null);
+  useEffect(() => {
+    if (!label) return;
+    const controller = new AbortController();
+    fetchLabelPage(label, controller.signal)
+      .then((page: { crew: string[] }) => setLabelCrew({ label, crew: page.crew }))
+      .catch(() => { /* the map's list stays */ });
+    return () => controller.abort();
+  }, [label]);
   const focus = useMemo<Focus | null>(() => {
     if (compare) return { ids: compare, bottomCard: true };
     if (festival) { const f = festivalById[festival]; return { ids: f.genres, hub: { x: f.x, y: f.y } }; }
-    if (label) { const l = labels[label]; return { ids: genresOfLabel(label).map((g) => g.id), hub: { x: l.x, y: l.y } }; }
+    if (label) { const l = labels[label]; return { ids: genresOfLabel(label).map((g) => g.id), hub: { x: l.x, y: l.y }, artists: labelCrew?.label === label ? labelCrew.crew : l.artists }; }
     return null;
-  }, [compare, festival, label]);
+  }, [compare, festival, label, labelCrew]);
 
   // Keep the address bar in sync so the current view can be shared
   useEffect(() => {
@@ -369,7 +381,7 @@ function MapOfPsy() {
         onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion}
         liveFleets={liveFleets} clockRef={clockRef}
         framedFleet={preview ? liveFleets.find((f) => f.eventId === preview.eventId) ?? null : null}
-        followedEvents={gigsByEvent} followedArtists={followedArtists} />
+        followedEvents={gigsByEvent} followedArtists={followedArtists} pointedArtist={pointedArtist} />
 
       <header className="topbar">
         <div className="brand">
@@ -443,7 +455,7 @@ function MapOfPsy() {
       <Panel genreId={selectedId} artist={artist} festival={festival} label={label}
         playing={hidden ? null : playing} playlist={playlist}
         onPlay={(t, list) => play(t, false, list ?? null)}
-        onSelect={select} onSelectArtist={setArtist} onOpenFestival={openFestival} onOpenLabel={openLabel}
+        onSelect={select} onSelectArtist={setArtist} onOpenFestival={openFestival} onOpenLabel={openLabel} onPointArtist={setPointedArtist}
         onOpenArtist={(name) => reveal(mainGenreOf(name) ?? genresOfArtist(name)[0].id, name)}
         ships={selectedId && !artist ? shipsOf(selectedId) : null}
         onCompare={openCompare} onClose={() => select(null)} />

@@ -49,6 +49,8 @@ interface Props {
   /** Events where artists the user follows play (event id -> their names): those ships are gold */
   followedEvents?: ReadonlyMap<number, string[]>;
   /** Slugs of the artists the user follows: they get a place on their stars' orbits first */
+  /** A label's artist the pointer is on in the panel: a dashed line runs from the label to it */
+  pointedArtist?: string | null;
   followedArtists?: ReadonlySet<string>;
 }
 
@@ -73,7 +75,12 @@ export interface Focus {
   hub?: { x: number; y: number };
   /** Keep the group clear of a card docked at the bottom of the screen (comparison) */
   bottomCard?: boolean;
+  /** A label's artists: they light up on their orbits, with a dashed line from the hub to each */
+  artists?: string[];
 }
+
+/** The colour a label's artists light up in */
+const CREW_GLOW = HC ? 0x0f6e56 : 0x5dcaa5;
 
 interface Satellite {
   name: string;
@@ -135,10 +142,10 @@ const MAX_SATELLITES = 12;
  * Which artists get a place on a star's orbit: the selected artist, then the ones the user follows, then the rest in
  * the map's order (its key artists come first). The others are listed in the genre's panel.
  */
-function pickSatellites(names: string[], selectedArtist: string | null, followed: ReadonlySet<string> | undefined): Set<string> {
-  const first = names.filter((n) => n === selectedArtist);
-  const liked = names.filter((n) => n !== selectedArtist && followed?.has(artistSlug(n)));
-  const rest = names.filter((n) => n !== selectedArtist && !followed?.has(artistSlug(n)));
+function pickSatellites(names: string[], selectedArtist: string | null, followed: ReadonlySet<string> | undefined, pinned: string[] = []): Set<string> {
+  const first = names.filter((n) => n === selectedArtist || pinned.includes(n));
+  const liked = names.filter((n) => !first.includes(n) && followed?.has(artistSlug(n)));
+  const rest = names.filter((n) => !first.includes(n) && !followed?.has(artistSlug(n)));
   return new Set([...first, ...liked, ...rest].slice(0, MAX_SATELLITES));
 }
 
@@ -221,7 +228,7 @@ const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
 /** Star map: scenes are nebulae, subgenres are stars, influences are hyperspace routes, artists are satellites. */
-export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, onBackground, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null, followedEvents, followedArtists }: Props) {
+export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tourPath, focus, showStations, onSelectFestival, showLabels, onSelectLabel, events, selectedFleet, onSelectFleet, onSelectHarbour, onBackground, crew, onSelectCrew, onView, cameraRef, reducedMotion = false, liveFleets = [], clockRef, framedFleet = null, followedEvents, followedArtists, pointedArtist = null }: Props) {
   const hostRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<Viewport | null>(null);
   const starsRef = useRef<Record<string, StarNode>>({});
@@ -272,6 +279,12 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   selectedRef.current = selectedId;
   const artistRef = useRef(artist);
   artistRef.current = artist;
+  // A label's artists and its hub, read by the ticker every frame
+  const focusCrewRef = useRef<{ hub: { x: number; y: number }; names: Set<string> } | null>(null);
+  focusCrewRef.current = focus?.hub && focus.artists?.length ? { hub: focus.hub, names: new Set(focus.artists) } : null;
+  const crewLinksRef = useRef<Graphics | null>(null);
+  const pointedRef = useRef(pointedArtist);
+  pointedRef.current = pointedArtist;
   const [ready, setReady] = useState(false);
   const onSelectRef = useRef(onSelect);
   onSelectRef.current = onSelect;
@@ -358,6 +371,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       const focusLine = new Graphics();
       routeLayer.addChild(focusLine);
       focusLineRef.current = focusLine;
+      const crewLinks = new Graphics();
+      routeLayer.addChild(crewLinks);
+      crewLinksRef.current = crewLinks;
       const fleetLines = new Graphics();
       routeLayer.addChild(fleetLines);
       fleetLinesRef.current = fleetLines;
@@ -559,6 +575,9 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         const zoomed = vp.scale.x >= SAT_ZOOM;
         // Keep star names readable when zoomed far out
         const labelScale = Math.max(1, 0.8 / vp.scale.x);
+        const fc = focusCrewRef.current;
+        const crewLinks = crewLinksRef.current;
+        crewLinks?.clear();
         for (const s of Object.values(starsRef.current)) {
           const bpm = (s.genre.bpm[0] + s.genre.bpm[1]) / 2;
           const beat = (time * bpm) / 60 / 4;
@@ -567,15 +586,30 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           s.count.scale.set(labelScale);
 
           const selected = s.genre.id === selectedRef.current;
-          s.orbit.visible = s.root.visible && (selected || zoomed);
+          const lit = fc ? s.sats.some((sat) => sat.node.visible && fc.names.has(sat.name)) : false;
+          s.orbit.visible = s.root.visible && (selected || zoomed || lit);
           if (!s.orbit.visible) continue;
-          s.orbit.alpha = selected ? 1 : 0.6;
+          s.orbit.alpha = selected || lit ? 1 : 0.6;
           for (const sat of s.sats) {
             const a = sat.phase + time * ORBIT_SPEED;
             sat.node.position.set(Math.cos(a) * sat.radius, Math.sin(a) * sat.radius);
-            sat.dot.scale.set(selected && sat.name === artistRef.current ? 1.6 : 1);
+            const onLabel = !!fc && fc.names.has(sat.name);
+            const pointed = onLabel && sat.name === pointedRef.current;
+            sat.dot.scale.set(pointed ? 2.1 : onLabel ? 1.5 : selected && sat.name === artistRef.current ? 1.6 : 1);
+            sat.dot.tint = onLabel ? CREW_GLOW : 0xffffff;
+            sat.node.alpha = !fc || onLabel ? 1 : 0.25;
+            // Dashed line from the label to the artist pointed at in the panel
+            if (pointed && sat.node.visible && crewLinks) {
+              const x = s.genre.x + sat.node.position.x, y = s.genre.y + sat.node.position.y;
+              const dx = x - fc.hub.x, dy = y - fc.hub.y, len = Math.hypot(dx, dy);
+              for (let d = 0; d < len - 8; d += 12) {
+                crewLinks.moveTo(fc.hub.x + (dx * d) / len, fc.hub.y + (dy * d) / len)
+                  .lineTo(fc.hub.x + (dx * Math.min(d + 6, len)) / len, fc.hub.y + (dy * Math.min(d + 6, len)) / len);
+              }
+            }
           }
         }
+        crewLinks?.stroke({ width: 2, color: CREW_GLOW, alpha: 0.9 });
         // Ships appear once you zoom in; a lone ship shows its event's name only up close
         const showShips = vp.scale.x >= SHIP_ZOOM;
         const dt = still ? 0 : tk.deltaMS / 1000;
@@ -749,11 +783,14 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     for (const s of Object.values(starsRef.current)) {
       // Only the artists whose main genre this is; an artist opened from another genre's panel joins for the visit
       const here = s.genre.id === selectedId ? artist : null;
-      const names = orbitingArtists(s.genre);
+      let names = orbitingArtists(s.genre);
       if (here && !names.includes(here) && s.genre.artists.includes(here)) names.unshift(here);
-      layoutSatellites(s, pickSatellites(names, here, followedArtists));
+      // An open label: its artists on this star get a place first, even the ones whose main genre is elsewhere
+      const crew = focus?.artists ? s.genre.artists.filter((n) => focus.artists!.includes(n)) : [];
+      if (crew.length) names = [...crew, ...names.filter((n) => !crew.includes(n))];
+      layoutSatellites(s, pickSatellites(names, here ?? null, followedArtists, crew));
     }
-  }, [selectedId, artist, followedArtists, ready]);
+  }, [selectedId, artist, followedArtists, ready, focus]);
 
   useEffect(() => {
     if (stationLayerRef.current) stationLayerRef.current.visible = showStations;

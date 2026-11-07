@@ -5,7 +5,7 @@ import { fetchLabelPage } from '../../api/backend.js';
  * The artists on a label in its panel: the crew as the site has it now (the map's, with the changes admins
  * approved for the label's owner), and the map's own list until that loads or when the backend can't be reached.
  */
-export function LabelCrew({ label, mapCrew, onOpenArtist }: { label: string; mapCrew: string[]; onOpenArtist: (name: string) => void }) {
+export function LabelCrew({ label, mapCrew, onOpenArtist, onPoint }: { label: string; mapCrew: string[]; onOpenArtist: (name: string) => void; onPoint?: (name: string | null) => void }) {
   // Tagged with the label, so another label's crew never shows while this one loads
   const [loaded, setLoaded] = useState<{ label: string; crew: string[] } | null>(null);
 
@@ -24,7 +24,9 @@ export function LabelCrew({ label, mapCrew, onOpenArtist }: { label: string; map
       <div className="hud__label">Artists on this label</div>
       <div className="hud__chips">
         {crew.map((a) => (
-          <button key={a} className="hud__chip" onClick={() => onOpenArtist(a)}>{a}</button>
+          <button key={a} className="hud__chip" onClick={() => onOpenArtist(a)}
+            onPointerEnter={() => onPoint?.(a)} onPointerLeave={() => onPoint?.(null)}
+            onFocus={() => onPoint?.(a)} onBlur={() => onPoint?.(null)}>{a}</button>
         ))}
       </div>
     </>
