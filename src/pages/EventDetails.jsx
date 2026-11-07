@@ -340,6 +340,9 @@ function EventDetails() {
                         <FavoriteButton event={event} />
                         <GoingButton eventId={id} status={currentGoing} onChange={status => setGoing({ id, value: status })} />
                         <a href={calendarUrl(id)} className="btn" title="A calendar file for your phone or calendar app">+ Calendar</a>
+                        {/* Next to Calendar, so on a phone it stays in the same row instead of a row of its own */}
+                        <ShareButton path={`/events/${id}`} title={event.nameParty}
+                            text={`${event.nameParty}${event.nameTown ? ` in ${event.nameTown}` : ''} on Map of Psy 🛸`} />
                         {event.urlPartyHtml && (
                             <a href={event.urlPartyHtml} target="_blank" rel="noreferrer" className="btn">
                                 {isOurEvent(id) ? 'Tickets ↗' : 'Goabase ↗'}
@@ -349,10 +352,6 @@ function EventDetails() {
                             to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'EVENT', ref: `${event.nameParty} (#${id})`, from: `/events/${id}` })}`}>
                             ✎ Report a problem
                         </Link>
-                        <div className="ml-auto">
-                            <ShareButton path={`/events/${id}`} title={event.nameParty}
-                                text={`${event.nameParty}${event.nameTown ? ` in ${event.nameTown}` : ''} on Map of Psy 🛸`} />
-                        </div>
                     </div>
                 </div>
             </div>
