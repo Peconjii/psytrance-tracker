@@ -7,7 +7,23 @@ const PLAYED_KEY = 'map-of-psy.quiz.played';
 /** First game in this browser uses well-known classics; later games draw from the whole map */
 const hasPlayed = () => { try { return localStorage.getItem(PLAYED_KEY) === '1'; } catch { return false; } };
 const markPlayed = () => { try { localStorage.setItem(PLAYED_KEY, '1'); } catch { /* storage blocked */ } };
-const shuffle = <T,>(xs: T[]) => [...xs].sort(() => Math.random() - 0.5);
+/**
+ * ?quizseed=… in the link: the same classics in the same order with the same answer buttons every time
+ * (for recording a demo). Read once at load, since the galaxy rewrites the address bar afterwards.
+ */
+const SEED = (() => { try { return new URLSearchParams(window.location.search).get('quizseed'); } catch { return null; } })();
+const seeded = (text: string) => {
+  let h = 1779033703;
+  for (const c of text) h = Math.imul(h ^ c.charCodeAt(0), 3432918353);
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507) + 0x6d2b79f5 | 0;
+    let t = Math.imul(h ^ (h >>> 13), 3266489909);
+    t ^= t >>> 16;
+    return (t >>> 0) / 4294967296;
+  };
+};
+let rand = Math.random;
+const shuffle = <T,>(xs: T[]) => xs.map((x) => [rand(), x] as const).sort((a, b) => a[0] - b[0]).map(([, x]) => x);
 
 interface Question {
   genre: Genre;
@@ -21,7 +37,7 @@ function makeQuestion(used: Set<string>, famous: boolean): Question {
   const askedGenres = new Set(famousTracks().filter((x) => used.has(x.track.youtube!)).map((x) => x.genre.id));
   const fresh = famousTracks().filter((x) => !used.has(x.track.youtube!));
   const pool = fresh.filter((x) => !askedGenres.has(x.genre.id));
-  let q = famous && fresh.length ? (pool.length ? pool : fresh)[Math.floor(Math.random() * (pool.length ? pool : fresh).length)] : randomTrack();
+  let q = famous && fresh.length ? (pool.length ? pool : fresh)[Math.floor(rand() * (pool.length ? pool : fresh).length)] : randomTrack();
   for (let i = 0; !famous && i < 20 && used.has(q.track.youtube!); i++) q = randomTrack();
   const others = playable().filter((g) => g.id !== q.genre.id);
   const near = shuffle(others.filter((g) => g.family === q.genre.family)).slice(0, 1);
@@ -38,12 +54,14 @@ interface Props {
 /** "Guess the genre": a mystery track plays, you pick the system it belongs to */
 export function Quiz({ onPlay, onReveal, onExit }: Props) {
   const [used] = useState(() => new Set<string>());
-  const [famous, setFamous] = useState(() => !hasPlayed());
+  const [famous, setFamous] = useState(() => !!SEED || !hasPlayed());
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
   const [answer, setAnswer] = useState<string | null>(null);
   const [q, setQ] = useState<Question>(() => {
-    const first = makeQuestion(used, !hasPlayed());
+    // A demo link starts the same sequence on every visit; a fresh set, so a repeated call picks the same first track
+    rand = SEED ? seeded(SEED) : Math.random;
+    const first = makeQuestion(new Set(), !!SEED || !hasPlayed());
     used.add(first.track.youtube!);
     return first;
   });
