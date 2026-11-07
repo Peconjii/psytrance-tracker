@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { fetchGenreContent, saveGenreContent } from '../api/backend.js'
+import { fetchGenreContent, fetchPlacements, saveGenreContent, searchAdminArtists, setArtistGenres } from '../api/backend.js'
+import { reloadPlacementsLater } from '../map/data/placements'
 import { data } from '../map/data/types'
 import { reloadContentLater } from '../map/data/content'
 import AdminTabs from '../components/AdminTabs'
@@ -79,12 +80,85 @@ function TrackCard({ track, index, count, onChange, onMove, onRemove }) {
     )
 }
 
+// Names compared the way the backend's slugs do: no case, accents or symbols
+const nameKey = (name) => (name ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '')
+const artistsOf = (tracks) => {
+    const byKey = new Map()
+    for (const t of tracks) if (nameKey(t.artist)) byKey.set(nameKey(t.artist), t.artist.trim())
+    return byKey
+}
+
+// The key tracks and the orbit are two lists: a track's artist doesn't orbit the star by itself. This asks
+// about the artists the two lists disagree on: a track but no orbit (add?), and the last track just removed (remove?).
+function OrbitCheck({ genreId, tracksJson, removedArtists }) {
+    const tracks = tracksJson ? JSON.parse(tracksJson).tracks : []
+    const [orbit, setOrbit] = useState(null)
+    const [done, setDone] = useState({})
+    const [busy, setBusy] = useState(null)
+    const [error, setError] = useState('')
+
+    useEffect(() => {
+        let cancelled = false
+        fetchPlacements()
+            .then(p => { if (!cancelled) setOrbit(new Set((p[genreId] ?? []).map(nameKey))) })
+            .catch(() => {})
+        return () => { cancelled = true }
+    }, [genreId, tracksJson])
+
+    if (!orbit) return null
+    const toAdd = [...artistsOf(tracks)].filter(([key]) => !orbit.has(key)).map(([, name]) => name)
+    const toRemove = removedArtists.filter(name => orbit.has(nameKey(name)) && !artistsOf(tracks).has(nameKey(name)))
+    if (toAdd.length === 0 && toRemove.length === 0) return null
+
+    async function change(name, add) {
+        setBusy(name)
+        setError('')
+        try {
+            const found = await searchAdminArtists(name)
+            const genres = found.find(a => nameKey(a.name) === nameKey(name))?.genres ?? []
+            await setArtistGenres(name, add ? [...genres.filter(g => g !== genreId), genreId] : genres.filter(g => g !== genreId))
+            reloadPlacementsLater()
+            setDone(d => ({ ...d, [name]: add ? 'Added to the orbit' : 'Removed from the orbit' }))
+        } catch (err) {
+            setError(err.response?.data?.message || `Could not change ${name}. Try again.`)
+        } finally {
+            setBusy(null)
+        }
+    }
+
+    const row = (name, add) => (
+        <li key={(add ? '+' : '-') + name} className="rows__item flex flex-wrap items-center gap-3">
+            <span className="font-medium">{name}</span>
+            <span className="mono text-xs muted">{add ? 'has a key track here, but doesn’t orbit this star' : 'no key track here any more, still orbits this star'}</span>
+            {done[name] ? <span className="mono text-xs ml-auto" style={{ color: 'var(--accent)' }}>{done[name]}</span> : (
+                <button type="button" className={'btn ml-auto' + (add ? '' : ' btn--danger')} disabled={busy !== null} aria-busy={busy === name}
+                    onClick={() => change(name, add)}>
+                    {busy === name ? 'Saving…' : add ? 'Add to the orbit' : 'Remove from the orbit'}
+                </button>
+            )}
+        </li>
+    )
+    return (
+        <section className="panel grid gap-3">
+            <h2 className="panel__label">Orbit of this star</h2>
+            <p className="mono text-xs muted m-0">Key tracks and the artists orbiting the star are separate lists. Every change here is in History, with undo.</p>
+            {error && <p className="notice m-0">{error}</p>}
+            <ul className="rows">
+                {toAdd.map(name => row(name, true))}
+                {toRemove.map(name => row(name, false))}
+            </ul>
+        </section>
+    )
+}
+
 // One genre's form; a new one (key) for every genre, so nothing of the last genre is left in it.
 // dirtyRef: tells the page whether leaving it would lose changes.
 function GenreEditor({ genreId, dirtyRef }) {
     const [form, setForm] = useState(null)
     const [loaded, setLoaded] = useState(null)
     const [state, setState] = useState({ saving: false, error: '', saved: false })
+    // Artists whose last key track here went away with the last save
+    const [removedArtists, setRemovedArtists] = useState([])
 
     useEffect(() => {
         let cancelled = false
@@ -120,6 +194,8 @@ function GenreEditor({ genreId, dirtyRef }) {
                 year: number(form.year), bpmMin: number(form.bpmMin), bpmMax: number(form.bpmMax), verified: form.verified,
                 tracks: form.tracks.map(t => ({ ...t, year: number(t.year), drop: dropSeconds(t.drop) })),
             })
+            const after = artistsOf(saved.tracks)
+            setRemovedArtists([...artistsOf(JSON.parse(loaded).tracks)].filter(([key]) => !after.has(key)).map(([, name]) => name))
             setForm(toForm(saved))
             setLoaded(JSON.stringify(toForm(saved)))
             // The galaxy loads the new content the next time it opens
@@ -181,6 +257,8 @@ function GenreEditor({ genreId, dirtyRef }) {
                             </button>
                         </div>
                     </section>
+
+                    <OrbitCheck genreId={genreId} tracksJson={loaded} removedArtists={removedArtists} />
 
                     <div className="galaxy-save flex flex-wrap items-center gap-3">
                         <button type="submit" className="btn btn--primary" disabled={state.saving || !dirty}>
