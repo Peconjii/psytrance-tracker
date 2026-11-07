@@ -520,3 +520,33 @@ html[data-theme="contrast"] :focus-visible { outline: 3px solid #111; outline-of
   .rows__name { flex: 1 1 auto; min-width: 45%; }
   .rows__meta { flex-shrink: 1; min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 }
+
+/* The Share button's panel (ShareButton.jsx): under the button on computers, a sheet at the bottom on phones */
+.share { position: relative; display: inline-block; }
+.share__panel {
+  position: fixed; z-index: 60; width: 240px; padding: 10px 12px 12px;
+  background: var(--hud); border: 1px solid var(--line); border-left: 2px solid var(--accent); backdrop-filter: blur(10px);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.45);
+}
+.share__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.share__close { background: none; border: 0; color: var(--muted); font-size: 20px; cursor: pointer; padding: 0 4px; }
+.share__close:hover { color: var(--fg); }
+.share__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.share__list a, .share__list button {
+  display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 6px; background: none; border: 0;
+  color: var(--fg); font: 14px var(--body); text-decoration: none; cursor: pointer; text-align: left;
+}
+.share__list a:hover, .share__list button:hover, .share__list a:focus-visible, .share__list button:focus-visible {
+  background: color-mix(in srgb, var(--accent) 12%, transparent); outline: none;
+}
+.share__icon {
+  display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none;
+  border: 1px solid var(--line); color: var(--accent); font: 13px var(--mono);
+}
+@media (max-width: 700px) {
+  .share__panel {
+    position: fixed; left: 12px !important; right: 12px; top: auto !important; width: auto;
+    bottom: calc(var(--bottom-nav, 0px) + 12px);
+  }
+  .share__list a, .share__list button { padding: 10px 6px; font-size: 15px; }
+}

@@ -10,6 +10,7 @@ import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { appearances, festivalById, genresOfLabel, labels } from '../map/data/types'
 import useDiscography from '../hooks/useDiscography.js'
+import ShareButton from '../components/ShareButton.jsx'
 import { GenreChip } from '../components/AdminParts'
 import { WEEKDAY_DAY as GIG_DAY, DAY_YEAR as PAST_DAY } from '../dates.js'
 
@@ -84,6 +85,7 @@ function Label() {
                 </div>
                 <div className="flex flex-wrap gap-2 shrink-0">
                     <FollowButton label={name} name={name} />
+                    <ShareButton path={`/labels/${encodeURIComponent(name)}`} title={name} text={`${name}: the label's crew and their next gigs on Map of Psy 🛸`} />
                     <Link className="btn btn--ghost" to={`/?label=${encodeURIComponent(name)}`}>On the map →</Link>
                     {canEdit && <Link className="btn btn--ghost" to={`/labels/${encodeURIComponent(name)}/edit`}>✎ Edit page</Link>}
                 </div>

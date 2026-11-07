@@ -6,7 +6,7 @@ import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
 import FavoriteButton from '../components/FavoriteButton.jsx'
 import GoingButton from '../components/GoingButton.jsx'
-import ShareLinks from '../components/ShareLinks.jsx'
+import ShareButton from '../components/ShareButton.jsx'
 import usePageMeta, { SITE_URL } from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { useAuth } from '../context/AuthContext'
@@ -349,9 +349,9 @@ function EventDetails() {
                             to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'EVENT', ref: `${event.nameParty} (#${id})`, from: `/events/${id}` })}`}>
                             ✎ Report a problem
                         </Link>
-                        <div className="flex items-center gap-2 ml-auto">
-                            <span className="field-label m-0">Share</span>
-                            <ShareLinks event={event} />
+                        <div className="ml-auto">
+                            <ShareButton path={`/events/${id}`} title={event.nameParty}
+                                text={`${event.nameParty}${event.nameTown ? ` in ${event.nameTown}` : ''} on Map of Psy 🛸`} />
                         </div>
                     </div>
                 </div>

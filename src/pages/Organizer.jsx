@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import ShareButton from '../components/ShareButton.jsx'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { fetchMyOrganizers, fetchOrganizer } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
@@ -68,9 +69,12 @@ function Organizer() {
                         </div>
                     </div>
                 </div>
-                {canEdit && (
-                    <Link className="btn btn--ghost shrink-0" to={`/organizers/${encodeURIComponent(organizer.slug)}/edit`}>✎ Edit page</Link>
-                )}
+                <div className="flex flex-wrap gap-2 shrink-0">
+                    <ShareButton path={`/organizers/${encodeURIComponent(organizer.slug)}`} title={name} text={`${name}: next parties on Map of Psy 🛸`} />
+                    {canEdit && (
+                        <Link className="btn btn--ghost" to={`/organizers/${encodeURIComponent(organizer.slug)}/edit`}>✎ Edit page</Link>
+                    )}
+                </div>
             </div>
             {profile?.bio && (
                 <section className="panel mb-4">

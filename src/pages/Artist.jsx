@@ -4,6 +4,7 @@ import { fetchArtist, fetchMyArtists } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import FollowButton from '../components/FollowButton.jsx'
 import StoryButton from '../components/StoryButton.jsx'
+import ShareButton from '../components/ShareButton.jsx'
 import ClaimPage from '../components/ClaimPage.jsx'
 import ArtistNumbers from '../components/ArtistNumbers.jsx'
 import useDiscography from '../hooks/useDiscography.js'
@@ -194,6 +195,7 @@ function Artist() {
                 <div className="flex flex-wrap sm:flex-col gap-2 shrink-0">
                     {/* Only artists from the line-ups can be followed: they are the ones with gigs */}
                     {artist && <FollowButton slug={artist.slug} name={artist.name} />}
+                    <ShareButton path={`/artists/${slug}`} title={name} text={`${name}: sound, tracks and next gigs on Map of Psy 🛸`} />
                     {firstGenre && (
                         <Link className="btn" to={`/?genre=${firstGenre}&artist=${encodeURIComponent(mapName)}`}>◎ View on the map</Link>
                     )}

@@ -14,6 +14,7 @@ import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { appearances, artistsAtFestival, data, festivalById, genreById } from '../map/data/types'
 import useDiscography from '../hooks/useDiscography.js'
+import ShareButton from '../components/ShareButton.jsx'
 import { DAY_YEAR as DAY } from '../dates.js'
 
 
@@ -115,6 +116,7 @@ function Festival() {
                 </div>
                 <div className="flex flex-wrap gap-2 shrink-0">
                     <Link className="btn btn--ghost" to={`/?festival=${encodeURIComponent(id)}`}>On the map →</Link>
+                    <ShareButton path={`/festivals/${encodeURIComponent(id)}`} title={festival.name} text={`${festival.name} on Map of Psy 🛸`} />
                     {canEdit && <Link className="btn btn--ghost" to={`/festivals/${encodeURIComponent(id)}/edit`}>✎ Edit page</Link>}
                 </div>
             </div>
