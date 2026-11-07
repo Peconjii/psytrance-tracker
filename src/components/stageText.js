@@ -59,7 +59,8 @@ export function lineUpOf(stages, days) {
 const HEADER = /^(.*?)\s*(?:\(([^()]+)\))?:$/
 const SET = new RegExp(`^(${WEEKDAYS.join('|')}) (\\d{1,2}:\\d{2})(?:-(\\d{1,2}:\\d{2}))? (.+)$`)
 const LIVE = / \(live\)$/i
-const GENRE_BY_NAME = Object.fromEntries(data.genres.map(g => [g.name.toLowerCase(), g.id]))
+// Read each time: genres admins added to the galaxy join after the site loads
+const genreIdByName = (name) => data.genres.find(g => g.name.toLowerCase() === name)?.id
 
 /**
  * The stage cards of a line-up text, when it is written the way the cards write it (or is only names, one per line);
@@ -73,7 +74,7 @@ export function stagesOf(text) {
         if (!line) continue
         const header = line.match(HEADER)
         if (header) {
-            const ids = header[2] ? header[2].split(',').map(n => GENRE_BY_NAME[n.trim().toLowerCase()]) : []
+            const ids = header[2] ? header[2].split(',').map(n => genreIdByName(n.trim().toLowerCase())) : []
             // Brackets that are no map genres are part of the name
             const genres = ids.length && ids.every(Boolean) ? [...new Set(ids)] : []
             const name = header[2] && !genres.length ? `${header[1]} (${header[2]})` : header[1]
@@ -115,6 +116,6 @@ export function stageWithGenres(name, genreIds) {
 export function stageParts(stage) {
     const header = (stage || '').match(/^(.*?)\s*\(([^()]+)\)\s*$/)
     if (!header) return { name: stage || '', genreIds: [] }
-    const ids = header[2].split(',').map(n => GENRE_BY_NAME[n.trim().toLowerCase()])
+    const ids = header[2].split(',').map(n => genreIdByName(n.trim().toLowerCase()))
     return ids.every(Boolean) ? { name: header[1], genreIds: [...new Set(ids)] } : { name: stage, genreIds: [] }
 }

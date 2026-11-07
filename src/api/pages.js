@@ -192,3 +192,14 @@ export async function fetchNewPages(kind, search, signal) {
 export async function setOwnFestivalEdition(festivalId, eventId, edition) {
     await api.put('/api/festivals/editions', { eventId, edition }, { params: { id: festivalId } })
 }
+
+// The sets played at a festival: anyone reads them, the festival's owner (or an admin) writes them
+export async function fetchSetsAt(id, signal) {
+    const response = await api.get('/api/festivals/sets', { params: { id }, signal })
+    return response.data
+}
+
+export async function saveSetsAt(id, sets) {
+    const response = await api.put('/api/festivals/sets', sets, { params: { id } })
+    return response.data
+}

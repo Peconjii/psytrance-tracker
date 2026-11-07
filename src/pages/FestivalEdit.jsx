@@ -7,6 +7,7 @@ import OwnerForm from '../components/OwnerForm.jsx'
 import OwnerNumbers from '../components/OwnerNumbers.jsx'
 import TrustPanel from '../components/TrustPanel.jsx'
 import StationDetailsEditor from '../components/StationDetailsEditor.jsx'
+import FestivalSetsEditor from '../components/FestivalSetsEditor.jsx'
 import LinkFields from '../components/LinkFields.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -134,6 +135,8 @@ function FestivalEdit() {
                     {status.error && <p className="notice m-0">{status.error}</p>}
                 </div>
             </form>
+
+            <FestivalSetsEditor id={id} />
 
             {user?.admin && (
                 <OwnerForm key={edit.owner ?? ''} owner={edit.owner} what="festival"

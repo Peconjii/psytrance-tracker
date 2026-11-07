@@ -5,9 +5,10 @@ import { reloadPlacementsLater } from '../map/data/placements'
 import { data } from '../map/data/types'
 import { reloadContentLater } from '../map/data/content'
 import AdminTabs from '../components/AdminTabs'
+import AddedGenreForm from '../components/AddedGenreForm'
+import { addedGenres, loadAddedGenres } from '../map/data/addedGenres'
 import usePageMeta from '../hooks/usePageMeta.js'
 
-const GENRES = [...data.genres].sort((a, b) => a.name.localeCompare(b.name))
 
 // The drop as the form shows it ("3:32") and as it is saved (212 seconds)
 const dropText = (seconds) => seconds == null ? '' : `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`
@@ -278,7 +279,13 @@ function GenreEditor({ genreId, dirtyRef }) {
 function AdminGalaxy() {
     usePageMeta({ title: 'Galaxy · Admin', path: '/admin/galaxy', noindex: true })
     const [params, setParams] = useSearchParams()
-    const genreId = data.genres.some(g => g.id === params.get('genre')) ? params.get('genre') : GENRES[0].id
+    // The genres admins added join once loaded; the list is read on every render
+    const [, setVersion] = useState(0)
+    useEffect(() => { loadAddedGenres().then(() => setVersion(v => v + 1)) }, [])
+    const genres = [...data.genres].sort((a, b) => a.name.localeCompare(b.name))
+    const genreId = data.genres.some(g => g.id === params.get('genre')) ? params.get('genre') : genres[0].id
+    const added = addedGenres.find(g => g.id === genreId)
+    const [adding, setAdding] = useState(false)
     const dirtyRef = useRef(false)
 
     const pick = (id) => {
@@ -302,11 +309,21 @@ function AdminGalaxy() {
                 <label className="field-label" htmlFor="galaxy-genre">Genre</label>
                 <div className="flex flex-wrap gap-2 items-center">
                     <select id="galaxy-genre" className="field max-w-xs" value={genreId} onChange={(e) => pick(e.target.value)}>
-                        {GENRES.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                        {genres.map(g => <option key={g.id} value={g.id}>{g.name}{addedGenres.some(a => a.id === g.id) ? ' · added' : ''}</option>)}
                     </select>
                     <Link className="link mono text-xs" to={`/?genre=${genreId}`}>See it on the galaxy →</Link>
+                    {!adding && <button type="button" className="btn ml-auto" onClick={() => setAdding(true)}>+ New genre</button>}
                 </div>
             </div>
+
+            {adding && (
+                <AddedGenreForm onCancel={() => setAdding(false)}
+                    onSaved={(g) => { setAdding(false); setParams({ genre: g.id }) }} onRemoved={() => setAdding(false)} />
+            )}
+            {!adding && added && (
+                <AddedGenreForm key={added.id + added.x + added.y + added.name} genre={added}
+                    onSaved={() => setVersion(v => v + 1)} onRemoved={() => setParams({})} />
+            )}
 
             <GenreEditor key={genreId} genreId={genreId} dirtyRef={dirtyRef} />
         </div>

@@ -1,5 +1,6 @@
 import { fetchMapDetails, fetchMapExtras } from '../../api/backend.js';
 import { festivalById, festivals, genreById, labels, type Festival } from './types';
+import { loadAddedGenres } from './addedGenres';
 
 // Labels and festivals admins added to the map from the admin panel (the backend's MapExtras), put next to the ones
 // in labels.json and festivals.json before the galaxy is drawn or a label / festival page looks one up.
@@ -56,8 +57,9 @@ const WAIT_MS = 4000;
 /** Loads the added labels and festivals once and puts them into the map data */
 export function loadMapExtras(): Promise<void> {
   if (!loading) {
-    loading = fetchMapExtras(AbortSignal.timeout(WAIT_MS))
-      .then((extras: { labels: AddedLabel[]; festivals: Festival[] }) => {
+    // The added genres go into the map data first: a new label or festival may sit at one of them
+    loading = Promise.all([fetchMapExtras(AbortSignal.timeout(WAIT_MS)), loadAddedGenres()])
+      .then(([extras]: [{ labels: AddedLabel[]; festivals: Festival[] }, void]) => {
         for (const l of extras.labels) {
           if (labels[l.name]) continue;
           // The crew comes from the label's page (LabelCrew); the map only needs the marker

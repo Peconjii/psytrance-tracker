@@ -47,3 +47,20 @@ export async function fetchMapExtras(signal) {
     const response = await api.get('/api/map/extras', { signal })
     return response.data
 }
+
+// Genres (stars) admins added to the galaxy, drawn next to the ones in genres.json
+export async function fetchAddedGenres(signal) {
+    const response = await api.get('/api/map/added-genres', { signal })
+    return response.data
+}
+
+// Artists' country, first year and albums (artist slug -> discography), and every set at a festival station
+export async function fetchDiscography(signal) {
+    const response = await api.get('/api/map/discography', { signal })
+    return response.data
+}
+
+export async function fetchFestivalSets(signal) {
+    const response = await api.get('/api/map/sets', { signal })
+    return response.data
+}

@@ -85,3 +85,14 @@ export async function fetchArtistOwnerStats(slug, signal) {
     const response = await api.get(`/api/artists/${encodeURIComponent(slug)}/owner-stats`, { signal })
     return response.data
 }
+
+// An artist's country, first year and albums (the artist or an admin writes them)
+export async function fetchArtistDiscography(slug, signal) {
+    const response = await api.get(`${artistPath(slug)}/discography`, { signal })
+    return response.data
+}
+
+export async function saveArtistDiscography(slug, discography) {
+    const response = await api.put(`${artistPath(slug)}/discography`, discography)
+    return response.data
+}

@@ -9,6 +9,7 @@ import { useOwnedPage } from '../components/ownedPage.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { appearances, festivalById, genresOfLabel, labels } from '../map/data/types'
+import useDiscography from '../hooks/useDiscography.js'
 import { GenreChip } from '../components/AdminParts'
 import { WEEKDAY_DAY as GIG_DAY, DAY_YEAR as PAST_DAY } from '../dates.js'
 
@@ -29,6 +30,8 @@ function festivalsOf(crew) {
 
 // A label of the map as a page: its crew, where the crew plays next (the label's tour) and its numbers
 function Label() {
+    // The crew's festival sets come from the backend
+    useDiscography()
     const { name } = useParams()
     // Labels admins added to the map are looked up once they are loaded
     const extrasReady = useMapExtras()

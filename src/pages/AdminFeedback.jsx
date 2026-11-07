@@ -142,7 +142,8 @@ function AdminFeedback() {
     )
 }
 
-const GENRE_NAMES = Object.fromEntries(data.genres.map(g => [g.id, g.name]))
+// A getter: genres admins added to the galaxy join after the site loads
+const GENRE_NAMES = new Proxy({}, { get: (_, id) => data.genres.find(g => g.id === id)?.name })
 const genreOfRef = (ref) => {
     const name = (ref ?? '').split(':')[0].trim().toLowerCase()
     return data.genres.find(g => g.name.toLowerCase() === name || g.id === name)?.id ?? null

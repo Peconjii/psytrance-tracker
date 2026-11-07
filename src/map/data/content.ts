@@ -1,5 +1,6 @@
 import { fetchGalaxyContent } from '../../api/backend.js';
 import { data, type Track } from './types';
+import { loadAddedGenres } from './addedGenres';
 
 // Each genre's texts and key tracks come from the backend, where admins and editors fix them (Admin -> Galaxy);
 // genres.json has what the map started with, and stays the fallback when the backend can't be reached.
@@ -27,8 +28,9 @@ const WAIT_MS = 4000;
 /** Loads the content once and puts it into the map data before the galaxy is drawn */
 export function loadContent(): Promise<void> {
   if (!loading) {
-    loading = fetchGalaxyContent(AbortSignal.timeout(WAIT_MS))
-      .then((byGenre: Record<string, Content>) => {
+    // The added genres go into the map data first, so their texts land on them too
+    loading = Promise.all([fetchGalaxyContent(AbortSignal.timeout(WAIT_MS)), loadAddedGenres()])
+      .then(([byGenre]: [Record<string, Content>, void]) => {
         for (const genre of data.genres) {
           const c = byGenre[genre.id];
           if (!c) continue;

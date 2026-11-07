@@ -20,6 +20,7 @@ import { FleetPanel } from './components/FleetPanel';
 import { loadPlacements, placementsApplied } from './data/placements';
 import { loadMapExtras, mapExtrasApplied } from './data/extras';
 import { contentApplied, loadContent } from './data/content';
+import { loadDiscography } from './data/discography';
 import { fetchMapEvents, fetchMapFestivals, mapArtistBySlug, withFestivals, type Boarded, type EventPeriod, type MapEvent } from './data/events';
 import { buildLiveFleets, fetchMapTimetables, type Timetable } from './data/liveFleet';
 import {
@@ -51,7 +52,7 @@ function readUrl() {
 export default function MapHome() {
   const [ready, setReady] = useState(() => placementsApplied() && mapExtrasApplied() && contentApplied());
   useEffect(() => {
-    if (!ready) Promise.all([loadPlacements(), loadMapExtras(), loadContent()]).then(() => setReady(true));
+    if (!ready) Promise.all([loadPlacements(), loadMapExtras(), loadContent(), loadDiscography()]).then(() => setReady(true));
   }, [ready]);
   if (!ready) {
     return <div className="psy-map app"><p className="map-loading">Charting the galaxy…</p></div>;

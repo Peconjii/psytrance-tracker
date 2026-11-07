@@ -13,6 +13,7 @@ import { useStatsView } from '../components/statsView.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
 import { appearances, artistsAtFestival, data, festivalById, genreById } from '../map/data/types'
+import useDiscography from '../hooks/useDiscography.js'
 import { DAY_YEAR as DAY } from '../dates.js'
 
 
@@ -25,6 +26,8 @@ function festivalMatch(name) {
 // A festival station of the map as a page: what the map knows (sound, sets on video) and what the site counted:
 // its editions in the event lists, their line-ups, genres, "I'm going" and saves, and years artists wrote themselves
 function Festival() {
+    // The sets come from the backend, where the festival and its artists edit them
+    useDiscography()
     const { id } = useParams()
     // Festivals admins added to the map are looked up once they are loaded
     const extrasReady = useMapExtras()
@@ -225,15 +228,17 @@ function Festival() {
             )}
             {sets.length > 0 && (
                 <section className="panel mb-4">
-                    <h2 className="panel__label">Sets on video · {sets.length}</h2>
+                    <h2 className="panel__label">Sets played here · {sets.length}</h2>
                     <ul className="list-none p-0 m-0">
                         {sets.map(s => (
-                            <li key={s.video} className="grid gap-1 py-2 text-left border-b border-dashed border-[var(--line)] min-w-0">
+                            <li key={`${s.name}|${s.year ?? ''}|${s.video ?? s.url ?? ''}`} className="grid gap-1 py-2 text-left border-b border-dashed border-[var(--line)] min-w-0">
                                 <Link className="link font-medium" to={`/artists/${encodeURIComponent(artistSlug(s.name))}`}>{s.name}</Link>
-                                <a className="mono text-xs muted truncate block" href={`https://www.youtube.com/watch?v=${s.video}`}
-                                    target="_blank" rel="noopener noreferrer" title={s.title}>
-                                    {s.title} ↗
-                                </a>
+                                {s.video || s.url ? (
+                                    <a className="mono text-xs muted truncate block" href={s.video ? `https://www.youtube.com/watch?v=${s.video}` : s.url}
+                                        target="_blank" rel="noopener noreferrer" title={s.title}>
+                                        {s.title} ↗
+                                    </a>
+                                ) : <span className="mono text-xs muted">{s.title}</span>}
                             </li>
                         ))}
                     </ul>

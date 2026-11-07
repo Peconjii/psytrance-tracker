@@ -6,6 +6,8 @@ import FollowButton from '../components/FollowButton.jsx'
 import StoryButton from '../components/StoryButton.jsx'
 import ClaimPage from '../components/ClaimPage.jsx'
 import ArtistNumbers from '../components/ArtistNumbers.jsx'
+import useDiscography from '../hooks/useDiscography.js'
+import { discographyOf } from '../map/data/discography'
 import usePageMeta from '../hooks/usePageMeta.js'
 import {
     appearances, artists as mapProfiles, data, festivalById, genresOfArtist, labelsOfArtist, tracksOfArtist,
@@ -48,6 +50,8 @@ function Section({ label, children }) {
 // albums, labels, festivals) and where they play next and played before. Artists who are only on the map, not in
 // any line-up yet, get a profile too, from the map alone.
 function Artist() {
+    // Albums and festival sets come from the backend, where the artist edits them
+    useDiscography()
     const { slug } = useParams()
     const location = useLocation()
     const navigate = useNavigate()
@@ -73,7 +77,9 @@ function Artist() {
     const mapName = onMap?.name
     const genres = mapName ? genresOfArtist(mapName) : []
     const mapTracks = mapName ? tracksOfArtist(mapName).slice(0, 8) : []
-    const albums = mapName ? mapProfiles[mapName]?.albums ?? [] : []
+    // By slug: an artist who isn't on the map has their albums too
+    const disco = discographyOf(slug) ?? (mapName ? mapProfiles[mapName] : undefined)
+    const albums = disco?.albums ?? []
     const labels = mapName ? labelsOfArtist(mapName) : []
     const mapFestivals = mapName ? (appearances[mapName] ?? []).filter(x => festivalById[x.festival]) : []
     // What the artist wrote on their profile comes first; the map's tracks only when they wrote none, and the map's
@@ -88,7 +94,7 @@ function Artist() {
     })
     const canEdit = Boolean(artist && (user?.admin || mine.some(a => a.slug === artist.slug)))
     const role = artist ? roleOf(artist) : null
-    const origin = mapName ? mapProfiles[mapName]?.country : null
+    const origin = disco?.country ?? null
 
     usePageMeta({
         title: `${name} – Psytrance Artist`,

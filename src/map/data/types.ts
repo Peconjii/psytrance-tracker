@@ -73,7 +73,7 @@ export interface ArtistProfile {
   country?: string;
   /** Year the project started (groups only; for solo artists MusicBrainz stores a birth date) */
   since?: number;
-  albums: { title: string; year: number }[];
+  albums: { title: string; year?: number }[];
 }
 
 export const artists = artistsRaw as Record<string, ArtistProfile>;
@@ -162,6 +162,10 @@ export interface Appearance {
   /** YouTube video of the set; missing when the evidence is a published line-up */
   video?: string;
   title: string;
+  /** The year it was played, when known */
+  year?: number;
+  /** A link that isn't a YouTube video (a line-up, a set elsewhere) */
+  url?: string;
 }
 
 export const appearances = appearancesRaw as Record<string, Appearance[]>;

@@ -15,7 +15,8 @@ const KINDS = [
 ]
 const ABOUT_LABELS = { GENRE: 'Genre', ARTIST: 'Artist', EVENT: 'Event', FESTIVAL: 'Festival', LABEL: 'Label', PAGE: 'Page' }
 const MAX_MESSAGE = 2000
-const GENRE_NAMES = data.genres.map(g => g.name).sort((a, b) => a.localeCompare(b))
+// Read each time: genres admins added to the galaxy join after the site loads
+const genreNames = () => data.genres.map(g => g.name).sort((a, b) => a.localeCompare(b))
 // What an event correction is about. A genre the inbox can set with one click; the rest comes from Goabase
 const EVENT_FIELDS = [
     { value: 'genre', label: 'Genre' },
@@ -201,7 +202,7 @@ function Feedback() {
                                 <label htmlFor="genre-from" className="field-label">Grew out of <span className="muted">(optional)</span></label>
                                 <input id="genre-from" className="field" list="genre-names" value={genre.from}
                                     onChange={setGenreField('from')} placeholder="e.g. Goa trance and ambient" />
-                                <datalist id="genre-names">{GENRE_NAMES.map(n => <option key={n} value={n} />)}</datalist>
+                                <datalist id="genre-names">{genreNames().map(n => <option key={n} value={n} />)}</datalist>
                             </div>
                             <div>
                                 <label htmlFor="genre-year" className="field-label">Since <span className="muted">(year)</span></label>
@@ -237,7 +238,7 @@ function Feedback() {
                                 <select id="fix-genre" className="field" value=""
                                     onChange={(e) => { const g = e.target.value; if (g) setFix(x => ({ ...x, genres: x.genres.includes(g) ? x.genres : [...x.genres, g].slice(0, 4) })) }}>
                                     <option value="">Pick a genre…</option>
-                                    {GENRE_NAMES.map(n => <option key={n} value={n}>{n}</option>)}
+                                    {genreNames().map(n => <option key={n} value={n}>{n}</option>)}
                                 </select>
                                 {fix.genres.length > 0 && (
                                     <div className="flex flex-wrap gap-2 mt-2">

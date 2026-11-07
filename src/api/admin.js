@@ -325,3 +325,18 @@ export async function fetchDuplicateArtists(signal) {
     const response = await api.get('/api/admin/upkeep/duplicate-artists', { signal })
     return response.data
 }
+
+// Admin -> Galaxy: add a genre (star) to the galaxy, change or remove one that was added. Throw on failure.
+export async function addMapGenre(form) {
+    const response = await api.post('/api/admin/map/genres', form)
+    return response.data
+}
+
+export async function updateMapGenre(id, form) {
+    const response = await api.put(`/api/admin/map/genres/${encodeURIComponent(id)}`, form)
+    return response.data
+}
+
+export async function removeMapGenre(id) {
+    await api.delete(`/api/admin/map/genres/${encodeURIComponent(id)}`)
+}

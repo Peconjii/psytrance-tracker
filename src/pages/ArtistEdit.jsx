@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
-    fetchArtistEdit, removeArtistOwner, requestArtistChange, saveArtistFestivals, saveArtistProfile, saveArtistTracks,
+    fetchArtistDiscography, fetchArtistEdit, removeArtistOwner, saveArtistDiscography, requestArtistChange, saveArtistFestivals, saveArtistProfile, saveArtistTracks,
     setArtistOwner, setArtistRole,
 } from '../api/backend.js'
 import { ROLES } from '../components/artistRole.js'
@@ -25,7 +25,8 @@ const PROFILE_FIELDS = [
 ]
 const MAX_BIO = 1000
 const MAX_TRACKS = 6
-const MAX_FESTIVALS = 20
+const MAX_FESTIVALS = 40
+const MAX_ALBUMS = 40
 const MAX_GENRES = 4
 
 // One part of the editor with its own Save button and status
@@ -79,6 +80,7 @@ function ArtistEdit() {
     const [profile, setProfile] = useState(null)
     const [tracks, setTracks] = useState([])
     const [festivals, setFestivals] = useState([])
+    const [disco, setDisco] = useState({ country: '', since: '', albums: [] })
     const [genres, setGenres] = useState([])
     const [name, setName] = useState('')
     const [owner, setOwner] = useState('')
@@ -87,6 +89,7 @@ function ArtistEdit() {
     const profileSave = useSave()
     const tracksSave = useSave()
     const festivalsSave = useSave()
+    const discoSave = useSave()
     const genresSave = useSave()
     const nameSave = useSave()
     const ownerSave = useSave()
@@ -107,6 +110,9 @@ function ArtistEdit() {
 
     useEffect(() => {
         const controller = new AbortController()
+        fetchArtistDiscography(slug, controller.signal)
+            .then(d => setDisco({ country: d.country ?? '', since: d.since ?? '', albums: d.albums.map(a => ({ title: a.title, year: a.year ?? '' })) }))
+            .catch(() => {})
         fetchArtistEdit(slug, controller.signal)
             .then(show)
             .catch(err => {
@@ -207,6 +213,33 @@ function ArtistEdit() {
                 ))}
                 {festivals.length < MAX_FESTIVALS && (
                     <button type="button" className="btn w-fit" onClick={() => setFestivals(prev => [...prev, { name: '', year: '', url: '' }])}>+ Add festival</button>
+                )}
+            </Part>
+
+            <Part label={`Albums · ${disco.albums.length}/${MAX_ALBUMS}`} hint="Your releases, newest or most important first, with where you are from and the year you started. They show on your page and on the galaxy."
+                saving={discoSave.saving} status={discoSave.status}
+                onSave={() => discoSave.run(() => saveArtistDiscography(slug, {
+                    country: trim(disco.country) || null, since: disco.since === '' ? null : Number(disco.since),
+                    albums: disco.albums.filter(a => trim(a.title)).map(a => ({ title: trim(a.title), year: a.year === '' ? null : Number(a.year) })),
+                }))}>
+                <div className="flex flex-wrap gap-2">
+                    <input className="field w-auto flex-1" placeholder="Country (e.g. Serbia)" aria-label="Country" value={disco.country}
+                        onChange={(e) => setDisco(d => ({ ...d, country: e.target.value }))} />
+                    <input className="field w-32" type="number" min="1960" max="2100" placeholder="Since (year)" aria-label="Since" value={disco.since}
+                        onChange={(e) => setDisco(d => ({ ...d, since: e.target.value }))} />
+                </div>
+                {disco.albums.map((album, i) => (
+                    <div key={i} className="flex flex-wrap gap-2">
+                        <input className="field w-auto flex-1" placeholder="Album title" aria-label="Album title" value={album.title}
+                            onChange={(e) => setDisco(d => ({ ...d, albums: d.albums.map((a, j) => (j === i ? { ...a, title: e.target.value } : a)) }))} />
+                        <input className="field w-24" type="number" min="1960" max="2100" placeholder="Year" aria-label="Album year" value={album.year}
+                            onChange={(e) => setDisco(d => ({ ...d, albums: d.albums.map((a, j) => (j === i ? { ...a, year: e.target.value } : a)) }))} />
+                        <button type="button" className="btn btn--ghost" aria-label={`Remove ${album.title || 'this album'}`}
+                            onClick={() => setDisco(d => ({ ...d, albums: d.albums.filter((_, j) => j !== i) }))}>✕</button>
+                    </div>
+                ))}
+                {disco.albums.length < MAX_ALBUMS && (
+                    <button type="button" className="btn w-fit" onClick={() => setDisco(d => ({ ...d, albums: [...d.albums, { title: '', year: '' }] }))}>+ Add album</button>
                 )}
             </Part>
 

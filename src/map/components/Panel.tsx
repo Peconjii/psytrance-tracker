@@ -388,12 +388,17 @@ export function Panel({
       </div>
       <p>{g.description}</p>
 
-      <div className="hud__label">How it sounds</div>
-      <dl className="hud__specs">
-        <dt>BASS</dt><dd>{g.production.bass}</dd>
-        <dt>KICK</dt><dd>{g.production.kick}</dd>
-        <dt>ATMOSPHERE</dt><dd>{g.production.atmosphere}</dd>
-      </dl>
+      {/* A genre added from the panel may not have these written yet */}
+      {(g.production.bass || g.production.kick || g.production.atmosphere) && (
+        <>
+          <div className="hud__label">How it sounds</div>
+          <dl className="hud__specs">
+            {g.production.bass && <><dt>BASS</dt><dd>{g.production.bass}</dd></>}
+            {g.production.kick && <><dt>KICK</dt><dd>{g.production.kick}</dd></>}
+            {g.production.atmosphere && <><dt>ATMOSPHERE</dt><dd>{g.production.atmosphere}</dd></>}
+          </dl>
+        </>
+      )}
 
       <ProducerCorner genre={g} />
 

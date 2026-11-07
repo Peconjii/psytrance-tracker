@@ -6,15 +6,15 @@ import { data, genreById } from '../map/data/types'
 // Pieces the admin pages share: the map genres as chips and in a picker, and the banner for a feedback message
 // that is being fixed.
 
-// Genres grouped by scene, as in the picker
-const SCENES = Object.entries(data.families).map(([id, family]) => ({
+// Genres grouped by scene, as in the picker; read each time, so genres admins added to the galaxy are in it
+const scenes = () => Object.entries(data.families).map(([id, family]) => ({
     name: family.name,
     genres: data.genres.filter(g => g.family === id),
 }))
 
 /** The <option>s of a genre picker, grouped by scene, without the genres in `exclude` */
 export function GenreOptions({ exclude = [] }) {
-    return SCENES.map(scene => (
+    return scenes().map(scene => (
         <optgroup key={scene.name} label={scene.name}>
             {scene.genres.filter(g => !exclude.includes(g.id)).map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
         </optgroup>

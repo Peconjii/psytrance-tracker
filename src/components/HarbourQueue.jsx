@@ -8,12 +8,13 @@ import { data } from '../map/data/types'
 
 // Genres whose name stands as whole words in the event's name ("FOREST GATHERING" -> Forest), longest names first so
 // "Dark progressive" wins over "Progressive psy"; a guess to take with one click, nothing is set by itself
-const BY_LENGTH = [...data.genres].sort((a, b) => b.name.length - a.name.length)
+// Read each time: genres admins added to the galaxy join after the site loads
+const byLength = () => [...data.genres].sort((a, b) => b.name.length - a.name.length)
 const escape = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 function guessGenres(name) {
     let rest = ` ${(name ?? '').toLowerCase()} `
     const found = []
-    for (const g of BY_LENGTH) {
+    for (const g of byLength()) {
         const words = new RegExp(`[^a-z0-9]${escape(g.name.toLowerCase())}[^a-z0-9]`)
         if (words.test(rest)) {
             found.push(g)
