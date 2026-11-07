@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
-import { calendarUrl, fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent } from '../api/backend.js'
+import { calendarUrl, fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent, setAdminEventGenres } from '../api/backend.js'
 import { fetchWeatherForEvents, forecastFor, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
@@ -9,6 +9,9 @@ import GoingButton from '../components/GoingButton.jsx'
 import ShareLinks from '../components/ShareLinks.jsx'
 import usePageMeta, { SITE_URL } from '../hooks/usePageMeta.js'
 import { artistSlug } from '../map/data/events'
+import { useAuth } from '../context/AuthContext'
+import { data, genreById } from '../map/data/types'
+import { stageParts } from '../components/stageText.js'
 
 const FALLBACK_IMAGE = 'https://placehold.co/800x400/05040d/8f88c4?text=No+flyer'
 
@@ -41,19 +44,62 @@ const setTime = (value) => {
     return `${SET_DAY.format(new Date(year, month - 1, day))} ${time.slice(0, 5)}`
 }
 
-// The timetable, one list per stage, in the order the organizer (or an admin) wrote it
+// A stage's genre in its scene's color, linking to its star on the galaxy
+function StageGenre({ id }) {
+    const genre = genreById[id]
+    if (!genre) return null
+    return (
+        <Link to={`/?genre=${id}`} className="genre-chip no-underline" style={{ '--c': data.families[genre.family].color }}>{genre.name}</Link>
+    )
+}
+
+// The timetable, one list per stage, in the order the organizer (or an admin) wrote it. Stages from our event form
+// carry their genres in brackets ("Main Stage (Forest, Goa trance)"): those are shown as a line of stages on top
 function Timetable({ timetable }) {
+    const { user } = useAuth()
+    const [shipNote, setShipNote] = useState('')
     const stages = []
     for (const set of timetable.sets) {
         const name = set.stage || ''
-        let stage = stages.find(s => s.name === name)
-        if (!stage) stages.push(stage = { name, sets: [] })
+        let stage = stages.find(s => s.key === name)
+        if (!stage) stages.push(stage = { key: name, sets: [], ...stageParts(name) })
         stage.sets.push(set)
+    }
+    const withGenres = stages.filter(s => s.genreIds.length)
+    // Editors and admins: "★ Ship by the main stage" moves the event's ship to the main stage's genres
+    const mainGenres = stages[0]?.genreIds ?? []
+    const shipByMain = async () => {
+        try {
+            await setAdminEventGenres(timetable.eventId, mainGenres.slice(0, 4))
+            setShipNote('The ship now flies by the main stage.')
+        } catch (err) {
+            setShipNote(err.response?.data?.message || 'Could not change it. Try again.')
+        }
     }
     return (
         <div className="grid gap-4">
+            {/* The stages at a glance: "★ Main: Forest, Goa trance · Chill: Psy-dub" (the first stage is the main one) */}
+            {withGenres.length > 0 && (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+                    {stages.map((stage, i) => (
+                        <span key={stage.key} className="inline-flex flex-wrap items-center gap-2">
+                            <span className="mono text-xs" style={{ color: i === 0 && stages.length > 1 ? 'var(--accent)' : 'var(--muted)' }}>
+                                {i === 0 && stages.length > 1 ? '★ ' : ''}{stage.name || 'Stage'}
+                            </span>
+                            {stage.genreIds.map(id => <StageGenre key={id} id={id} />)}
+                        </span>
+                    ))}
+                    {(user?.admin || user?.editor) && mainGenres.length > 0 && (
+                        <button type="button" className="btn btn--ghost" onClick={shipByMain}
+                            title="The event's genres (where its ship flies on the map) become the main stage's">
+                            ★ Ship by the main stage
+                        </button>
+                    )}
+                    {shipNote && <span className="mono text-xs" style={{ color: 'var(--accent)' }}>{shipNote}</span>}
+                </div>
+            )}
             {stages.map(stage => (
-                <div key={stage.name}>
+                <div key={stage.key}>
                     {stage.name && <div className="field-label">{stage.name}</div>}
                     <ul className="list-none p-0 m-0 text-sm">
                         {stage.sets.map((set, i) => (

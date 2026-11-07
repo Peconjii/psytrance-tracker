@@ -152,6 +152,12 @@ export async function submitOurEvent(event) {
 }
 
 // The events this account added, newest first, with their status and an admin's reason when rejected
+// Whether this account may add a festival (organizers and festivals with a claimed page, editors, admins)
+export async function fetchCanAddFestival(signal) {
+    const response = await api.get('/api/our-events/can-add-festival', { signal })
+    return response.data.canAddFestival
+}
+
 export async function fetchMyOurEvents(signal) {
     const response = await api.get('/api/our-events/mine', { signal })
     return response.data

@@ -97,6 +97,8 @@ function AdminEvents() {
     const [hiddenVersion, setHiddenVersion] = useState(0)
     // Bumped when an event is featured, so the featured list loads again
     const [featuredVersion, setFeaturedVersion] = useState(0)
+    // Bumped by "★ Ship by the main stage", so the genres above load again
+    const [genresVersion, setGenresVersion] = useState(0)
 
     useEffect(() => {
         if (debounced.length < 2) return
@@ -123,8 +125,9 @@ function AdminEvents() {
 
             {feedbackId && <FeedbackBanner feedbackId={feedbackId} fixed={savedFor !== null && savedFor === selected} />}
 
-            {selected && <EventEditor key={selected} id={selected} onSaved={() => setSavedFor(selected)} />}
+            {selected && <EventEditor key={`${selected}-${genresVersion}`} id={selected} onSaved={() => setSavedFor(selected)} />}
             {selected && <TimetableEditor key={'tt' + selected} id={selected} save={setAdminTimetable} handBack={handBackTimetable}
+                setGenres={async (id, genres) => { await setAdminEventGenres(id, genres); setGenresVersion(v => v + 1) }}
                 onSaved={() => setSavedFor(selected)} />}
             {selected && <EventAdminTools key={'tools' + selected} id={selected}
                 onHidden={() => { setParams({}); setHiddenVersion(v => v + 1) }}

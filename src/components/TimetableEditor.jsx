@@ -1,21 +1,27 @@
 import { useEffect, useState } from 'react'
 import { fetchTimetable } from '../api/backend.js'
-import { GenreOptions } from './AdminParts'
+import { AddGenre, GenreChip, GenreOptions } from './AdminParts'
 import ArtistInput from './ArtistInput.jsx'
+import { MAX_STAGE_GENRES, stageParts, stageWithGenres } from './stageText.js'
 import { toField } from '../dates.js'
 
 // Venue-clock times: the API sends "2026-10-24T22:00:00", a datetime-local field wants "2026-10-24T22:00"
 const emptySet = (startsAt = '') => ({ stage: '', artist: '', startsAt, endsAt: '', genreId: '' })
 
 // The event's timetable: what was read from the line-up, to correct, or a new one written from scratch.
+// As in the event form, a stage has up to four genres, kept in brackets after its name ("Main (Forest, Goa trance)"),
+// and the first stage is the main one; a set can still get its own genre.
 // Saving makes it hand-set (the line-up no longer changes it); "Back to the line-up" undoes that.
 // `save(id, sets)` and `handBack(id)` call the backend: the admin's endpoints, or the organizer's for their events.
-function TimetableEditor({ id, save, handBack, onSaved = () => {} }) {
+// `setGenres(id, genres)`: when given, "★ Ship by the main stage" sets the event's genres (where its ship flies) to the
+// main stage's.
+function TimetableEditor({ id, save, handBack, setGenres, onSaved = () => {} }) {
     const [timetable, setTimetable] = useState(null)
     const [rows, setRows] = useState([])
     const [error, setError] = useState('')
     const [saving, setSaving] = useState(false)
     const [dirty, setDirty] = useState(false)
+    const [shipNote, setShipNote] = useState('')
 
     const show = (found) => {
         setTimetable(found)
@@ -35,17 +41,13 @@ function TimetableEditor({ id, save, handBack, onSaved = () => {} }) {
         setRows(prev => prev.map((row, j) => (j === i ? { ...row, [field]: value } : row)))
         setDirty(true)
     }
-    // The sets by stage, in the order the stages first come: [{ stage, genreId (null: the sets differ), rows: [index] }]
+    // The sets by stage, in the order the stages first come: [{ stage (as stored), name, genreIds, rows: [index] }]
     const groups = []
     rows.forEach((row, i) => {
         let group = groups.find(x => x.stage === row.stage)
-        if (!group) groups.push(group = { stage: row.stage, rows: [] })
+        if (!group) groups.push(group = { stage: row.stage, ...stageParts(row.stage), rows: [] })
         group.rows.push(i)
     })
-    for (const group of groups) {
-        const genres = new Set(group.rows.map(i => rows[i].genreId))
-        group.genreId = genres.size === 1 ? [...genres][0] : null
-    }
 
     const add = (stage) => {
         // A new set starts where the stage's last one ends, which is how most timetables run
@@ -65,8 +67,10 @@ function TimetableEditor({ id, save, handBack, onSaved = () => {} }) {
         setRows(prev => prev.map(r => (r.stage === from ? { ...r, stage: to } : r)))
         setDirty(true)
     }
-    const setStageGenre = (stage, genreId) => {
-        setRows(prev => prev.map(r => (r.stage === stage ? { ...r, genreId } : r)))
+    const setStageGenres = (group, genreIds) => renameStage(group.stage, stageWithGenres(group.name, genreIds))
+    // The main stage goes first
+    const makeMain = (stage) => {
+        setRows(prev => [...prev.filter(r => r.stage === stage), ...prev.filter(r => r.stage !== stage)])
         setDirty(true)
     }
     const remove = (i) => {
@@ -82,6 +86,21 @@ function TimetableEditor({ id, save, handBack, onSaved = () => {} }) {
             onSaved()
         } catch (err) {
             setError(err.response?.data?.message || 'Could not save. Try again.')
+        } finally {
+            setSaving(false)
+        }
+    }
+    // The main stage's genres (the first stage), for "★ Ship by the main stage"
+    const mainGenres = groups[0]?.genreIds ?? []
+    const shipByMain = async () => {
+        setSaving(true)
+        setError('')
+        try {
+            await setGenres(id, mainGenres.slice(0, 4))
+            setShipNote('The ship now flies by the main stage.')
+            onSaved()
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not set the genres. Try again.')
         } finally {
             setSaving(false)
         }
@@ -109,15 +128,28 @@ function TimetableEditor({ id, save, handBack, onSaved = () => {} }) {
                 <div className="grid gap-3 mb-3">
                     {groups.map((group, g) => (
                         <div key={g} className="stage-card">
+                            {groups.length > 1 && (
+                                <div className="flex items-center gap-2 mb-2 mono text-xs">
+                                    {g === 0
+                                        ? <span style={{ color: 'var(--accent)' }}>★ Main stage</span>
+                                        : <button type="button" className="link bg-transparent border-0 p-0 cursor-pointer" onClick={() => makeMain(group.stage)}>☆ Make it the main stage</button>}
+                                </div>
+                            )}
                             <div className="flex flex-wrap items-center gap-2 mb-2">
-                                <input className="field flex-1 min-w-40" placeholder="Stage (optional)" value={group.stage}
-                                    aria-label={`Name of stage ${g + 1}`} onChange={(e) => renameStage(group.stage, e.target.value)} />
-                                {/* Gives every set of the stage this genre; a set can still get its own below */}
-                                <select className="field w-auto" value={group.genreId ?? ''} aria-label={`Genre of stage ${g + 1}`}
-                                    onChange={(e) => setStageGenre(group.stage, e.target.value)}>
-                                    <option value="">{group.genreId === null ? 'Stage genre: mixed' : 'Stage genre: none'}</option>
-                                    <GenreOptions />
-                                </select>
+                                <input className="field flex-1 min-w-40" placeholder="Stage (optional)" value={group.name} maxLength={60}
+                                    aria-label={`Name of stage ${g + 1}`}
+                                    onChange={(e) => renameStage(group.stage, stageWithGenres(e.target.value, group.genreIds))} />
+                            </div>
+                            {/* The stage's genres: its sets of artists the map doesn't place fly to the first one */}
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <span className="mono text-xs muted">Stage genres:</span>
+                                {group.genreIds.map(id => (
+                                    <GenreChip key={id} id={id} onRemove={() => setStageGenres(group, group.genreIds.filter(x => x !== id))} />
+                                ))}
+                                {group.genreIds.length < MAX_STAGE_GENRES && (
+                                    <AddGenre exclude={group.genreIds} label={`Add a genre to stage ${g + 1}`}
+                                        onAdd={(id) => setStageGenres(group, [...group.genreIds, id])} />
+                                )}
                             </div>
                             <div className="grid gap-2">
                                 {group.rows.map(i => {
@@ -135,7 +167,7 @@ function TimetableEditor({ id, save, handBack, onSaved = () => {} }) {
                                                 {/* The set's genre sends its ship of the live fleet to that star */}
                                                 <select className="field" value={row.genreId} aria-label="Genre of the set"
                                                     onChange={(e) => change(i, 'genreId', e.target.value)}>
-                                                    <option value="">Genre: none</option>
+                                                    <option value="">Genre: as the stage / artist</option>
                                                     <GenreOptions />
                                                 </select>
                                                 <button className="btn btn--ghost shrink-0" onClick={() => remove(i)}
@@ -160,6 +192,13 @@ function TimetableEditor({ id, save, handBack, onSaved = () => {} }) {
                 {timetable.manual && !dirty && (
                     <button className="btn" onClick={() => run(() => handBack(id))} disabled={saving}>Back to the line-up</button>
                 )}
+                {setGenres && !dirty && mainGenres.length > 0 && (
+                    <button className="btn" onClick={shipByMain} disabled={saving}
+                        title="The event's genres (where its ship flies on the map) become the main stage's">
+                        ★ Ship by the main stage
+                    </button>
+                )}
+                {shipNote && <span className="mono text-xs" style={{ color: 'var(--accent)' }}>✓ {shipNote}</span>}
             </div>
             <p className="muted text-sm mb-0 mt-3">
                 Times on the clock at the venue. The end is optional. A saved timetable stays until you hand it back.

@@ -26,12 +26,35 @@ export interface MapEvent {
   /** An admin features it: a mark on the map and first in the departures, with an optional note */
   featured: boolean;
   featuredNote: string | null;
+  /** A festival (kind Festival, three days or more): a bigger ship, on the map until it is over, whatever the period */
+  festival: boolean;
+  /** The festival station it is an edition of: a dashed line to it on hover */
+  festivalId: string | null;
+  /** On the map only because it is a festival: outside the period the ship console shows, so drawn a little fainter */
+  outside?: boolean;
 }
 
 export async function fetchMapEvents(period: EventPeriod): Promise<MapEvent[]> {
   const { data } = await api.get('/api/map/events', { params: { period } });
   // Genres the map doesn't have (an older or newer genres.json on the backend) are dropped
   return (data as MapEvent[]).map((e) => ({ ...e, genres: e.genres.filter((g) => genreById[g.genreId]) }));
+}
+
+/** Every upcoming festival with a known genre, however far ahead (GET /api/map/festivals) */
+export async function fetchMapFestivals(): Promise<MapEvent[]> {
+  const { data } = await api.get('/api/map/festivals');
+  return (data as MapEvent[]).map((e) => ({ ...e, genres: e.genres.filter((g) => genreById[g.genreId]) }))
+    .filter((e) => e.genres.length);
+}
+
+/**
+ * The ships of the map: the period's events, plus every festival outside the period (marked `outside`); no ships at
+ * all when the console is off (events null)
+ */
+export function withFestivals(events: MapEvent[] | null, festivals: MapEvent[]): MapEvent[] | null {
+  if (!events) return null;
+  const inPeriod = new Set(events.map((e) => e.id));
+  return [...events, ...festivals.filter((f) => !inPeriod.has(f.id)).map((f) => ({ ...f, outside: true }))];
 }
 
 /** Where a ship sits: the share-weighted middle of its genres' stars, or null when the genre is unknown */
@@ -113,7 +136,8 @@ export function buildFleets(events: MapEvent[]): FleetSpot[] {
       p.x = top.x + ux * SHIP_OFFSET;
       p.y = top.y + uy * SHIP_OFFSET;
     }
-    const key = `${Math.round(p.x / FLEET_GRID)}:${Math.round(p.y / FLEET_GRID)}`;
+    // A festival sails on its own, never in a fleet of parties
+    const key = e.festival ? `festival:${e.id}` : `${Math.round(p.x / FLEET_GRID)}:${Math.round(p.y / FLEET_GRID)}`;
     const group = groups.get(key) ?? { events: [], x: p.x, y: p.y };
     group.events.push(e);
     groups.set(key, group);

@@ -4,7 +4,8 @@ import { WEEKDAY_DAY as DAY_LABEL } from '../dates.js'
 // The stage cards of the event form and the line-up text they stand for. The backend reads the text as it reads any
 // line-up (TimetableParser, its test theStageCardsOfOurEventFormAreReadAsWritten checks this format):
 //
-//   Main Stage (Morning full-on):      <- a stage, its genre's map name in brackets (MapGenres.genreInBrackets)
+//   Main Stage (Morning full-on):      <- a stage, its genres' map names in brackets, comma separated, up to 4
+//                                         (MapGenres.genresInBrackets); the first stage is the main one
 //   Fri 23:00-01:00 Ajja               <- weekday, start, end (optional), the artist
 //   Sat 01:00 Tristan (live)
 //   Some Friend                        <- an artist without a set time
@@ -14,7 +15,8 @@ import { WEEKDAY_DAY as DAY_LABEL } from '../dates.js'
 export const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
 export const emptySet = (day = '', start = '') => ({ day, start, end: '', artist: '', live: false })
-export const emptyStage = () => ({ name: '', genreId: '', sets: [emptySet()] })
+export const MAX_STAGE_GENRES = 4
+export const emptyStage = () => ({ name: '', genreIds: [], sets: [emptySet()] })
 
 /** The days of the event, from the form's start and end ("2026-10-23T22:00"): [{ value: 'Fri', label: 'Fri 23 Oct' }] */
 export function eventDays(startsAt, endsAt) {
@@ -34,12 +36,12 @@ const clean = (text) => text.replace(/[():\r\n]/g, ' ').replace(/\s+/g, ' ').tri
 /** The line-up text of the stage cards */
 export function lineUpOf(stages, days) {
     const blocks = []
-    const withHeaders = stages.length > 1 || stages.some(s => clean(s.name) || s.genreId)
+    const withHeaders = stages.length > 1 || stages.some(s => clean(s.name) || s.genreIds.length)
     for (const stage of stages) {
         const lines = []
         if (withHeaders) {
-            const genre = genreById[stage.genreId]
-            lines.push(`${clean(stage.name) || 'Stage'}${genre ? ` (${genre.name})` : ''}:`)
+            const names = stage.genreIds.map(id => genreById[id]?.name).filter(Boolean)
+            lines.push(`${clean(stage.name) || 'Stage'}${names.length ? ` (${names.join(', ')})` : ''}:`)
         }
         for (const set of stage.sets) {
             const artist = clean(set.artist)
@@ -71,15 +73,16 @@ export function stagesOf(text) {
         if (!line) continue
         const header = line.match(HEADER)
         if (header) {
-            const genreId = header[2] ? GENRE_BY_NAME[header[2].trim().toLowerCase()] : undefined
-            // Brackets that are no map genre are part of the name
-            const name = header[2] && !genreId ? `${header[1]} (${header[2]})` : header[1]
-            stage = { name: name === 'Stage' ? '' : name, genreId: genreId || '', sets: [] }
+            const ids = header[2] ? header[2].split(',').map(n => GENRE_BY_NAME[n.trim().toLowerCase()]) : []
+            // Brackets that are no map genres are part of the name
+            const genres = ids.length && ids.every(Boolean) ? [...new Set(ids)] : []
+            const name = header[2] && !genres.length ? `${header[1]} (${header[2]})` : header[1]
+            stage = { name: name === 'Stage' ? '' : name, genreIds: genres, sets: [] }
             stages.push(stage)
             continue
         }
         if (!stage) {
-            stage = { name: '', genreId: '', sets: [] }
+            stage = { name: '', genreIds: [], sets: [] }
             stages.push(stage)
         }
         const set = line.match(SET)
@@ -96,4 +99,22 @@ export function stagesOf(text) {
     }
     for (const s of stages) if (s.sets.length === 0) s.sets.push(emptySet())
     return stages.length ? stages : null
+}
+
+/** { name, genreIds } -> "Main stage (Forest, Goa trance)": a stage with its genres, as the timetable stores it */
+export function stageWithGenres(name, genreIds) {
+    const names = genreIds.map(id => genreById[id]?.name).filter(Boolean)
+    const base = (name || '').replace(/:/g, ' ').replace(/\s+/g, ' ').trim()
+    return names.length ? `${base || 'Stage'} (${names.join(', ')})` : base
+}
+
+/**
+ * "Main stage (Forest, Goa trance)" -> { name: 'Main stage', genreIds: ['forest', 'goa'] }: a timetable's stage
+ * as our event form writes it; a stage without map genres in brackets keeps its whole name
+ */
+export function stageParts(stage) {
+    const header = (stage || '').match(/^(.*?)\s*\(([^()]+)\)\s*$/)
+    if (!header) return { name: stage || '', genreIds: [] }
+    const ids = header[2].split(',').map(n => GENRE_BY_NAME[n.trim().toLowerCase()])
+    return ids.every(Boolean) ? { name: header[1], genreIds: [...new Set(ids)] } : { name: stage, genreIds: [] }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type MutableRefObject } from 'react';
 import { Application, BlurFilter, Container, Graphics, Text } from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
-import { data, festivals, genreById, genresOfArtist, labels, mainGenreOf, orbitingArtists, WORLD, type Genre } from '../data/types';
+import { data, festivalById, festivals, genreById, genresOfArtist, labels, mainGenreOf, orbitingArtists, WORLD, type Genre } from '../data/types';
 import { artistSlug, buildFleets, HARBOUR, type MapEvent } from '../data/events';
 import { shipState, type LiveFleet } from '../data/liveFleet';
 import { highContrast as HC } from '../../theme.js';
@@ -116,7 +116,16 @@ interface Fleet {
   phase: number;
   /** Rings around a ship with an artist the user follows, redrawn every frame */
   halo: Graphics | null;
+  /** A festival's own ship: bigger, and on the map whatever the period */
+  festival: boolean;
+  /** A festival outside the console's period: a little fainter until hovered or opened */
+  outside: boolean;
 }
+
+/** How faint a festival outside the period is: still clearly on the map */
+const OUTSIDE_ALPHA = 0.72;
+/** The year the slider ends at: ships sail only in the present */
+const NOW_YEAR = new Date().getFullYear();
 
 const hex = (c: string) => parseInt(c.slice(1), 16);
 /** At most this many artists orbit a star, so a busy genre stays readable; the genre's panel lists them all */
@@ -190,6 +199,24 @@ function drawShip(g: Graphics, x: number, y: number, color: number) {
   g.poly([x - 7, y - 9, x + 11, y, x - 7, y + 9, x - 3, y]).fill(color).stroke({ width: 1.5, color: INK, alpha: 0.7 });
 }
 
+/** A festival's ship: half again as big, with a second outline, all in its main genre's color */
+function drawFestivalShip(g: Graphics, color: number) {
+  const k = 1.5;
+  g.poly([-7 * k, -9 * k, 11 * k, 0, -7 * k, 9 * k, -3 * k, 0]).fill(color).stroke({ width: 1.5, color: INK, alpha: 0.7 });
+  g.poly([-12 * k, -13 * k, 15 * k, 0, -12 * k, 13 * k, -7 * k, 0]).stroke({ width: 1.8, color, alpha: 0.95 });
+}
+
+/** A dashed line, for the way from a festival's ship to its station */
+function dashed(g: Graphics, x0: number, y0: number, x1: number, y1: number, color: number) {
+  const len = Math.hypot(x1 - x0, y1 - y0);
+  const ux = (x1 - x0) / len, uy = (y1 - y0) / len;
+  for (let d = 0; d < len; d += 14) {
+    const e = Math.min(d + 8, len);
+    g.moveTo(x0 + ux * d, y0 + uy * d).lineTo(x0 + ux * e, y0 + uy * e);
+  }
+  g.stroke({ width: 1.6, color, alpha: 0.85 });
+}
+
 const TRAIL_LIFE = 0.8;
 const TRAIL_EVERY = 0.05;
 
@@ -214,6 +241,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
   const clockRefRef = useRef(clockRef);
   clockRefRef.current = clockRef;
   const hoverFleetRef = useRef<MapEvent[] | null>(null);
+  const yearRef = useRef(year);
+  // Festival stations and labels with their key: they light up from the year they began (the year slider)
+  const stationNodesRef = useRef<{ node: Container; id: string }[]>([]);
+  const labelNodesRef = useRef<{ node: Container; name: string }[]>([]);
   const selectedFleetRef = useRef(selectedFleet);
   selectedFleetRef.current = selectedFleet;
   const onSelectFleetRef = useRef(onSelectFleet);
@@ -374,6 +405,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       liveLayerRef.current = liveLayer;
       harbourRef.current = { node: harbour, text: harbourText };
 
+      stationNodesRef.current = [];
+      labelNodesRef.current = [];
       // Record labels: hexagon markers parked near the systems they release
       const labelTexts: Text[] = [];
       for (const [name, l] of Object.entries(labels)) {
@@ -394,6 +427,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         node.hitArea = { contains: (x: number, y: number) => (Math.abs(x) < 16 && Math.abs(y) < 16) || (Math.abs(x) < text.width / 2 && y > 12 && y < 30) };
         node.on('pointertap', () => onSelectLabelRef.current(name));
         labelLayer.addChild(node);
+        labelNodesRef.current.push({ node, name });
         labelTexts.push(text);
       }
 
@@ -420,6 +454,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         node.hitArea = { contains: (x: number, y: number) => (Math.abs(x) < 18 && Math.abs(y) < 18) || (Math.abs(x) < text.width / 2 && y > 12 && y < 32) };
         node.on('pointertap', () => onSelectFestivalRef.current(fest.id));
         stationLayer.addChild(node);
+        stationNodesRef.current.push({ node, id: fest.id });
         stations.push(icon);
         stationTexts.push(text);
       }
@@ -621,6 +656,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       routesRef.current = [];
       fleetsRef.current = [];
       liveShipsRef.current = [];
+      stationNodesRef.current = [];
+      labelNodesRef.current = [];
       liveLayerRef.current = null;
       crewRef.current = null;
       eventLayerRef.current = null;
@@ -635,6 +672,16 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       if (app.renderer) app.destroy(true, { children: true });
     };
   }, []);
+
+  // The year slider: ships (and festivals) sail only in the present; festival stations and labels light up from the
+  // year they began, and the ones whose first year nobody wrote down yet only in the present (On the map -> Since)
+  useEffect(() => {
+    yearRef.current = year;
+    if (eventLayerRef.current) eventLayerRef.current.visible = year >= NOW_YEAR;
+    drawFleetLines.current();
+    for (const { node, id } of stationNodesRef.current) node.visible = (festivalById[id]?.since ?? NOW_YEAR) <= year;
+    for (const { node, name } of labelNodesRef.current) node.visible = (labels[name]?.since ?? NOW_YEAR) <= year;
+  }, [year, ready]);
 
   // Selection + year filter: draws routes and dims unrelated stars.
   // With an artist selected, the highlighted systems are the genres that artist appears in.
@@ -722,8 +769,18 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
     const lines = fleetLinesRef.current;
     if (!lines) return;
     lines.clear();
+    // Ships sail only in the present: back in time their lines go too
+    if (yearRef.current < NOW_YEAR) return;
     const shown = new Set<number>([...(selectedFleetRef.current ?? []), ...(hoverFleetRef.current ?? []).map((e) => e.id)]);
     for (const f of fleetsRef.current) {
+      if (f.festival) {
+        const e = f.events[0];
+        const on = shown.has(e.id);
+        // Hovered or opened, a faint festival comes back to full strength and shows the way to its station
+        f.node.alpha = on || !f.outside ? 1 : OUTSIDE_ALPHA;
+        const station = on && e.festivalId ? festivalById[e.festivalId] : null;
+        if (station) dashed(lines, f.x, f.y, station.x, station.y, f.color);
+      }
       for (const e of f.events) {
         if (!shown.has(e.id)) continue;
         for (const g of e.genres) {
@@ -794,7 +851,20 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       };
 
       let name: Text | null = null;
-      if (fleetEvents.length === 1) {
+      const festival = fleetEvents.length === 1 && fleetEvents[0].festival;
+      const outside = festival && !!fleetEvents[0].outside;
+      if (festival) {
+        drawFestivalShip(arrows, color);
+        engines.push({ x: -6, y: 0 });
+        name = new Text({
+          text: (featured ? '◆ ' : '') + (followed ? '★ ' : '') + shortName(fleetEvents[0].nameParty),
+          style: { fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: '600', fill: HC ? INK : 0xe9e6ff },
+        });
+        name.anchor.set(0.5, 0);
+        name.position.set(0, 22);
+        node.addChild(trail, body, name);
+        node.alpha = outside ? OUTSIDE_ALPHA : 1;
+      } else if (fleetEvents.length === 1) {
         addShip(0, 0);
         name = new Text({
           text: (featured ? '◆ ' : '') + (followed ? '★ ' : '') + shortName(fleetEvents[0].nameParty),
@@ -818,14 +888,14 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       }
       node.eventMode = 'static';
       node.cursor = 'pointer';
-      node.hitArea = { contains: (px: number, py: number) => px * px + py * py < 26 * 26 };
+      node.hitArea = { contains: (px: number, py: number) => px * px + py * py < (festival ? 34 : 26) ** 2 };
       node.on('pointerover', () => { hoverFleetRef.current = fleetEvents; drawFleetLines.current(); });
       node.on('pointerout', () => { hoverFleetRef.current = null; drawFleetLines.current(); });
       node.on('pointertap', () => onSelectFleetRef.current(fleetEvents.map((e) => e.id)));
       layer.addChild(node);
       fleetsRef.current.push({
         events: fleetEvents, x, y, node, name, body, trail, color, engines,
-        particles: [], spawn: 0, phase: Math.random() * Math.PI * 2, halo,
+        particles: [], spawn: 0, phase: Math.random() * Math.PI * 2, halo, festival, outside,
       });
     }
     drawFleetLines.current();

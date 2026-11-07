@@ -108,7 +108,7 @@ function StationDetailsEditor({ kind, stationKey }) {
                 </div>
             )}
             <div>
-                <span className="field-label">Genres it plays <span className="muted">(up to 6; where it sits in the galaxy)</span></span>
+                <span className="field-label">Genres it plays <span className="muted">(up to 6{festival ? ', the main stage’s first' : ''})</span></span>
                 <div className="flex flex-wrap items-center gap-2">
                     {form.genres.map(g => (
                         <GenreChip key={g} id={g} onRemove={canEdit ? () => setGenres(form.genres.filter(x => x !== g)) : undefined} />

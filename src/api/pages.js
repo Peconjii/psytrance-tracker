@@ -24,6 +24,12 @@ export async function unfollowLabel(label) {
 }
 
 // Organizers with upcoming events, busiest first: [{ slug, name, upcomingEvents }]
+// Where one of the organizer's own events flies on the map (its genres, up to 4; [] = read from the line-up again)
+export async function setOrganizerEventGenres(slug, eventId, genres) {
+    const response = await api.put(`/api/organizers/${encodeURIComponent(slug)}/events/${eventId}/genres`, { genres })
+    return response.data
+}
+
 export async function fetchOrganizers(search, signal) {
     const response = await api.get('/api/organizers', { params: { search: search || undefined }, signal })
     return response.data

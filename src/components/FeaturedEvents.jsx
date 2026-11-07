@@ -25,7 +25,20 @@ function FeaturedEvents({ version }) {
         }
     }
 
-    if (!events || events.length === 0) return error ? <p className="notice">{error}</p> : null
+    if (error && !events) return <p className="notice">{error}</p>
+    if (!events) return null
+    // None yet: say how to feature one, so the section is easy to find
+    if (events.length === 0) {
+        return (
+            <section className="panel mb-6">
+                <h2 className="panel__label">◆ Featured on the map · 0 of 3</h2>
+                <p className="muted text-sm m-0">
+                    Nothing featured yet. Pick an event above (search, or click one in the harbour), then in its tools write an
+                    optional note and press <b>◆ Feature on the map</b>: its ship gets a diamond and lists show ◆ before it.
+                </p>
+            </section>
+        )
+    }
 
     return (
         <section className="panel mb-6">

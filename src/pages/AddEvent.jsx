@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { fetchOurEvent, submitOurEvent, updateOurEvent } from '../api/backend.js'
+import { fetchCanAddFestival, fetchMyOurEvents, fetchOurEvent, submitOurEvent, updateOurEvent } from '../api/backend.js'
 import { searchPlaces } from '../api/places.js'
 import { AddGenre, GenreChip } from '../components/AdminParts'
 import ImageField from '../components/ImageField.jsx'
@@ -21,7 +21,7 @@ const LINKS = [
     { key: 'imageUrl', label: 'Flyer', placeholder: 'https://… or upload one', image: 'flyer' },
 ]
 const EMPTY = {
-    name: '', eventType: 'Festival', startsAt: '', endsAt: '', lineUp: '', organizerName: '', locationText: '',
+    name: '', eventType: 'Open Air', startsAt: '', endsAt: '', lineUp: '', organizerName: '', locationText: '',
     entryFee: '', info: '', ticketUrl: '', organizerUrl: '', imageUrl: '',
 }
 
@@ -83,6 +83,15 @@ function AddEvent() {
         return () => controller.abort()
     }, [editId])
 
+    // A festival only organizers and festivals with a claimed page can add (and editors and admins)
+    const [canFestival, setCanFestival] = useState(false)
+    useEffect(() => {
+        if (!user) return
+        const controller = new AbortController()
+        fetchCanAddFestival(controller.signal).then(setCanFestival).catch(() => {})
+        return () => controller.abort()
+    }, [user])
+
     const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }))
 
     const findPlace = async () => {
@@ -98,9 +107,40 @@ function AddEvent() {
         }
     }
 
+    // "Use main stage genres": the event's genres (where the ship flies) from the first stage, to change from there
+    const mainGenres = asText ? [] : (stages[0]?.genreIds ?? [])
+    const useMainGenres = () => setGenres([...new Set(mainGenres)].slice(0, MAX_GENRES))
+
+    // "Fill from a previous event": copies what was picked from one of this account's events (never the date or the
+    // line-up's artists); everything stays editable afterwards
+    const fillFrom = (ev, what) => {
+        if (what.stages) {
+            const found = ev.lineUp?.trim() ? stagesOf(ev.lineUp) : null
+            if (found) {
+                setStages(found.map(s => ({ ...emptyStage(), name: s.name, genreIds: s.genreIds })))
+                setAsText(false)
+            }
+        }
+        if (what.place) {
+            setPlace({ name: ev.town, region: '', country: ev.country, lat: ev.lat, lon: ev.lon, timeZone: ev.timeZone })
+            setForm(f => ({ ...f, locationText: ev.locationText ?? '' }))
+        }
+        if (what.links) {
+            setForm(f => ({
+                ...f, eventType: ev.eventType ?? f.eventType, organizerName: ev.organizerName ?? '', ticketUrl: ev.ticketUrl ?? '',
+                organizerUrl: ev.organizerUrl ?? '', entryFee: ev.entryFee ?? '',
+            }))
+        }
+        if (what.genres) setGenres(ev.genres ?? [])
+    }
+
     const submit = async (e) => {
         e.preventDefault()
         if (!place) return setError('Pick the town from the search results, so the ship lands in the right place.')
+        // A festival with no genre would have no place on the map
+        if (form.eventType === 'Festival' && genres.length === 0) {
+            return setError('Pick at least one genre for the festival (or use the main stage’s genres).')
+        }
         setSending(true)
         setError('')
         try {
@@ -173,6 +213,7 @@ function AddEvent() {
                 <VerifyEmailNotice reason="Only accounts with a confirmed email can add events, so the map stays free of spam." />
             ) : (
                 <form className="grid grid-cols-1 gap-4" onSubmit={submit}>
+                    {!editId && <FillFromPrevious onFill={fillFrom} />}
                     <section className="panel grid gap-3">
                         <h2 className="panel__label m-0">The event</h2>
                         <div>
@@ -182,8 +223,17 @@ function AddEvent() {
                         <div>
                             <label htmlFor="ev-type" className="field-label">Kind</label>
                             <select id="ev-type" className="field" value={form.eventType} onChange={set('eventType')}>
-                                {TYPES.map(t => <option key={t}>{t}</option>)}
+                                {TYPES.map(t => (
+                                    <option key={t} value={t} disabled={t === 'Festival' && !canFestival && form.eventType !== 'Festival'}>
+                                        {t === 'Festival' && !canFestival ? 'Festival (organizers and festivals only)' : t}
+                                    </option>
+                                ))}
                             </select>
+                            {!canFestival && (
+                                <p className="muted text-xs mt-1 mb-0">
+                                    Festivals are added by their organizers and festivals: <Link className="link" to="/new-page">claim or ask for your page</Link>, or <Link className="link" to="/feedback?kind=SUGGESTION">tell us about it</Link>.
+                                </p>
+                            )}
                         </div>
                         <div className="grid sm:grid-cols-2 gap-3">
                             <div>
@@ -243,7 +293,15 @@ function AddEvent() {
                                 <AddGenre exclude={genres} onAdd={(id) => setGenres(g => [...g, id])} />
                             )}
                         </div>
-                        <p className="muted text-sm m-0">Up to {MAX_GENRES} genres: they decide where the ship flies.</p>
+                        <div className="flex flex-wrap items-center gap-3">
+                            <p className="muted text-sm m-0">Up to {MAX_GENRES} genres: they decide where the ship flies.</p>
+                            {mainGenres.length > 0 && (
+                                <button type="button" className="btn btn--ghost" onClick={useMainGenres}
+                                    title="Take the genres of the main stage (the first stage below); you can still change them">
+                                    ★ Use main stage genres
+                                </button>
+                            )}
+                        </div>
                         <div>
                             <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
                                 <span className="field-label m-0">Line-up and timetable</span>
@@ -303,6 +361,77 @@ function AddEvent() {
                 </form>
             )}
         </div>
+    )
+}
+
+// "Fill from a previous event": one of the events this account added, and what to copy from it
+const WHAT = [
+    { key: 'stages', label: 'Stages (names and genres)' },
+    { key: 'place', label: 'Location' },
+    { key: 'links', label: 'Organizer, kind, tickets, links and entry fee' },
+    { key: 'genres', label: 'Event genres' },
+]
+
+function FillFromPrevious({ onFill }) {
+    const [open, setOpen] = useState(false)
+    const [events, setEvents] = useState(null)
+    const [pick, setPick] = useState('')
+    const [what, setWhat] = useState({ stages: true, place: true, links: true, genres: true })
+    const [done, setDone] = useState('')
+
+    useEffect(() => {
+        if (!open || events) return
+        const controller = new AbortController()
+        fetchMyOurEvents(controller.signal)
+            .then(found => {
+                const list = [...found].sort((a, b) => String(b.startsAt).localeCompare(String(a.startsAt)))
+                setEvents(list)
+                if (list[0]) setPick(String(list[0].id))
+            })
+            .catch(() => { if (!controller.signal.aborted) setEvents([]) })
+        return () => controller.abort()
+    }, [open, events])
+
+    if (!open) {
+        return (
+            <button type="button" className="btn btn--ghost justify-self-start" onClick={() => setOpen(true)}>
+                ↺ Fill from a previous event
+            </button>
+        )
+    }
+    const ev = events?.find(e => String(e.id) === pick)
+    return (
+        <section className="panel grid gap-3">
+            <div className="flex items-center justify-between gap-2">
+                <h2 className="panel__label m-0">Fill from a previous event</h2>
+                <button type="button" className="btn btn--ghost" onClick={() => setOpen(false)} aria-label="Close">✕</button>
+            </div>
+            {!events ? <p className="mono text-xs muted m-0">Loading your events…</p>
+                : events.length === 0 ? <p className="muted text-sm m-0">You haven&apos;t added an event yet. Next time this fills the form for you.</p>
+                : (
+                    <>
+                        <select className="field" value={pick} onChange={(e) => { setPick(e.target.value); setDone('') }} aria-label="Previous event">
+                            {events.map(e => <option key={e.id} value={e.id}>{e.name} · {String(e.startsAt).slice(0, 10)}</option>)}
+                        </select>
+                        <div className="grid gap-1">
+                            {WHAT.map(w => (
+                                <label key={w.key} className="flex items-center gap-2 text-sm">
+                                    <input type="checkbox" checked={what[w.key]} onChange={(e) => { setWhat(x => ({ ...x, [w.key]: e.target.checked })); setDone('') }} />
+                                    {w.label}
+                                </label>
+                            ))}
+                        </div>
+                        <p className="muted text-xs m-0">The date and the artists are never copied. Everything stays editable: rename the stages, add or remove genres.</p>
+                        <div className="flex items-center gap-3">
+                            <button type="button" className="btn" disabled={!ev || !Object.values(what).some(Boolean)}
+                                onClick={() => { onFill(ev, what); setDone(`Filled from ${ev.name}.`) }}>
+                                Fill the form
+                            </button>
+                            {done && <span className="mono text-xs" style={{ color: 'var(--accent)' }}>✓ {done}</span>}
+                        </div>
+                    </>
+                )}
+        </section>
     )
 }
 

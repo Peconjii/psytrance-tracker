@@ -20,7 +20,7 @@ import { FleetPanel } from './components/FleetPanel';
 import { loadPlacements, placementsApplied } from './data/placements';
 import { loadMapExtras, mapExtrasApplied } from './data/extras';
 import { contentApplied, loadContent } from './data/content';
-import { fetchMapEvents, mapArtistBySlug, type Boarded, type EventPeriod, type MapEvent } from './data/events';
+import { fetchMapEvents, fetchMapFestivals, mapArtistBySlug, withFestivals, type Boarded, type EventPeriod, type MapEvent } from './data/events';
 import { buildLiveFleets, fetchMapTimetables, type Timetable } from './data/liveFleet';
 import {
   data, festivalById, genreById, genresOfArtist, genresOfLabel, genresOfTrack, labels, mainGenreOf, randomTrack, stopTrack, type Tour, type Track,
@@ -87,6 +87,15 @@ function MapOfPsy() {
   // A shared ship may sail later than this week, so its link opens the month
   const [period, setPeriod] = useState<EventPeriod | null>(initial.ship ? 'MONTH' : 'WEEK');
   const [events, setEvents] = useState<MapEvent[] | null>(null);
+  // Festivals stay on the map whatever the period (fainter outside it); loaded once
+  const [festivalShips, setFestivalShips] = useState<MapEvent[]>([]);
+  useEffect(() => {
+    let current = true;
+    fetchMapFestivals().then((list) => { if (current) setFestivalShips(list); })
+      .catch((err) => console.warn('Could not load the festivals for the map', err));
+    return () => { current = false; };
+  }, []);
+  const mapEvents = useMemo(() => withFestivals(events, festivalShips), [events, festivalShips]);
   const [fleet, setFleet] = useState<number[] | null>(null);
   const [harbour, setHarbour] = useState(false);
   // What the camera sees, and a way to move it: for the cockpit radar
@@ -134,10 +143,10 @@ function MapOfPsy() {
   const sharedShip = useRef(initial.ship);
   useEffect(() => {
     const id = sharedShip.current;
-    if (id === null || !events) return;
+    if (id === null || !mapEvents) return;
     sharedShip.current = null;
-    if (events.some((e) => e.id === id)) setFleet([id]);
-  }, [events]);
+    if (mapEvents.some((e) => e.id === id)) setFleet([id]);
+  }, [mapEvents]);
 
   // Timetables of the period's events: festivals over several genres get a live fleet, one ship per genre
   const [timetables, setTimetables] = useState<Timetable[]>([]);
@@ -298,7 +307,7 @@ function MapOfPsy() {
   };
   const fleetEvents = harbour
     ? (events ?? []).filter((e) => e.lineUpRead && !e.genres.length)
-    : fleet ? (events ?? []).filter((e) => fleet.includes(e.id)) : [];
+    : fleet ? (mapEvents ?? []).filter((e) => fleet.includes(e.id)) : [];
   const openCompare = (a: string, b?: string) => {
     const other = b ?? data.links.find(([x, y]) => x === a || y === a)?.find((id) => id !== a) ?? 'goa';
     setYear(MAX_YEAR);
@@ -353,7 +362,7 @@ function MapOfPsy() {
       <Galaxy selectedId={selectedId} artist={artist} year={year} onSelect={select} onSelectArtist={reveal}
         tourPath={tourPath} focus={focus} showStations={showStations} onSelectFestival={openFestival}
         showLabels={showLabels} onSelectLabel={openLabel}
-        events={events} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour}
+        events={mapEvents} selectedFleet={fleet} onSelectFleet={openFleet} onSelectHarbour={openHarbour}
         onBackground={() => { if (window.matchMedia('(max-width: 700px)').matches) closeAllRef.current(); }}
         crew={currentBoarded?.crew ?? null} onSelectCrew={selectCrew}
         onView={setView} cameraRef={cameraRef} reducedMotion={reducedMotion}
@@ -439,7 +448,7 @@ function MapOfPsy() {
         onCompare={openCompare} onClose={() => select(null)} />
       )}
 
-      <Cockpit period={period} events={events} view={view}
+      <Cockpit period={period} events={events} view={view} festivalCount={period ? festivalShips.length : 0}
         onPeriod={(p) => { setPeriod(p); setFleet(null); setHarbour(false); }}
         onLook={(x, y) => cameraRef.current?.(x, y)} onBoard={(id) => openFleet([id])} onHarbour={openHarbour}
         picked={fleet} />

@@ -114,7 +114,12 @@ a { color: inherit; }
 .embed__foot { margin-top: auto; }
 
 /* A stage of the event form's timetable: a card inside the "Sound" panel */
-.stage-card { padding: 12px; border: 1px dashed var(--line); border-left: 2px solid var(--accent); }
+.stage-card { padding: 12px; border: 1px dashed var(--line); border-left: 2px solid var(--accent); min-width: 0; }
+/* Phones: a set's artist and its genre go on two lines, so the timetable editor's card stays inside its panel */
+@media (max-width: 640px) {
+  .stage-set__artist { flex-wrap: wrap; }
+  .stage-set__artist select { flex: 1 1 100%; }
+}
 /* A set: day, start – end on one line, the artist after (on the next line when the form is narrow) */
 .stage-set { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
 .stage-set .field { width: auto; padding: 8px 10px; }

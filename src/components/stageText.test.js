@@ -1,25 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import { eventDays, lineUpOf, stagesOf } from './stageText.js'
+import { eventDays, lineUpOf, stageParts, stageWithGenres, stagesOf } from './stageText.js'
 
 // Friday 13 to Sunday 15 November 2026
 const DAYS = eventDays('2026-11-13T20:00', '2026-11-15T12:00')
 
 const STAGES = [
     {
-        name: 'Main Stage', genreId: 'night', sets: [
+        name: 'Main Stage', genreIds: ['night', 'forest'], sets: [
             { day: 'Fri', start: '23:00', end: '01:00', artist: 'Ajja', live: false },
             { day: 'Sat', start: '01:00', end: '02:30', artist: 'Some Local Hero', live: true },
         ],
     },
     {
-        name: 'Chai Shop', genreId: 'psybient', sets: [
+        name: 'Chai Shop', genreIds: ['psybient'], sets: [
             { day: '', start: '', end: '', artist: 'Kaya Project', live: false },
         ],
     },
 ]
 
 // The same format the backend's TimetableParserTest reads (theStageCardsOfOurEventFormAreReadAsWritten)
-const TEXT = `Main Stage (Night full-on):
+const TEXT = `Main Stage (Night full-on, Forest):
 Fri 23:00-01:00 Ajja
 Sat 01:00-02:30 Some Local Hero (live)
 
@@ -47,7 +47,7 @@ describe('lineUpOf', () => {
     })
 
     it('writes no header for one stage without a name or genre, and leaves out empty sets', () => {
-        const one = [{ name: '', genreId: '', sets: [
+        const one = [{ name: '', genreIds: [], sets: [
             { day: '', start: '22:00', end: '', artist: 'Ajja', live: false },
             { day: '', start: '', end: '', artist: '  ', live: false },
         ] }]
@@ -56,7 +56,7 @@ describe('lineUpOf', () => {
     })
 
     it('keeps colons and brackets out of names, which would read as headers', () => {
-        const odd = [{ name: 'Main: Floor', genreId: '', sets: [{ day: '', start: '', end: '', artist: 'DJ (x): y', live: false }] }]
+        const odd = [{ name: 'Main: Floor', genreIds: [], sets: [{ day: '', start: '', end: '', artist: 'DJ (x): y', live: false }] }]
         expect(lineUpOf(odd, DAYS)).toBe('Main Floor:\nDJ x y')
     })
 })
@@ -67,11 +67,11 @@ describe('stagesOf', () => {
     })
 
     it('keeps brackets that are no map genre in the stage name', () => {
-        expect(stagesOf('Garden (by night):\nAjja')[0]).toMatchObject({ name: 'Garden (by night)', genreId: '' })
+        expect(stagesOf('Garden (by night):\nAjja')[0]).toMatchObject({ name: 'Garden (by night)', genreIds: [] })
     })
 
     it('reads a plain list of names as one stage', () => {
-        expect(stagesOf('Ajja\nTristan')).toEqual([{ name: '', genreId: '', sets: [
+        expect(stagesOf('Ajja\nTristan')).toEqual([{ name: '', genreIds: [], sets: [
             { day: '', start: '', end: '', artist: 'Ajja', live: false },
             { day: '', start: '', end: '', artist: 'Tristan', live: false },
         ] }])
@@ -81,5 +81,22 @@ describe('stagesOf', () => {
         expect(stagesOf('Ajja\nTickets: 20 € at the door')).toBeNull()
         expect(stagesOf('Info https://example.com')).toBeNull()
         expect(stagesOf('')).toBeNull()
+    })
+})
+
+describe('stageParts', () => {
+    it('splits a stage of our form into its name and its genres', () => {
+        expect(stageParts('Main Stage (Night full-on, Forest)')).toEqual({ name: 'Main Stage', genreIds: ['night', 'forest'] })
+        expect(stageParts('Garden (by night)')).toEqual({ name: 'Garden (by night)', genreIds: [] })
+        expect(stageParts('')).toEqual({ name: '', genreIds: [] })
+    })
+})
+
+describe('stageWithGenres', () => {
+    it('writes a stage with its genres the way stageParts reads it back', () => {
+        expect(stageWithGenres('Main Stage', ['forest', 'goa'])).toBe('Main Stage (Forest, Goa trance)')
+        expect(stageParts(stageWithGenres('Garden (by night)', ['psydub']))).toEqual({ name: 'Garden (by night)', genreIds: ['psydub'] })
+        expect(stageWithGenres('', ['forest'])).toBe('Stage (Forest)')
+        expect(stageWithGenres('Main: Floor', [])).toBe('Main Floor')
     })
 })

@@ -17,6 +17,8 @@ interface Props {
   onHarbour: () => void;
   /** Events of the ship or fleet clicked on the map: they go to the top of the departures */
   picked: number[] | null;
+  /** Upcoming festivals with a genre: on the map whatever the period */
+  festivalCount?: number;
 }
 
 const PERIODS: [EventPeriod | null, string][] = [['WEEK', 'Week'], ['MONTH', 'Month'], [null, 'Off']];
@@ -39,7 +41,7 @@ function departureLabel(dateStart: string | null): string {
 }
 
 /** The ship's console, bottom left: radar, event period, counts and the next departures to board */
-export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHarbour, picked }: Props) {
+export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHarbour, picked, festivalCount = 0 }: Props) {
   // Phones start with the console folded, so it doesn't cover the map
   const [open, setOpen] = useState(() => !window.matchMedia('(max-width: 700px)').matches);
   const { gigsByEvent } = useFollows();
@@ -120,6 +122,7 @@ export function Cockpit({ period, onPeriod, events, view, onLook, onBoard, onHar
               {period && events ? (
                 <p className="cockpit__counts">
                   <b>▲ {shipCount}</b> ships · <b>{fleets.filter((f) => f.events.length > 1).length}</b> fleets<br />
+                  {festivalCount > 0 && <><b>◆ {festivalCount}</b> festivals · on the map all year<br /></>}
                   <button className="cockpit__harbour" onClick={onHarbour}><b>⚓ {inHarbour}</b> in harbour</button>
                 </p>
               ) : (

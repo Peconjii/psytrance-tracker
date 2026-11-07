@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
-    fetchOrganizerEdit, handBackOrganizerTimetable, removeOrganizerOwner, saveOrganizerProfile, setOrganizerOwner,
+    fetchOrganizerEdit, handBackOrganizerTimetable, setOrganizerEventGenres, removeOrganizerOwner, saveOrganizerProfile, setOrganizerOwner,
     setOrganizerTimetable,
 } from '../api/backend.js'
 import TimetableEditor from '../components/TimetableEditor.jsx'
@@ -132,7 +132,8 @@ function OrganizerEdit() {
                                 {open === event.id && (
                                     <TimetableEditor key={event.id} id={event.id}
                                         save={(id, sets) => setOrganizerTimetable(slug, id, sets)}
-                                        handBack={(id) => handBackOrganizerTimetable(slug, id)} />
+                                        handBack={(id) => handBackOrganizerTimetable(slug, id)}
+                                        setGenres={(id, genres) => setOrganizerEventGenres(slug, id, genres)} />
                                 )}
                             </li>
                         ))}
