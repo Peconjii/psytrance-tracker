@@ -3,6 +3,7 @@ import { fetchTimetable } from '../api/backend.js'
 import { AddGenre, GenreChip, GenreOptions } from './AdminParts'
 import ArtistInput from './ArtistInput.jsx'
 import { MAX_STAGE_GENRES, stageParts, stageWithGenres } from './stageText.js'
+import { genreById } from '../map/data/types'
 import { toField } from '../dates.js'
 
 // Venue-clock times: the API sends "2026-10-24T22:00:00", a datetime-local field wants "2026-10-24T22:00"
@@ -195,7 +196,7 @@ function TimetableEditor({ id, save, handBack, setGenres, onSaved = () => {} }) 
                 {setGenres && !dirty && mainGenres.length > 0 && (
                     <button className="btn" onClick={shipByMain} disabled={saving}
                         title="The event's genres (where its ship flies on the map) become the main stage's">
-                        ★ Ship by the main stage
+                        ★ Ship by the main stage ({groups[0].name || 'Stage'}: {mainGenres.map(id => genreById[id]?.name ?? id).join(', ')})
                     </button>
                 )}
                 {shipNote && <span className="mono text-xs" style={{ color: 'var(--accent)' }}>✓ {shipNote}</span>}

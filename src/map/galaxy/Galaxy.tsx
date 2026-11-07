@@ -214,7 +214,7 @@ function dashed(g: Graphics, x0: number, y0: number, x1: number, y1: number, col
     const e = Math.min(d + 8, len);
     g.moveTo(x0 + ux * d, y0 + uy * d).lineTo(x0 + ux * e, y0 + uy * e);
   }
-  g.stroke({ width: 1.6, color, alpha: 0.85 });
+  g.stroke({ width: 2.2, color, alpha: 0.95 });
 }
 
 const TRAIL_LIFE = 0.8;
@@ -779,7 +779,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         // Hovered or opened, a faint festival comes back to full strength and shows the way to its station
         f.node.alpha = on || !f.outside ? 1 : OUTSIDE_ALPHA;
         const station = on && e.festivalId ? festivalById[e.festivalId] : null;
-        if (station) dashed(lines, f.x, f.y, station.x, station.y, f.color);
+        // In the ink color (white on the night sky), so it stands apart from the genre lines in the ship's color
+        if (station) dashed(lines, f.x, f.y, station.x, station.y, INK);
       }
       for (const e of f.events) {
         if (!shown.has(e.id)) continue;

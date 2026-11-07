@@ -92,7 +92,7 @@ function Timetable({ timetable }) {
                     {(user?.admin || user?.editor) && mainGenres.length > 0 && (
                         <button type="button" className="btn btn--ghost" onClick={shipByMain}
                             title="The event's genres (where its ship flies on the map) become the main stage's">
-                            ★ Ship by the main stage
+                            ★ Ship by the main stage ({stages[0].name || 'Stage'}: {mainGenres.map(id => genreById[id]?.name ?? id).join(', ')})
                         </button>
                     )}
                     {shipNote && <span className="mono text-xs" style={{ color: 'var(--accent)' }}>{shipNote}</span>}
