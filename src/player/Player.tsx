@@ -187,11 +187,30 @@ export function Player() {
     d.moved = true;
     setSpot(keepIn(e.clientX - d.dx, e.clientY - d.dy));
   };
+  // The bar ignores taps for a moment after it opens, so a late copy of the bubble's tap can't close or pause it
+  const openedAt = useRef(0);
+  // Set by the end of a press on the bubble: a drag moves it and must not open the bar
+  const lastDragMoved = useRef(false);
+  const [opening, setOpening] = useState(false);
+  const openFromBubble = () => {
+    if (lastDragMoved.current) { lastDragMoved.current = false; return; }
+    openedAt.current = Date.now();
+    setMini(false);
+    // The video is an iframe the page can't stop taps on, so it ignores the pointer for that moment too
+    setOpening(true);
+    setTimeout(() => setOpening(false), 450);
+  };
+  const swallowGhostTap = (e: React.SyntheticEvent) => {
+    if (Date.now() - openedAt.current < 450) { e.preventDefault(); e.stopPropagation(); }
+  };
   const onBubbleUp = () => {
     const d = drag.current;
     drag.current = null;
     if (!d) return;
-    if (!d.moved) { setMini(false); return; }   // a tap opens the bar
+    lastDragMoved.current = d.moved;
+    // A tap opens the bar, but only on the click that ends it (see openFromBubble): opened now, the bar would be
+    // under the finger and the phone would hand it the same tap, on the close button or the video (which pauses)
+    if (!d.moved) return;
     setSpot((p) => {
       if (!p) return p;
       const snapped = keepIn(p.x + SIZE / 2 < window.innerWidth / 2 ? MARGIN : window.innerWidth, p.y);
@@ -214,8 +233,9 @@ export function Player() {
   }, [mini]);
 
   return (
-    <section className={['player', hidden && 'is-hidden', mini && 'is-mini', drag.current?.moved && 'is-dragged'].filter(Boolean).join(' ')}
-      style={bubbleStyle ? { left: bubbleStyle.x, top: bubbleStyle.y, right: 'auto', bottom: 'auto' } : undefined} aria-label="Player" hidden={!track?.youtube}>
+    <section className={['player', hidden && 'is-hidden', mini && 'is-mini', opening && 'is-opening', drag.current?.moved && 'is-dragged'].filter(Boolean).join(' ')}
+      style={bubbleStyle ? { left: bubbleStyle.x, top: bubbleStyle.y, right: 'auto', bottom: 'auto' } : undefined} aria-label="Player" hidden={!track?.youtube}
+      onClickCapture={mini ? undefined : swallowGhostTap} onPointerUpCapture={mini ? undefined : swallowGhostTap}>
       {track?.youtube && (
         <div className="player__head">
           {hidden
@@ -248,6 +268,7 @@ export function Player() {
       {mini && <button type="button" className="player__bubble" aria-label="Open the player (drag to move it)"
         onPointerDown={onBubbleDown} onPointerMove={onBubbleMove} onPointerUp={onBubbleUp}
         onPointerCancel={() => { drag.current = null; }}
+        onClick={openFromBubble}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMini(false); } }}><span aria-hidden="true">♪</span></button>}
     </section>
   );

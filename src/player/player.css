@@ -19,6 +19,7 @@
 .player__head button:disabled { opacity: 0.3; cursor: default; }
 .player__head .heart { width: auto; background: none; padding: 0 4px; }
 .player__frame { position: relative; }
+.player.is-opening .player__mount iframe { pointer-events: none; }
 .player__mount iframe { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; border: 0; }
 /* Quiz: the track keeps playing behind a cover */
 .player__cover { position: absolute; inset: 0; display: grid; place-items: center; background: radial-gradient(circle, #2a1f55, #0b0918); }
