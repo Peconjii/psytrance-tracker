@@ -54,7 +54,8 @@ html.has-player:not(.on-galaxy) body { padding-bottom: 250px; }
   .player__frame { grid-row: 1; grid-column: 1; }
   .player__mount iframe { width: 112px; }
   /* Phones: narrow, in the row of the close button, just left of it */
-  .player__seek { order: 0; flex: 1 1 0; gap: 6px; padding: 0 4px 0 0; font-size: 10px; }
+  /* Never narrower than a thumb can use: on a wide phone it would else squeeze into the buttons' row at no width */
+  .player__seek { order: 0; flex: 1 1 150px; min-width: 150px; gap: 6px; padding: 0 4px 0 0; font-size: 10px; }
   .player__seek input { height: 30px; }
   .player__seek span:last-child { display: none; }
   .player__head { grid-row: 1; grid-column: 2; flex-wrap: wrap; gap: 0 2px; padding: 4px 4px 4px 10px; }
