@@ -383,6 +383,8 @@ export function Panel({
       <button className="hud__close" onClick={onClose} aria-label="Close">×</button>
       <div className="hud__tag">// SYSTEM · {fam.name.toUpperCase()}</div>
       <h2>{g.name}{g.verified && <span className="hud__verified hud__verified--badge" title="Someone checked this text">✓ verified</span>}</h2>
+      {/* Roots aren't psy: said up front, so nobody takes techno or house for a psy genre */}
+      {g.family === 'roots' && <div className="hud__roots">ROOTS · not psytrance, but where it came from</div>}
       <button className="hud__compare" onClick={() => onCompare(g.id)}>⇄ Compare</button>
       <div className="hud__stats">
         <span>DISCOVERED <b>≈{g.year}</b></span>

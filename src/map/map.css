@@ -44,6 +44,7 @@
 }
 .hud--idle p { color: var(--muted); line-height: 1.5; margin: 8px 0 0; }
 .hud__tag { font: 11px var(--mono); letter-spacing: 0.14em; color: var(--fam); padding-right: 28px; }
+.hud__roots { display: inline-block; margin: 2px 0 6px; padding: 3px 8px; border: 1px solid var(--fam); font: 10px var(--mono); letter-spacing: 0.12em; color: var(--fam); }
 .hud h2 { font-family: var(--display); font-weight: 500; font-size: 24px; margin: 8px 0 12px; text-wrap: balance; }
 .hud p { line-height: 1.6; color: var(--soft, #cfcaf2); }
 .hud__stats { display: flex; gap: 16px; flex-wrap: wrap; font: 11px var(--mono); color: var(--muted); letter-spacing: 0.08em; }
