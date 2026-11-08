@@ -127,22 +127,22 @@
     "stops": [
       {
         "genre": "night",
-        "track": "Make Some Noise",
+        "track": "The God Molecule",
         "text": "The sun has set and full-on gets heavier. This is where most people first cross from the main stage into the darker sounds."
       },
       {
         "genre": "twilight",
-        "track": "Idiot",
+        "track": "Search For The Divine",
         "text": "Twilight sits between full-on and dark: a dark mood, but still with groove and even melodies. Swedish acts like Hux Flux shaped it."
       },
       {
         "genre": "dark",
-        "track": "P.O. Saga",
+        "track": "Achtung Kinder",
         "text": "Darkpsy proper: distortion, horror samples, abstract structures. The Russian scene, with Psykovsky and Kindzadza, is its heartland."
       },
       {
         "genre": "forest",
-        "track": "Clairvoyage",
+        "track": "Hippietalamus",
         "text": "Dark, but organic: forest psy fills the mix with rustling, insects and mystical atmospheres. Where exactly dark ends and forest begins is a favourite scene debate."
       },
       {
@@ -152,7 +152,7 @@
       },
       {
         "genre": "psycore",
-        "track": "Macabra Queen",
+        "track": "Expansion Forzada",
         "text": "The far edge of the spectrum: psycore adds industrial and noise influences at extreme tempos. This is as heavy as the map gets."
       }
     ]
