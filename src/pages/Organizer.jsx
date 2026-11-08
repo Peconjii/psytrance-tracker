@@ -70,7 +70,7 @@ function Organizer() {
                     </div>
                 </div>
                 <div className="flex flex-wrap gap-2 shrink-0">
-                    <ShareButton path={`/organizers/${encodeURIComponent(organizer.slug)}`} title={name} text={`${name}: next parties on Map of Psy 🛸`} />
+                    <ShareButton path={`/organizers/${encodeURIComponent(slug)}`} title={name} text={`${name}: next parties on Map of Psy 🛸`} />
                     {canEdit && (
                         <Link className="btn btn--ghost" to={`/organizers/${encodeURIComponent(organizer.slug)}/edit`}>✎ Edit page</Link>
                     )}
