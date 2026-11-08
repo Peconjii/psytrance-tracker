@@ -141,6 +141,8 @@ export interface Festival {
   name: string;
   /** Former names (the festival was renamed), so pages that still write them match it */
   aliases?: string[];
+  /** What to type into YouTube to find its sets, when the name alone finds another festival */
+  youtube?: string;
   country: string;
   /** First edition, only where it is well documented */
   since?: number;

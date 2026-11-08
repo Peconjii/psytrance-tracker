@@ -192,7 +192,7 @@ export function Panel({
           </>
         )}
         <div className="hud__footer">
-          <a className="hud__ext" href={youtube(`${f.name} full set`)} target="_blank" rel="noopener noreferrer">Sets on YouTube ↗</a>
+          <a className="hud__ext" href={youtube(`${f.youtube ?? f.name} full set`)} target="_blank" rel="noopener noreferrer">Sets on YouTube ↗</a>
           <FixLink about="FESTIVAL" name={f.name} />
           <ShareButton />
           <Link className="hud__ext" to={`/festivals/${encodeURIComponent(f.id)}`}>Festival page →</Link>
