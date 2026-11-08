@@ -266,6 +266,8 @@ function GenreEditor({ genreId, dirtyRef }) {
                             {state.saving ? 'Saving…' : 'Save'}
                         </button>
                         {dirty && <span className="mono text-xs muted">Not saved yet</span>}
+                        {/* The reason a save failed, next to the button: the notice at the top is off screen down here */}
+                        {state.error && <span className="mono text-xs" role="alert" style={{ color: 'var(--danger, #ff6b6b)' }}>{state.error}</span>}
                         {state.saved && !dirty && <span className="mono text-xs" style={{ color: 'var(--accent)' }}>Saved. It is on the galaxy now.</span>}
                     </div>
                 </form>
