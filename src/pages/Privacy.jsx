@@ -17,6 +17,11 @@ function Privacy() {
             </header>
 
             <div className="grid gap-4">
+                <Part title="Who is responsible">
+                    <p>Map of Psy is run by <strong>Petar Vlku</strong>, a private person in Serbia. He decides what the site
+                        keeps and is the one to write to about your data: <a className="link" href="mailto:hello@mapofpsy.com">hello@mapofpsy.com</a>.</p>
+                </Part>
+
                 <Part title="Without an account">
                     <p>You can use the map, the events and every page without an account. The site sets no cookies and
                         shows no ads. Your login, when you have one, is kept in your browser&apos;s storage, not in a cookie.</p>
@@ -43,6 +48,24 @@ function Privacy() {
                         We never send your email to anyone else.</p>
                 </Part>
 
+                <Part title="Why we may use it">
+                    <ul>
+                        <li>Your account and what you do with it: because you asked for it, the site can&apos;t give you an
+                            account, follows or reminders without it.</li>
+                        <li>Reminders, new gigs and the Monday email: because you chose them; you can turn them off any time on
+                            your profile.</li>
+                        <li>Counting visits and keeping the site safe (login limits, stopping spam): because the site has a
+                            fair interest in working and staying safe, done without cookies and without following you.</li>
+                    </ul>
+                </Part>
+
+                <Part title="How long we keep it">
+                    <ul>
+                        <li>Your account and everything that is yours: until you delete the account, then right away.</li>
+                        <li>Feedback messages: as long as they help improve the site; write to us and we delete yours.</li>
+                    </ul>
+                </Part>
+
                 <Part title="Feedback">
                     <p>A message through the <Link className="link" to="/feedback">feedback form</Link> keeps what you wrote, and
                         your email if you give one, so an admin can answer. It stays when you delete your account, without it.</p>
@@ -61,6 +84,9 @@ function Privacy() {
                         <li><strong>Vercel Web Analytics</strong> counts visits, without cookies (see above).</li>
                         <li>Videos play from YouTube in its no-cookie mode: YouTube only sets cookies once you play one.</li>
                     </ul>
+                    <p>Some of these companies are in the United States, so your data may be kept or handled there. They
+                        promise to protect it to EU standards (the EU&apos;s standard contract clauses or the EU-US Data
+                        Privacy Framework).</p>
                 </Part>
 
                 <Part title="Seeing and deleting your data">
@@ -68,7 +94,17 @@ function Privacy() {
                         At its bottom, &ldquo;Delete my account&rdquo; deletes the account and everything that is yours, for good,
                         right away. For anything else, write to us through the <Link className="link" to="/feedback">feedback form</Link> or
                         to <a className="link" href="mailto:hello@mapofpsy.com">hello@mapofpsy.com</a>.</p>
+                    <p>You can always ask to see what we keep about you, to correct it, to get a copy of it, or to stop us using
+                        it; we answer within a month. If you think we handle your data wrongly, you can complain to the data
+                        protection authority where you live (in Serbia: the Commissioner for Information of Public Importance
+                        and Personal Data Protection).</p>
                 </Part>
+
+                <Part title="Age">
+                    <p>You need to be at least 16 to make an account.</p>
+                </Part>
+
+                <p className="muted text-xs m-0">Last updated: 8 November 2026. Also see the <Link className="link" to="/terms">terms of use</Link>.</p>
             </div>
         </div>
     )
