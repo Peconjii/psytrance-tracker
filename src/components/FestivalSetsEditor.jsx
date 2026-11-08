@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { fetchSetsAt, saveSetsAt } from '../api/backend.js'
 import { reloadDiscographyLater } from '../map/data/discography'
 import { errorOf } from './formErrors.js'
+import YouTubeCheck from './YouTubeCheck.jsx'
+import { cleanYouTubeLink } from '../utils/youtube.js'
+import ArtistInput from './ArtistInput.jsx'
 
 const MAX_SETS = 200
 
@@ -51,14 +54,15 @@ export default function FestivalSetsEditor({ id }) {
             </div>
             {!sets ? <p className="mono text-xs muted m-0">Loading…</p> : sets.map((s, i) => (
                 <div key={i} className="flex flex-wrap gap-2">
-                    <input className="field w-auto flex-1" placeholder="Artist" aria-label="Artist" value={s.artist}
-                        onChange={(e) => change(i, 'artist', e.target.value)} />
+                    <ArtistInput className="field w-auto flex-1" placeholder="Artist" aria-label="Artist" maxLength={100}
+                        value={s.artist} onChange={(value) => change(i, 'artist', value)} />
                     <input className="field w-24" type="number" min="1960" max="2100" placeholder="Year" aria-label="Year" value={s.year}
                         onChange={(e) => change(i, 'year', e.target.value)} />
                     <input className="field w-auto flex-1" type="url" placeholder="https://… (optional)" aria-label="Link" value={s.url}
-                        onChange={(e) => change(i, 'url', e.target.value)} />
+                        onChange={(e) => change(i, 'url', cleanYouTubeLink(e.target.value))} />
                     <button type="button" className="btn btn--ghost" aria-label={`Remove ${s.artist || 'this set'}`}
                         onClick={() => setSets(prev => prev.filter((_, j) => j !== i))}>✕</button>
+                    <div className="w-full"><YouTubeCheck value={s.url} /></div>
                 </div>
             ))}
             {sets && sets.length < MAX_SETS && (

@@ -150,6 +150,12 @@ export async function fetchOurEventsForAdmin(status, signal) {
     return response.data
 }
 
+// The same party here and on Goabase: ours stays, the Goabase one is hidden (its line-up fills ours only if ours has none)
+export async function keepOurEventInsteadOf(id, goabaseId) {
+    const response = await api.post(`/api/admin/our-events/${id}/keep-instead-of/${goabaseId}`)
+    return response.data
+}
+
 export async function approveOurEvent(id) {
     const response = await api.post(`/api/admin/our-events/${id}/approve`)
     return response.data

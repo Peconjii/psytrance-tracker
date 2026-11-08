@@ -11,6 +11,7 @@ import LinkFields from '../components/LinkFields.jsx'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { errorOf } from '../components/formErrors.js'
+import ArtistInput from '../components/ArtistInput.jsx'
 
 const FIELDS = [
     { key: 'logoUrl', label: 'Logo', placeholder: 'https://…', image: 'square' },
@@ -127,8 +128,8 @@ function LabelEdit() {
                     ))}
                 </ul>
                 <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (newArtist.trim()) crewChange('ADD', newArtist.trim()) }}>
-                    <input className="field" aria-label="Artist to add" placeholder="An artist from the line-ups, e.g. Ajja" maxLength={100}
-                        value={newArtist} onChange={(e) => setNewArtist(e.target.value)} />
+                    <ArtistInput aria-label="Artist to add" placeholder="An artist from the line-ups, e.g. Ajja" maxLength={100}
+                        value={newArtist} onChange={setNewArtist} />
                     <button type="submit" className="btn shrink-0" disabled={saving === 'crew'}>+ Add</button>
                 </form>
                 {statusOf('crew')}

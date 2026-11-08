@@ -8,6 +8,8 @@ import AdminTabs from '../components/AdminTabs'
 import AddedGenreForm from '../components/AddedGenreForm'
 import { addedGenres, loadAddedGenres } from '../map/data/addedGenres'
 import usePageMeta from '../hooks/usePageMeta.js'
+import YouTubeCheck from '../components/YouTubeCheck.jsx'
+import { cleanYouTubeLink } from '../utils/youtube.js'
 
 
 // The drop as the form shows it ("3:32") and as it is saved (212 seconds)
@@ -55,8 +57,10 @@ function TrackCard({ track, index, count, onChange, onMove, onRemove }) {
                 </div>
                 <div>
                     <label className="field-label" htmlFor={id('youtube')}>YouTube link or id</label>
-                    <input id={id('youtube')} className="field" value={track.youtube} onChange={set('youtube')}
+                    <input id={id('youtube')} className="field" value={track.youtube}
+                        onChange={(e) => onChange({ ...track, youtube: cleanYouTubeLink(e.target.value) })}
                         placeholder="https://www.youtube.com/watch?v=… (optional)" />
+                    <YouTubeCheck value={track.youtube} />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                     <div>

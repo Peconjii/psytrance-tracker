@@ -14,6 +14,8 @@ import LinkFields from '../components/LinkFields.jsx'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { genreById } from '../map/data/types'
 import { errorOf } from '../components/formErrors.js'
+import YouTubeCheck from '../components/YouTubeCheck.jsx'
+import { cleanYouTubeLink } from '../utils/youtube.js'
 
 const PROFILE_FIELDS = [
     { key: 'photoUrl', label: 'Photo', placeholder: 'https://… (a square picture works best)', image: 'square' },
@@ -186,8 +188,9 @@ function ArtistEdit() {
                         <input className="field w-auto flex-1" placeholder="Title" aria-label="Track title" value={track.title}
                             onChange={(e) => changeRow(setTracks, i, 'title', e.target.value)} />
                         <input className="field w-auto flex-1" type="url" placeholder="https://…" aria-label="Link" value={track.url}
-                            onChange={(e) => changeRow(setTracks, i, 'url', e.target.value)} />
+                            onChange={(e) => changeRow(setTracks, i, 'url', cleanYouTubeLink(e.target.value))} />
                         <button type="button" className="btn btn--ghost" onClick={() => removeRow(setTracks, i)} aria-label={`Remove ${track.title || 'this track'}`}>✕</button>
+                        <div className="w-full"><YouTubeCheck value={track.url} /></div>
                     </div>
                 ))}
                 {tracks.length < MAX_TRACKS && (
@@ -207,8 +210,9 @@ function ArtistEdit() {
                         <input className="field w-24" type="number" min="1965" max="2100" placeholder="Year" aria-label="Year" value={festival.year}
                             onChange={(e) => changeRow(setFestivals, i, 'year', e.target.value)} />
                         <input className="field w-auto flex-1" type="url" placeholder="https://… (optional)" aria-label="Link" value={festival.url}
-                            onChange={(e) => changeRow(setFestivals, i, 'url', e.target.value)} />
+                            onChange={(e) => changeRow(setFestivals, i, 'url', cleanYouTubeLink(e.target.value))} />
                         <button type="button" className="btn btn--ghost" onClick={() => removeRow(setFestivals, i)} aria-label={`Remove ${festival.name || 'this festival'}`}>✕</button>
+                        <div className="w-full"><YouTubeCheck value={festival.url} /></div>
                     </div>
                 ))}
                 {festivals.length < MAX_FESTIVALS && (

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { approveOurEvent, fetchOurEventsForAdmin, rejectOurEvent } from '../api/backend.js'
+import { approveOurEvent, fetchOurEventsForAdmin, keepOurEventInsteadOf, rejectOurEvent } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import { GenreChip } from '../components/AdminParts'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -42,6 +42,23 @@ function AdminOurEvents() {
             setLoaded(l => ({ ...l, events: l.events.filter(e => e.id !== event.id) }))
         } catch (err) {
             setError(err.response?.data?.message || 'Could not save. Try again.')
+        } finally {
+            setBusy(null)
+        }
+    }
+
+    // Ours stays, the Goabase twin is hidden; the event is shown again with its line-up as it is now
+    const keepOurs = async (event, twin) => {
+        const copies = !event.lineUp?.trim()
+        if (!window.confirm(`Hide “${twin.name}” (Goabase) and keep this one?${copies ? ' Its line-up is copied into this event, which has none.' : ''}`)) return
+        setBusy(event.id)
+        setError('')
+        try {
+            const kept = await keepOurEventInsteadOf(event.id, twin.id)
+            setLoaded(l => ({ ...l, events: l.events.map(e => e.id === event.id
+                ? { ...e, lineUp: kept.lineUp, possibleDuplicates: e.possibleDuplicates.filter(d => d.id !== twin.id) } : e) }))
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not hide it. Try again.')
         } finally {
             setBusy(null)
         }
@@ -94,13 +111,15 @@ function AdminOurEvents() {
                                 ))}
                             </div>
                             {event.possibleDuplicates?.length > 0 && (
-                                <div className="notice m-0">
-                                    Maybe already on Goabase:{' '}
-                                    {event.possibleDuplicates.map((d, i) => (
-                                        <span key={d.id}>
-                                            {i > 0 && ', '}
+                                <div className="notice m-0 grid gap-2">
+                                    <span>Maybe already on Goabase:</span>
+                                    {event.possibleDuplicates.map(d => (
+                                        <span key={d.id} className="flex flex-wrap items-center gap-2">
                                             <Link className="link" to={`/events/${d.id}`}>{d.name}</Link>
-                                            <span className="muted"> ({d.dateStart ? DAY.format(new Date(d.dateStart + 'T12:00:00')) : '?'}, {d.town})</span>
+                                            <span className="muted">({d.dateStart ? DAY.format(new Date(d.dateStart + 'T12:00:00')) : '?'}, {d.town})</span>
+                                            <button type="button" className="btn" disabled={busy === event.id} onClick={() => keepOurs(event, d)}>
+                                                Same party: keep this one, hide Goabase&apos;s{!event.lineUp?.trim() ? ' (copy its line-up)' : ''}
+                                            </button>
                                         </span>
                                     ))}
                                 </div>

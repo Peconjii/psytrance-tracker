@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { markAsOrganizer, mergeArtists, searchAdminArtists, setArtistGenres, setArtistHidden } from '../api/backend.js'
+import { fetchGalaxyContent, fetchGenreContent, markAsOrganizer, mergeArtists, saveGenreContent, searchAdminArtists, setArtistGenres, setArtistHidden } from '../api/backend.js'
+import { reloadContentLater } from '../map/data/content'
+import { genreById } from '../map/data/types'
 import { reloadPlacementsLater } from '../map/data/placements'
 import AdminTabs from '../components/AdminTabs'
 import { AddGenre, FeedbackBanner, GenreChip } from '../components/AdminParts'
@@ -11,12 +13,19 @@ import usePageMeta from '../hooks/usePageMeta.js'
 function ArtistRow({ artist, onSaved, onGone }) {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
+    // Key tracks of theirs left at a star they no longer orbit as their main one, offered to move after a save
+    const [strays, setStrays] = useState([])
 
     const save = async (genres) => {
         setSaving(true)
         setError('')
+        setStrays([])
         try {
-            onSaved(await setArtistGenres(artist.name, genres))
+            const saved = await setArtistGenres(artist.name, genres)
+            onSaved(saved)
+            if (saved.genres[0] && (saved.genres[0] !== artist.genres[0] || artist.genres.some(g => !saved.genres.includes(g)))) {
+                findStrays(artist.name, saved.genres).then(setStrays).catch(() => {})
+            }
             // The galaxy loads the new placements the next time it opens
             reloadPlacementsLater()
         } catch (err) {
@@ -56,9 +65,80 @@ function ArtistRow({ artist, onSaved, onGone }) {
                     onAdd={(id) => save([...artist.genres, id])} />
                 {saving && <span className="mono text-xs muted">Saving…</span>}
             </div>
+            {strays.length > 0 && <MoveTracks artist={artist.name} strays={strays} onDone={() => setStrays([])} />}
             {!artist.onMap && <CleanupTools artist={artist} onGone={onGone} />}
             {error && <p className="notice m-0">{error}</p>}
         </li>
+    )
+}
+
+// Is the artist one of the names on this key track ("A & B", "A vs B", "A feat. B" count for both)?
+const onTrack = (name, track) => [track.artist, ...track.artist.split(/ & |, | x | vs\.? | ft\.? | feat\.? /i)]
+    .some(part => part.trim().toLowerCase() === name.trim().toLowerCase())
+
+// After the artist's genres changed: their key tracks that sit at a star they don't orbit any more, or at their old
+// main star while the new one has none of theirs. Each is offered to move to the new main star.
+async function findStrays(name, genres) {
+    const content = await fetchGalaxyContent()
+    const main = genres[0]
+    const atMain = (content[main]?.tracks ?? []).some(t => onTrack(name, t))
+    const strays = []
+    for (const [genreId, c] of Object.entries(content)) {
+        if (genreId === main) continue
+        const theirs = (c.tracks ?? []).filter(t => onTrack(name, t))
+        if (theirs.length === 0) continue
+        if (!genres.includes(genreId) || !atMain) {
+            for (const t of theirs) strays.push({ from: genreId, to: main, track: t })
+        }
+    }
+    return strays
+}
+
+// "Move it": the key track leaves the old star and joins the end of the new star's list (both saved, both in History)
+function MoveTracks({ artist, strays, onDone }) {
+    const [busy, setBusy] = useState(null)
+    const [error, setError] = useState('')
+    const [left, setLeft] = useState(strays)
+    const name = (id) => genreById[id]?.name ?? id
+
+    const move = async (stray) => {
+        setBusy(stray)
+        setError('')
+        try {
+            const [from, to] = await Promise.all([fetchGenreContent(stray.from), fetchGenreContent(stray.to)])
+            const same = (t) => t.title === stray.track.title && t.artist === stray.track.artist
+            const moving = from.tracks.find(same)
+            if (moving && !to.tracks.some(same)) {
+                await saveGenreContent(stray.to, { ...to, tracks: [...to.tracks, moving] })
+            }
+            if (moving) await saveGenreContent(stray.from, { ...from, tracks: from.tracks.filter(t => !same(t)) })
+            reloadContentLater()
+            const rest = left.filter(s => s !== stray)
+            setLeft(rest)
+            if (rest.length === 0) onDone()
+        } catch (err) {
+            setError(err.response?.data?.message || 'Could not move it. Try again.')
+        } finally {
+            setBusy(null)
+        }
+    }
+
+    return (
+        <div className="grid gap-2 text-sm" style={{ borderTop: '1px dashed var(--line)', paddingTop: 8 }}>
+            {left.map(s => (
+                <div key={s.from + s.track.title} className="flex flex-wrap items-center gap-2">
+                    <span className="soft">Key track <b>{s.track.artist} – {s.track.title}</b> is at {name(s.from)}.</span>
+                    <button type="button" className="btn" disabled={busy !== null} onClick={() => move(s)}>
+                        {busy === s ? 'Moving…' : `Move it to ${name(s.to)}`}
+                    </button>
+                </div>
+            ))}
+            <div className="flex items-center gap-3">
+                <button type="button" className="link mono text-xs bg-transparent border-0 p-0 cursor-pointer" onClick={onDone}>Keep them where they are</button>
+                {error && <span className="mono text-xs" style={{ color: 'var(--danger)' }}>{error}</span>}
+            </div>
+            <p className="mono text-xs muted m-0">Artist: {artist}. Both stars&apos; key tracks change; each is in History with undo.</p>
+        </div>
     )
 }
 

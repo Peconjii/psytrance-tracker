@@ -5,6 +5,8 @@ import { sendFeedback } from '../api/backend.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import { isSitePath } from '../components/sitePath.js'
 import { data } from '../map/data/types'
+import YouTubeCheck from '../components/YouTubeCheck.jsx'
+import { cleanYouTubeLink } from '../utils/youtube.js'
 
 const KINDS = [
     { value: 'CORRECTION', label: 'Correct the data', hint: 'A genre, artist, festival or event is wrong or missing' },
@@ -51,10 +53,10 @@ function Feedback() {
     // "+ Suggest a genre" on the galaxy: a genre the map doesn't have yet
     const newGenre = params.get('newgenre') === '1'
     const [genre, setGenre] = useState({ name: '', from: '', year: '', artists: '', link: '' })
-    const setGenreField = (field) => (e) => { setGenre(g => ({ ...g, [field]: e.target.value })); setError('') }
+    const setGenreField = (field) => (e) => { setGenre(g => ({ ...g, [field]: field === 'link' ? cleanYouTubeLink(e.target.value) : e.target.value })); setError('') }
     // A correction of an event: which field is wrong and what is right
     const [fix, setFix] = useState({ field: 'genre', genres: [], value: '' })
-    const setTrackField = (field) => (e) => { setTrack(t => ({ ...t, [field]: e.target.value })); setError('') }
+    const setTrackField = (field) => (e) => { setTrack(t => ({ ...t, [field]: field === 'link' ? cleanYouTubeLink(e.target.value) : e.target.value })); setError('') }
     const [email, setEmail] = useState(user?.email || '')
     // Never shown to people; bots fill it in (see the backend's FeedbackService)
     const [website, setWebsite] = useState('')
@@ -218,6 +220,7 @@ function Feedback() {
                             <label htmlFor="genre-link" className="field-label">A track that shows it <span className="muted">(link, optional)</span></label>
                             <input id="genre-link" type="url" inputMode="url" className="field" value={genre.link}
                                 onChange={setGenreField('link')} placeholder="https://www.youtube.com/watch?v=…" />
+                            <YouTubeCheck value={genre.link} />
                         </div>
                     </fieldset>
                 )}
@@ -289,6 +292,7 @@ function Feedback() {
                                 <label htmlFor="track-link" className="field-label">Link <span className="muted">(YouTube, Bandcamp...)</span></label>
                                 <input id="track-link" type="url" inputMode="url" className="field" value={track.link}
                                     onChange={setTrackField('link')} placeholder="https://www.youtube.com/watch?v=…" />
+                                <YouTubeCheck value={track.link} />
                             </div>
                             <div>
                                 <label htmlFor="track-year" className="field-label">Year</label>
