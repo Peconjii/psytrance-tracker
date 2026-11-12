@@ -5,7 +5,7 @@ import {
 } from '../api/backend.js'
 import usePageMeta from '../hooks/usePageMeta.js'
 import AdminTabs from '../components/AdminTabs'
-import { data } from '../map/data/types'
+import { data, genresOfArtist, sources } from '../map/data/types'
 
 // A getter: genres admins added to the galaxy join after the site loads
 const GENRE_NAMES = new Proxy({}, { get: (_, id) => data.genres.find(g => g.id === id)?.name })
@@ -27,6 +27,7 @@ function AdminUpkeep() {
             <div className="grid gap-6">
                 <DeadTracks />
                 <DuplicateArtists />
+                <GenresToCheck />
             </div>
         </div>
     )
@@ -156,6 +157,57 @@ function DuplicateArtists() {
                         ))}
                     </ul>
                 )}
+        </section>
+    )
+}
+
+// Artists whose place on the map the public tags (MusicBrainz, Last.fm in map/data/sources.json) don't back,
+// or point somewhere else: a list to go through one by one. Built in the browser, the tags ship with the site.
+function GenresToCheck() {
+    const rows = Object.entries(sources).flatMap(([artist, src]) => {
+        const placed = genresOfArtist(artist)
+        if (placed.length === 0) return []
+        const unconfirmed = placed.filter(g => src.check[g.id] === 'unconfirmed').map(g => g.id)
+        const suggest = src.suggest.filter(id => GENRE_NAMES[id] && !placed.some(g => g.id === id))
+        return unconfirmed.length || suggest.length ? [{ artist, src, placed, unconfirmed, suggest }] : []
+    }).sort((a, b) => b.unconfirmed.length - a.unconfirmed.length || a.artist.localeCompare(b.artist))
+
+    return (
+        <section className="panel">
+            <h2 className="panel__label">Genres to check · {rows.length}</h2>
+            <p className="mono text-xs muted mt-0">
+                Artists whose genre on the map the public tags (MusicBrainz, Last.fm) don&apos;t confirm, or whose tags point to
+                another genre too. Tags can be wrong: open the sources, then fix it in Artist genres or leave it.
+            </p>
+            {rows.length === 0 ? <p className="soft m-0">✓ The tags back every placement.</p> : (
+                <ul className="rows">
+                    {rows.map(({ artist, src, placed, unconfirmed, suggest }) => (
+                        <li key={artist} className="rows__item">
+                            <span className="rows__name">
+                                <b>{artist}</b>{' '}
+                                <span className="muted">· on {placed.map(g => g.name).join(', ')}</span>
+                                {unconfirmed.length > 0 && (
+                                    <span className="mono text-xs" style={{ color: 'var(--danger)' }}>
+                                        {' '}· not confirmed: {unconfirmed.map(id => GENRE_NAMES[id]).join(', ')}
+                                    </span>
+                                )}
+                                {suggest.length > 0 && (
+                                    <span className="mono text-xs" style={{ color: 'var(--gold)' }}>
+                                        {' '}· tags point to: {suggest.map(id => GENRE_NAMES[id]).join(', ')}
+                                    </span>
+                                )}
+                                {src.tags.length > 0 && <span className="block mono text-xs muted">tags: {src.tags.slice(0, 8).join(' · ')}</span>}
+                            </span>
+                            <span className="flex flex-wrap items-center gap-3 mono text-xs">
+                                {src.musicbrainz && <a className="link" href={`https://musicbrainz.org/artist/${src.musicbrainz}`} target="_blank" rel="noopener noreferrer">MusicBrainz ↗</a>}
+                                {src.discogs && <a className="link" href={`https://www.discogs.com/artist/${src.discogs}`} target="_blank" rel="noopener noreferrer">Discogs ↗</a>}
+                                {src.lastfm && <a className="link" href={src.lastfm} target="_blank" rel="noopener noreferrer">Last.fm ↗</a>}
+                                <Link className="link" to={`/admin/genres?artist=${encodeURIComponent(artist)}`}>Fix →</Link>
+                            </span>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </section>
     )
 }

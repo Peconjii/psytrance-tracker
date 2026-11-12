@@ -198,6 +198,11 @@ function AcceptSuggestion({ item, onAccepted }) {
             <span className="soft">{what}</span>
             {done ? (
                 <span className="mono text-xs" style={{ color: 'var(--accent)' }}>✓ Added</span>
+            ) : track && accept.addedTo ? (
+                // Already among the key tracks (added from here earlier, or by hand in Admin -> Galaxy)
+                <span className="mono text-xs" style={{ color: 'var(--accent)' }}>
+                    ✓ Already a key track of {GENRE_NAMES[accept.addedTo] ?? accept.addedTo}
+                </span>
             ) : accept.genres.length === 0 ? (
                 <span className="mono text-xs muted">
                     {track ? `${accept.artist} isn't on the map yet: put them on a star first (Fix in the panel), then add the track.`

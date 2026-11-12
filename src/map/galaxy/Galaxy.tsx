@@ -547,6 +547,8 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       let time = 0;
       // Festival and label names hidden because another one already stands there, at the zoom they were worked out for
       const crowded = new Set<Text>();
+      // Where each name sits under its icon (it moves above the icon when there is no room under it)
+      const nameBelow = new WeakMap<Text, number>();
       let crowdedAt = -1;
       let crowdedWidth = -1;
       app.ticker.add((tk) => {
@@ -562,7 +564,10 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         // zoom. Worked out again when the zoom changes or a name gets its real width once the font has loaded
         // (moving the map doesn't change what overlaps). Every name and icon keeps a margin around it
         // Only what is on the map counts: labels switched off or not yet founded in the chosen year leave room
-        const texts = [...stationTexts, ...(labelLayer.visible ? labelTexts : [])].filter((t) => t.parent!.visible);
+        // Names hidden at this zoom don't take room either (festival names before their zoom used to hide label names)
+        const showLabelNames = vp.scale.x >= 0.75 && vp.scale.x < SAT_ZOOM;
+        const texts = [...(showStationNames ? stationTexts : []), ...(labelLayer.visible && showLabelNames ? labelTexts : [])]
+          .filter((t) => t.parent!.visible);
         const namesKey = texts.reduce((w, t) => w + t.width, 0) + texts.length * 1e6;
         if (vp.scale.x !== crowdedAt || namesKey !== crowdedWidth) {
           crowdedAt = vp.scale.x;
@@ -580,15 +585,24 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
           const kept: Box[] = [];
           for (const t of texts) {
             const at = t.parent!.position;
-            const box = { x0: at.x - t.width / 2, y0: at.y + t.y, x1: at.x + t.width / 2, y1: at.y + t.y + t.height };
+            // A name sits under its icon; with no room there it tries above the icon before it waits for a closer zoom
+            const below = nameBelow.get(t) ?? t.y;
+            nameBelow.set(t, below);
             const ownIcon = icons[texts.indexOf(t)];
-            if (kept.some((k) => hits(box, k)) || icons.some((i) => i !== ownIcon && hits(box, i))) crowded.add(t);
-            else kept.push(box);
+            const free = (y: number) => {
+              const box = { x0: at.x - t.width / 2, y0: at.y + y, x1: at.x + t.width / 2, y1: at.y + y + t.height };
+              return kept.some((k) => hits(box, k)) || icons.some((i) => i !== ownIcon && hits(box, i)) ? null : box;
+            };
+            const above = -below - t.height;
+            const boxBelow = free(below);
+            const box = boxBelow ?? free(above);
+            t.y = boxBelow ? below : above;
+            if (box) kept.push(box);
+            else { t.y = below; crowded.add(t); }
           }
         }
         for (const t of stationTexts) t.visible = showStationNames && !crowded.has(t);
         // Label names appear at mid zoom: hidden in the overview (too crowded) and up close, where artist satellites need the room
-        const showLabelNames = vp.scale.x >= 0.75 && vp.scale.x < SAT_ZOOM;
         for (const t of labelTexts) t.visible = showLabelNames && !crowded.has(t);
         const zoomed = vp.scale.x >= SAT_ZOOM;
         // Keep star names readable when zoomed far out
