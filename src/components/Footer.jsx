@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 const AUTHOR_NAME = 'Petar Vlku'
 const GITHUB_PROFILE = 'https://github.com/Peconjii'
 const LINKEDIN_PROFILE = 'https://www.linkedin.com/in/petar-vlku-a6445b294/'
+// The site's own Instagram (not Petar's): tours, quizzes and news from the map
+const INSTAGRAM = 'https://www.instagram.com/mapofpsy/'
 
 const repos = [
     { label: 'Frontend', href: 'https://github.com/Peconjii/psytrance-tracker' },
@@ -34,6 +36,7 @@ function Footer() {
                     </p>
                     <p className="m-0">
                         <Link to="/about">About</Link> · <Link to="/about#support">♡ Support</Link> · <Link to="/feedback">✎ Feedback</Link> · <a href="mailto:hello@mapofpsy.com">hello@mapofpsy.com</a> ·{' '}
+                        <ExternalLink href={INSTAGRAM}>Instagram ↗</ExternalLink> ·{' '}
                         <Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link> ·{' '}
                         <ExternalLink href={GITHUB_PROFILE}>GitHub ↗</ExternalLink>
                         {LINKEDIN_PROFILE && <> · <ExternalLink href={LINKEDIN_PROFILE}>LinkedIn ↗</ExternalLink></>}

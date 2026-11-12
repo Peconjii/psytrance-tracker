@@ -4,6 +4,7 @@ import usePageMeta from '../hooks/usePageMeta.js'
 
 const GITHUB_PROFILE = 'https://github.com/Peconjii'
 const LINKEDIN_PROFILE = 'https://www.linkedin.com/in/petar-vlku-a6445b294/'
+const INSTAGRAM = 'https://www.instagram.com/mapofpsy/'
 
 // Crypto addresses for donations: { coin, network, address }. The support box shows them once there are any.
 const CRYPTO = [
@@ -85,6 +86,7 @@ function About() {
             </section>
 
             <p className="about__links mono text-xs">
+                <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram ↗</a> ·{' '}
                 <a href={GITHUB_PROFILE} target="_blank" rel="noopener noreferrer">GitHub ↗</a> ·{' '}
                 <a href={LINKEDIN_PROFILE} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
             </p>
