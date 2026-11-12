@@ -99,7 +99,14 @@ function Events() {
                     <h1 className="page-title">{timeline === 'PAST' ? 'Past events' : 'Upcoming events'}</h1>
                     <p className="page-head__sub">{timeline === 'PAST' ? 'The archive: what the site read since October 2026, newest first.' : 'Psytrance festivals and parties worldwide, soonest first.'}</p>
                 </div>
-                <Link className="btn shrink-0" to="/events/new">+ Add an event</Link>
+                <div className="flex flex-wrap gap-2 shrink-0">
+                    <Link className="btn" to="/events/new">+ Add an event</Link>
+                    {/* For people who know of an event but don't organise it: it reaches the admins as feedback */}
+                    <Link className="btn btn--ghost" title="Know of an event that isn't here? Tell us"
+                        to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', missing: '1', from: '/events' })}`}>
+                        Report a missing event
+                    </Link>
+                </div>
             </header>
 
             <JoinStrip inline />

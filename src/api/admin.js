@@ -346,3 +346,10 @@ export async function updateMapGenre(id, form) {
 export async function removeMapGenre(id) {
     await api.delete(`/api/admin/map/genres/${encodeURIComponent(id)}`)
 }
+
+// Admins only: the events whose ticket button was clicked most in the last `days` days
+// [{ eventId, eventName, clicks, today }]
+export async function fetchTicketClicks(days = 30, signal) {
+    const response = await api.get('/api/admin/ticket-clicks', { params: { days }, signal })
+    return response.data
+}

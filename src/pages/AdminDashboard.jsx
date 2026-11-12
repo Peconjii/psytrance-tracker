@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchAdminDashboard } from '../api/backend.js'
+import { fetchAdminDashboard, fetchTicketClicks } from '../api/backend.js'
 import AdminTabs from '../components/AdminTabs'
 import { useAuth } from '../context/AuthContext'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -14,6 +14,8 @@ function AdminDashboard() {
     const { user } = useAuth()
     const [data, setData] = useState(null)
     const [error, setError] = useState('')
+    // Ticket button clicks of the last 30 days: admins only, never shown to organizers
+    const [clicks, setClicks] = useState(null)
 
     useEffect(() => {
         const controller = new AbortController()
@@ -25,6 +27,13 @@ function AdminDashboard() {
 
     // An editor sees only what they can work on (no messages, requests or accounts)
     const admin = Boolean(user?.admin)
+
+    useEffect(() => {
+        if (!admin) return undefined
+        const controller = new AbortController()
+        fetchTicketClicks(30, controller.signal).then(setClicks).catch(() => { if (!controller.signal.aborted) setClicks([]) })
+        return () => controller.abort()
+    }, [admin])
     const waiting = data && [
         admin && { count: data.waiting.feedback, label: 'New messages', to: '/admin/feedback' },
         { count: data.waiting.events, label: 'Events to approve', to: '/admin/our-events' },
@@ -82,6 +91,27 @@ function AdminDashboard() {
                             <p className="mono text-xs muted mt-2 mb-0">No errors since the last restart.</p>
                         )}
                     </section>
+
+                    {admin && (
+                        <section className="panel">
+                            <h2 className="panel__label">Ticket clicks · last 30 days</h2>
+                            <p className="muted text-xs mt-0">Clicks on an event&apos;s Tickets ↗ / Goabase ↗ button. Only you see this.</p>
+                            {!clicks ? (
+                                <p className="mono text-xs muted m-0">Loading…</p>
+                            ) : clicks.length === 0 ? (
+                                <p className="muted text-sm m-0">No clicks yet.</p>
+                            ) : (
+                                <ul className="rows">
+                                    {clicks.map(c => (
+                                        <li key={c.eventId} className="rows__item">
+                                            <Link className="rows__name link" to={`/events/${c.eventId}`}>{c.eventName || `Event #${c.eventId}`}</Link>
+                                            <span className="rows__meta">{c.clicks} {c.clicks === 1 ? 'click' : 'clicks'}{c.today > 0 ? ` · ${c.today} today` : ''}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </section>
+                    )}
 
                     <section className="panel">
                         <h2 className="panel__label">Most followed artists</h2>

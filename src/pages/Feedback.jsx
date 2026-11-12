@@ -25,6 +25,8 @@ const EVENT_FIELDS = [
     { value: 'date', label: 'Date' },
     { value: 'place', label: 'Place' },
     { value: 'name', label: 'Name' },
+    // Nothing to fill in: the message says it all
+    { value: 'cancelled', label: 'Cancelled' },
     { value: 'other', label: 'Something else' },
 ]
 
@@ -53,6 +55,10 @@ function Feedback() {
     // "+ Suggest a genre" on the galaxy: a genre the map doesn't have yet
     const newGenre = params.get('newgenre') === '1'
     const [genre, setGenre] = useState({ name: '', from: '', year: '', artists: '', link: '' })
+    // "Report a missing event" on the events list: an event the site doesn't have yet
+    const missingEvent = params.get('missing') === '1'
+    const [missing, setMissing] = useState({ name: '', date: '', place: '', link: '' })
+    const setMissingField = (field) => (e) => { setMissing(m => ({ ...m, [field]: e.target.value })); setError('') }
     const setGenreField = (field) => (e) => { setGenre(g => ({ ...g, [field]: field === 'link' ? cleanYouTubeLink(e.target.value) : e.target.value })); setError('') }
     // A correction of an event: which field is wrong and what is right
     const [fix, setFix] = useState({ field: 'genre', genres: [], value: '' })
@@ -69,6 +75,12 @@ function Feedback() {
         // "✕ Not about this" turns it back into plain feedback
         const suggestion = about ? offered : null
         const eventFix = about?.type === 'EVENT' && kind === 'CORRECTION'
+        if (missingEvent && !about && missing.name.trim().length < 2) {
+            return setError('Write the name of the event.')
+        }
+        if (missingEvent && !about && missing.link.trim() && !/^https?:\/\/\S+$/.test(missing.link.trim())) {
+            return setError('The link should start with https:// (Facebook, Instagram, Goabase, tickets...).')
+        }
         if (newGenre && !about && genre.name.trim().length < 2) {
             return setError('Write the name of the genre.')
         }
@@ -82,11 +94,19 @@ function Feedback() {
             return setError('The link should start with https:// (YouTube, Bandcamp, SoundCloud...).')
         }
         // Only what the chosen field shows counts: genres picked before switching to "Date" don't
-        const filled = (newGenre && !about) || (eventFix && (fix.field === 'genre' ? fix.genres.length > 0 : Boolean(fix.value.trim())))
+        const filled = (newGenre && !about) || (missingEvent && !about)
+            || (eventFix && (fix.field === 'genre' ? fix.genres.length > 0 : fix.field === 'cancelled' || Boolean(fix.value.trim())))
         if (!suggestion && !filled && message.trim().length < 5) {
             return setError('Write a few more words, so we know what to fix.')
         }
-        const text = newGenre && !about
+        const text = missingEvent && !about
+            ? [`Missing event: "${missing.name.trim()}"`,
+                missing.date.trim() && `When: ${missing.date.trim()}`,
+                missing.place.trim() && `Where: ${missing.place.trim()}`,
+                missing.link.trim() && `Link: ${missing.link.trim()}`, message.trim()].filter(Boolean).join('\n')
+            : eventFix && fix.field === 'cancelled'
+            ? ['Event correction · cancelled', message.trim()].filter(Boolean).join('\n')
+            : newGenre && !about
             ? [`Genre suggestion: "${genre.name.trim()}"`,
                 genre.from.trim() && `Grew out of: ${genre.from.trim()}`,
                 genre.year.trim() && `Since: ${genre.year.trim()}`,
@@ -225,6 +245,32 @@ function Feedback() {
                     </fieldset>
                 )}
 
+                {missingEvent && !about && (
+                    <fieldset className="grid gap-3 m-0 p-0 border-0">
+                        <legend className="field-label">An event the site is missing</legend>
+                        <div>
+                            <label htmlFor="missing-name" className="field-label">Name</label>
+                            <input id="missing-name" className="field" value={missing.name} onChange={setMissingField('name')}
+                                placeholder="e.g. Forest Gathering 2027" />
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label htmlFor="missing-date" className="field-label">When <span className="muted">(optional)</span></label>
+                                <input id="missing-date" className="field" value={missing.date} onChange={setMissingField('date')} placeholder="e.g. 12–14 June 2027" />
+                            </div>
+                            <div>
+                                <label htmlFor="missing-place" className="field-label">Where <span className="muted">(optional)</span></label>
+                                <input id="missing-place" className="field" value={missing.place} onChange={setMissingField('place')} placeholder="e.g. Lisbon, Portugal" />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="missing-link" className="field-label">Link <span className="muted">(event page, Instagram, tickets...)</span></label>
+                            <input id="missing-link" type="url" inputMode="url" className="field" value={missing.link}
+                                onChange={setMissingField('link')} placeholder="https://…" />
+                        </div>
+                    </fieldset>
+                )}
+
                 {about?.type === 'EVENT' && kind === 'CORRECTION' && (
                     <fieldset className="grid gap-3 m-0 p-0 border-0">
                         <legend className="field-label">What is wrong?</legend>
@@ -252,7 +298,7 @@ function Feedback() {
                                     </div>
                                 )}
                             </div>
-                        ) : fix.field !== 'other' && (
+                        ) : fix.field !== 'other' && fix.field !== 'cancelled' && (
                             <div>
                                 <label htmlFor="fix-value" className="field-label">What is right</label>
                                 <input id="fix-value" className="field" value={fix.value}
@@ -312,7 +358,7 @@ function Feedback() {
                         maxLength={MAX_MESSAGE}
                         value={message}
                         onChange={(e) => { setMessage(e.target.value); setError('') }}
-                        placeholder={(offered && about) || (newGenre && !about) || (about?.type === 'EVENT' && kind === 'CORRECTION')
+                        placeholder={(offered && about) || (newGenre && !about) || (missingEvent && !about) || (about?.type === 'EVENT' && kind === 'CORRECTION')
                             ? 'Optional: why it belongs here, which genre it fits...'
                             : kind === 'CORRECTION'
                             ? 'e.g. Fungus Funk plays night full-on, not forest. Source: their Sangoma releases.'

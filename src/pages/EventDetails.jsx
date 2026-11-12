@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useParams, useLocation, useNavigate } from 'react-router-dom'
-import { calendarUrl, fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent, setAdminEventGenres } from '../api/backend.js'
+import { calendarUrl, countTicketClick, fetchEventDetails, fetchAftermovie, fetchGoing, fetchTimetable, isOurEvent, setAdminEventGenres } from '../api/backend.js'
 import { fetchWeatherForEvents, forecastFor, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
@@ -344,11 +344,12 @@ function EventDetails() {
                         <ShareButton path={`/events/${id}`} title={event.nameParty}
                             text={`${event.nameParty}${event.nameTown ? ` in ${event.nameTown}` : ''} on Map of Psy 🛸`} />
                         {event.urlPartyHtml && (
-                            <a href={event.urlPartyHtml} target="_blank" rel="noreferrer" className="btn">
+                            <a href={event.urlPartyHtml} target="_blank" rel="noreferrer" className="btn"
+                                onClick={() => countTicketClick(id, event.nameParty)}>
                                 {isOurEvent(id) ? 'Tickets ↗' : 'Goabase ↗'}
                             </a>
                         )}
-                        <Link className="btn btn--ghost" title="Wrong date, place or line-up? Tell us"
+                        <Link className="btn btn--ghost" title="Cancelled, or a wrong date, place or line-up? Tell us"
                             to={`/feedback?${new URLSearchParams({ kind: 'CORRECTION', about: 'EVENT', ref: `${event.nameParty} (#${id})`, from: `/events/${id}` })}`}>
                             ✎ Report a problem
                         </Link>

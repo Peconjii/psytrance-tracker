@@ -188,3 +188,16 @@ export async function fetchFeaturedEvents(signal) {
     const response = await api.get('/api/admin/events/featured', { signal })
     return response.data
 }
+
+// One click on an event's "Tickets ↗" / "Goabase ↗" button, counted for the admin only. Never waits and never fails
+// loudly: the link opens either way, and keepalive lets the count finish while the browser leaves for the ticket site
+export function countTicketClick(id, name) {
+    try {
+        fetch(`${api.defaults.baseURL}/api/events/${encodeURIComponent(id)}/ticket-click`, {
+            method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: (name || '').slice(0, 200) }),
+        }).catch(() => {})
+    } catch {
+        // an old browser without fetch: nothing to count
+    }
+}
