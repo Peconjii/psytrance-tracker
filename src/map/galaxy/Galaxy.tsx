@@ -171,6 +171,8 @@ const sheetLift = (scale: number) => (onPhone() ? (window.innerHeight * 0.22) / 
 const SAT_ZOOM = 1.6;
 /** Festival names appear from this zoom; in the full overview they crowd the centre of the map */
 const STATION_NAME_ZOOM = 0.5;
+/** Room kept free around every festival and label name and icon, so no two of them touch */
+const NAME_GAP = 10;
 const ORBIT_SPEED = 0.05;
 /** Zoom level from which ships are drawn; further out, the stars show how many events they have */
 const SHIP_ZOOM = 0.7;
@@ -546,6 +548,7 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
       // Festival and label names hidden because another one already stands there, at the zoom they were worked out for
       const crowded = new Set<Text>();
       let crowdedAt = -1;
+      let crowdedWidth = -1;
       app.ticker.add((tk) => {
         // With reduced motion the clock stops, so pulses, orbits, rotations and bobbing all hold still
         const still = reducedMotionRef.current;
@@ -556,15 +559,30 @@ export function Galaxy({ selectedId, artist, year, onSelect, onSelectArtist, tou
         for (const t of stationTexts) t.scale.set(stationScale);
         for (const t of labelTexts) t.scale.set(stationScale);
         // Names that would cover each other: festivals first, then labels in their order; the rest wait for a closer
-        // zoom. Worked out only when the zoom changes (moving the map doesn't change what overlaps)
-        if (vp.scale.x !== crowdedAt) {
+        // zoom. Worked out again when the zoom changes or a name gets its real width once the font has loaded
+        // (moving the map doesn't change what overlaps). Every name and icon keeps a margin around it
+        // Only what is on the map counts: labels switched off or not yet founded in the chosen year leave room
+        const texts = [...stationTexts, ...(labelLayer.visible ? labelTexts : [])].filter((t) => t.parent!.visible);
+        const namesKey = texts.reduce((w, t) => w + t.width, 0) + texts.length * 1e6;
+        if (vp.scale.x !== crowdedAt || namesKey !== crowdedWidth) {
           crowdedAt = vp.scale.x;
+          crowdedWidth = namesKey;
           crowded.clear();
-          const kept: { x0: number; y0: number; x1: number; y1: number }[] = [];
-          for (const t of [...stationTexts, ...labelTexts]) {
+          const gap = NAME_GAP * stationScale;
+          type Box = { x0: number; y0: number; x1: number; y1: number };
+          const hits = (a: Box, b: Box) => a.x0 < b.x1 + gap && a.x1 + gap > b.x0 && a.y0 < b.y1 + gap && a.y1 + gap > b.y0;
+          // The icons themselves are never hidden, so a name may not lie on any of them
+          const icons: Box[] = texts.map((t) => {
             const at = t.parent!.position;
-            const box = { x0: at.x - t.width / 2, y0: at.y + t.y * t.scale.y, x1: at.x + t.width / 2, y1: at.y + t.y * t.scale.y + t.height };
-            if (kept.some((k) => box.x0 < k.x1 && box.x1 > k.x0 && box.y0 < k.y1 && box.y1 > k.y0)) crowded.add(t);
+            const r = 12 * stationScale;
+            return { x0: at.x - r, y0: at.y - r, x1: at.x + r, y1: at.y + r };
+          });
+          const kept: Box[] = [];
+          for (const t of texts) {
+            const at = t.parent!.position;
+            const box = { x0: at.x - t.width / 2, y0: at.y + t.y, x1: at.x + t.width / 2, y1: at.y + t.y + t.height };
+            const ownIcon = icons[texts.indexOf(t)];
+            if (kept.some((k) => hits(box, k)) || icons.some((i) => i !== ownIcon && hits(box, i))) crowded.add(t);
             else kept.push(box);
           }
         }
