@@ -406,6 +406,7 @@
       "edm"
     ],
     "check": {
+      "psy": "related",
       "fullon": "related",
       "mainstream": "confirmed"
     },
@@ -456,8 +457,7 @@
     ],
     "check": {
       "fullon": "related",
-      "mainstream": "related",
-      "nitzhonot": "confirmed"
+      "mainstream": "related"
     },
     "suggest": []
   },
@@ -473,8 +473,7 @@
       "trance"
     ],
     "check": {
-      "fullon": "related",
-      "night": "related"
+      "fullon": "related"
     },
     "suggest": []
   },
@@ -623,6 +622,7 @@
     ],
     "check": {
       "morning": "related",
+      "night": "related",
       "twilight": "related"
     },
     "suggest": []
@@ -694,6 +694,7 @@
     "discogs": 583609,
     "tags": [],
     "check": {
+      "morning": "nodata",
       "night": "nodata"
     },
     "suggest": []
@@ -709,7 +710,7 @@
       "full-on"
     ],
     "check": {
-      "night": "related"
+      "fullon": "confirmed"
     },
     "suggest": []
   },
@@ -724,6 +725,7 @@
       "goa"
     ],
     "check": {
+      "morning": "related",
       "night": "related"
     },
     "suggest": []
@@ -755,7 +757,8 @@
       "goa"
     ],
     "check": {
-      "night": "related"
+      "night": "related",
+      "twilight": "related"
     },
     "suggest": []
   },
@@ -781,7 +784,8 @@
       "psytrance"
     ],
     "check": {
-      "fullon": "related"
+      "fullon": "related",
+      "morning": "related"
     },
     "suggest": []
   },
@@ -1270,7 +1274,7 @@
       "dark psytrance"
     ],
     "check": {
-      "twilight": "related",
+      "dark": "confirmed",
       "psycore": "related"
     },
     "suggest": []
@@ -1736,8 +1740,7 @@
       "dark psytrance"
     ],
     "check": {
-      "hitech": "related",
-      "psycore": "related"
+      "hitech": "related"
     },
     "suggest": []
   },
@@ -1773,7 +1776,7 @@
       "dark psytrance"
     ],
     "check": {
-      "hitech": "related"
+      "forest": "related"
     },
     "suggest": []
   },
@@ -1924,7 +1927,8 @@
       "darkpsy"
     ],
     "check": {
-      "psycore": "related"
+      "dark": "confirmed",
+      "forest": "confirmed"
     },
     "suggest": [
       "psybient"
