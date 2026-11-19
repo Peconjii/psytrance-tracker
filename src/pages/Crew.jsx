@@ -162,7 +162,7 @@ function CrewView({ crew, setCrew, onGone }) {
                         {crew.captain ? 'Delete crew' : 'Leave crew'}
                     </button>
                 </div>
-                <p className="muted text-xs m-0">Only people with the link and an account can join (up to 20). A new link stops the old one. The crew is deleted a week after the event.</p>
+                <p className="muted text-xs m-0">Only people with the link and an account can join (up to 20). Someone the captain removes can't come back with the same link; a new link stops the old one for everyone. The crew is deleted a week after the event.</p>
                 <CampSpot crew={crew} run={run} />
             </section>
 
@@ -302,7 +302,9 @@ function PackingList({ crew, run }) {
                                     </button>
                                 )
                                 : <button type="button" className="btn btn--ghost" onClick={() => run(toggleCrewItem(crew.code, i.id))}>I'll bring it</button>}
-                            <button type="button" className="muted" aria-label={`Delete ${i.name}`} onClick={() => run(deleteCrewItem(crew.code, i.id))}>×</button>
+                            {i.canDelete && (
+                                <button type="button" className="muted" aria-label={`Delete ${i.name}`} onClick={() => run(deleteCrewItem(crew.code, i.id))}>×</button>
+                            )}
                         </span>
                     </li>
                 ))}

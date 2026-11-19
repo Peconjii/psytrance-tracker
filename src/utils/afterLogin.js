@@ -10,7 +10,8 @@ export function takeAfterLogin(fallback = '/events') {
     try {
         const path = sessionStorage.getItem(KEY)
         sessionStorage.removeItem(KEY)
-        return path && path.startsWith('/') ? path : fallback
+        // Only paths on this site: "//other.site" would leave it
+        return path && path.startsWith('/') && !path.startsWith('//') ? path : fallback
     } catch {
         return fallback
     }

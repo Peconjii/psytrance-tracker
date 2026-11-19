@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { fetchBuddies, fetchMyCrewsForEvent } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import BuddySettingsForm from './BuddySettingsForm.jsx'
+import VerifyEmailNotice from './VerifyEmailNotice.jsx'
 import { countryName, flag } from './countries.js'
 
 // Festival Buddies on an event page: who else is going and chose to be visible.
@@ -55,6 +56,9 @@ function BuddiesSection({ eventId, goingKey }) {
                     )}
                     {data.reason === 'not-going' && (
                         <p className="muted text-sm m-0">Press “I'm going” first. Only people going can see each other.</p>
+                    )}
+                    {data.reason === 'verify-email' && (
+                        <VerifyEmailNotice reason="Confirm your email to see Festival Buddies. It keeps fake accounts out." />
                     )}
                     {data.reason === 'not-visible' && (
                         <BuddySettingsForm compact onSaved={() => setReload((n) => n + 1)} />

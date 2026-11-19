@@ -41,6 +41,9 @@ function Privacy() {
                         <li>Only if you turn on Festival Buddies (off by default): your country, a short note and your Instagram
                             name, if you fill them in. They are shown, with your username, only to other people who are going to
                             the same event and turned Festival Buddies on too. Turning it off hides you right away.</li>
+                        <li>Only if you start or join a Crew: the crew's name, its members' usernames, its packing list (who brings what),
+                            the sets it picked and where it camps. Only people in that crew see it, and the whole crew is deleted
+                            7 days after the event (or when its captain leaves).</li>
                         <li>With &ldquo;Continue with Google&rdquo;: Google tells us your email (confirmed by Google), your
                             name and an id for your Google account. We keep the email and that id, and use the name only to
                             suggest a username. We get nothing else from Google, and Google doesn&apos;t see what you do here.</li>
