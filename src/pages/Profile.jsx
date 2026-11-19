@@ -12,6 +12,7 @@ import api, {
 } from '../api/backend'
 import usePageMeta from '../hooks/usePageMeta.js'
 import BuddySettingsForm from '../components/BuddySettingsForm.jsx'
+import MyCrews from '../components/crew/MyCrews.jsx'
 
 // "2026-10-14" in the browser's time zone, to compare with the dates the backend sends
 function todayIso() {
@@ -184,6 +185,11 @@ function Profile() {
                     disabled={savingDigest}
                     className="switch shrink-0"
                 />
+            </section>
+
+            <section className="panel">
+                <h2 className="panel__label">Your crews</h2>
+                <MyCrews />
             </section>
 
             <section className="panel">

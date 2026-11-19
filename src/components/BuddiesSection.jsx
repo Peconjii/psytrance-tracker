@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchBuddies } from '../api/backend.js'
+import { fetchBuddies, fetchMyCrewsForEvent } from '../api/backend.js'
 import { useAuth } from '../context/AuthContext'
 import BuddySettingsForm from './BuddySettingsForm.jsx'
 import { countryName, flag } from './countries.js'
@@ -13,12 +13,27 @@ function BuddiesSection({ eventId, goingKey }) {
     const [data, setData] = useState(null)
     const [reload, setReload] = useState(0)
     const [onlyMine, setOnlyMine] = useState(false)
+    // Your crew for this event, if any: "Invite aboard" copies its link to send to a buddy
+    const [crew, setCrew] = useState(null)
+    const [copiedFor, setCopiedFor] = useState(null)
 
     useEffect(() => {
         const controller = new AbortController()
         fetchBuddies(eventId, controller.signal).then((d) => d && setData(d))
         return () => controller.abort()
     }, [eventId, goingKey, reload, user?.username])
+
+    useEffect(() => {
+        if (!data?.canSee) return
+        let alive = true
+        fetchMyCrewsForEvent(eventId).then((c) => alive && setCrew(c[0] || null)).catch(() => {})
+        return () => { alive = false }
+    }, [eventId, data?.canSee])
+
+    const invite = (username) => navigator.clipboard?.writeText(`${window.location.origin}/crew/${crew.code}`).then(() => {
+        setCopiedFor(username)
+        setTimeout(() => setCopiedFor(null), 2500)
+    })
 
     if (!data) return null
     const others = data.visibleCount - (data.buddies.some((b) => b.me) ? 1 : 0)
@@ -67,6 +82,11 @@ function BuddiesSection({ eventId, goingKey }) {
                                     <a href={`https://instagram.com/${encodeURIComponent(b.instagram)}`} target="_blank" rel="noreferrer nofollow" className="muted">
                                         @{b.instagram} ↗
                                     </a>
+                                )}
+                                {crew && !b.me && (
+                                    <button type="button" className="link text-xs" onClick={() => invite(b.username)}>
+                                        {copiedFor === b.username ? 'Crew link copied, send it to them ✓' : `Invite aboard ${crew.name}`}
+                                    </button>
                                 )}
                                 {b.note && <span className="soft basis-full">{b.note}</span>}
                             </li>

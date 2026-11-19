@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { takeAfterLogin } from '../utils/afterLogin.js'
 import { useAuth } from '../context/AuthContext'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import usePageMeta from '../hooks/usePageMeta.js'
@@ -20,7 +21,7 @@ function Login() {
         e.preventDefault()
         try {
             await login(username, password)
-            navigate('/events')
+            navigate(takeAfterLogin())
         } catch (err) {
             // 429: too many wrong passwords for this username, the backend says how long to wait
             setError(err.response?.status === 429 ? err.response.data?.message : 'Invalid username or password')

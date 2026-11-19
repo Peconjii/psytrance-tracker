@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { takeAfterLogin } from '../utils/afterLogin.js'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import api from '../api/backend'
@@ -67,7 +68,7 @@ function GoogleSignIn({ onNewAccount }) {
                 setUsername(needs.suggestedUsername)
                 onNewAccount?.(true)
             } else {
-                navigate('/events')
+                navigate(takeAfterLogin())
             }
         } catch (err) {
             setError(err.response?.data?.message || "Google sign-in didn't work. Try again.")
@@ -117,7 +118,7 @@ function GoogleSignIn({ onNewAccount }) {
         setError('')
         try {
             await loginWithGoogle(newAccount.credential, username.trim())
-            navigate('/events')
+            navigate(takeAfterLogin())
         } catch (err) {
             const status = err.response?.status
             setError(status === 409 ? 'That username is taken. Try another one.'

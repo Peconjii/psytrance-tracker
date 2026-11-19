@@ -17,6 +17,7 @@ import BottomNav from './components/BottomNav'
 const MapOfPsy = lazy(() => import('./map/MapOfPsy'))
 const Events = lazy(() => import('./pages/Events'))
 const EventDetails = lazy(() => import('./pages/EventDetails'))
+const Crew = lazy(() => import('./pages/Crew'))
 const Favorites = lazy(() => import('./pages/Favorites'))
 const Register = lazy(() => import('./pages/Register'))
 const Login = lazy(() => import('./pages/Login'))
@@ -87,6 +88,7 @@ function Shell() {
           <Route path="/" element={<MapOfPsy />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/crew/:code" element={<Crew />} />
           <Route path="/map" element={<GlobalMap />} />
           <Route path="/artists" element={<Artists />} />
           <Route path="/artists/:slug" element={<Artist />} />

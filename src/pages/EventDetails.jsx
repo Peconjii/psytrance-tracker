@@ -5,6 +5,7 @@ import { fetchWeatherForEvents, forecastFor, weatherKey } from '../api/weather.j
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
 import BuddiesSection from '../components/BuddiesSection.jsx'
+import CrewPanel from '../components/crew/CrewPanel.jsx'
 import FavoriteButton from '../components/FavoriteButton.jsx'
 import GoingButton from '../components/GoingButton.jsx'
 import ShareButton from '../components/ShareButton.jsx'
@@ -286,6 +287,9 @@ function EventDetails() {
     const endsAt = formatWhen(details?.endsAt || event.dateEnd)
     const isCancelled = /cancel/i.test(event.nameStatus || '')
     const hasStory = details && (details.lineUp.length > 0 || details.info)
+    // Over once its last day is behind us (the crew panel hides then)
+    const lastDay = (details?.endsAt || event.dateEnd || details?.startsAt || event.dateStart || '').slice(0, 10)
+    const eventOver = Boolean(lastDay) && lastDay < new Date().toLocaleDateString('sv')
 
     return (
         <div className="page">
@@ -440,6 +444,7 @@ function EventDetails() {
                         </Section>
                     )}
 
+                    <CrewPanel eventId={id} eventOver={eventOver} />
                     <BuddiesSection eventId={id} goingKey={currentGoing?.going ? 'going' : 'not'} />
 
                     <ReviewSection eventId={id} />

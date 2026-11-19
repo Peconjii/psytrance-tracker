@@ -224,3 +224,73 @@ export async function saveBuddySettings(settings) {
     const response = await api.put('/api/me/buddy', settings)
     return response.data
 }
+
+// Crews: a private group for one event, joined with its link (code). Everything needs login.
+export async function fetchMyCrewsForEvent(eventId) {
+    const response = await api.get(`/api/crews/event/${eventId}`)
+    return response.data
+}
+
+export async function fetchMyCrews() {
+    const response = await api.get('/api/crews/mine')
+    return response.data
+}
+
+export async function createCrew(eventId, name) {
+    const response = await api.post(`/api/crews/event/${eventId}`, { name })
+    return response.data
+}
+
+export async function fetchCrewPreview(code) {
+    const response = await api.get(`/api/crews/${encodeURIComponent(code)}/preview`)
+    return response.data
+}
+
+export async function fetchCrew(code) {
+    const response = await api.get(`/api/crews/${encodeURIComponent(code)}`)
+    return response.data
+}
+
+export async function joinCrew(code) {
+    const response = await api.post(`/api/crews/${encodeURIComponent(code)}/join`)
+    return response.data
+}
+
+export async function removeCrewMember(code, username) {
+    await api.delete(`/api/crews/${encodeURIComponent(code)}/members/${encodeURIComponent(username)}`)
+}
+
+export async function newCrewLink(code) {
+    const response = await api.post(`/api/crews/${encodeURIComponent(code)}/link`)
+    return response.data
+}
+
+export async function setCrewCamp(code, campSpot) {
+    const response = await api.put(`/api/crews/${encodeURIComponent(code)}/camp`, { campSpot })
+    return response.data
+}
+
+export async function addCrewItem(code, name) {
+    const response = await api.post(`/api/crews/${encodeURIComponent(code)}/items`, { name })
+    return response.data
+}
+
+export async function toggleCrewItem(code, itemId) {
+    const response = await api.post(`/api/crews/${encodeURIComponent(code)}/items/${itemId}/bring`)
+    return response.data
+}
+
+export async function deleteCrewItem(code, itemId) {
+    const response = await api.delete(`/api/crews/${encodeURIComponent(code)}/items/${itemId}`)
+    return response.data
+}
+
+export async function pickCrewSet(code, artist, startsAt) {
+    const response = await api.post(`/api/crews/${encodeURIComponent(code)}/picks`, { artist, startsAt })
+    return response.data
+}
+
+export async function unpickCrewSet(code, artist, startsAt) {
+    const response = await api.delete(`/api/crews/${encodeURIComponent(code)}/picks`, { data: { artist, startsAt } })
+    return response.data
+}
