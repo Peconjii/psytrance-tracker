@@ -1,31 +1,17 @@
-import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import usePageMeta from '../hooks/usePageMeta.js'
 
 const GITHUB_PROFILE = 'https://github.com/Peconjii'
 const LINKEDIN_PROFILE = 'https://www.linkedin.com/in/petar-vlku-a6445b294/'
 const INSTAGRAM = 'https://www.instagram.com/mapofpsy/'
 
-// Crypto addresses for donations: { coin, network, address }. The support box shows them once there are any.
-const CRYPTO = [
-    { coin: 'BTC', network: 'Bitcoin', address: 'bc1qcyskg99t7pu5up8rpr2rt4slhtyu30ulddynap' },
-    { coin: 'ETH', network: 'Ethereum', address: '0x86CF8be12cDeeb6aDd68f347BeBa232aE17c39ea' },
-    { coin: 'USDT / TRX', network: 'Tron (TRC20)', address: 'THfBskd3GAWLML96VgrBnBnekZdCjmVnpu' },
-    { coin: 'XRP', network: 'XRP Ledger', address: 'raZWviaGqHVosG7Gjas7PQFrrhWrfEGAPs' },
-]
-
-// Why the map exists, the story behind it and how to support it. The footer's "♡ Support" opens #support.
+// Why the map exists and the story behind it
 function About() {
     usePageMeta({
         title: 'About',
         description: 'Why Map of Psy exists: one place for the whole psytrance culture, its history, its sound and its parties.',
         path: '/about',
     })
-    // "♡ Support" in the footer links to /about#support: the router doesn't scroll to it by itself
-    const { hash } = useLocation()
-    useEffect(() => {
-        if (hash === '#support') document.getElementById('support')?.scrollIntoView({ behavior: 'smooth' })
-    }, [hash])
     return (
         <div className="page about">
             <header className="page-head">
@@ -72,42 +58,12 @@ function About() {
                 </div>
             </section>
 
-            <section id="support" className="about__support">
-                <h2 className="about__label">// Support</h2>
-                <p>Map of Psy is free and always will be — it&apos;s built for the community, not for money. The best way
-                    to support it is to add an event, fix what&apos;s wrong, or share the map with someone who&apos;d feel it
-                    too. And if you&apos;d still like to chip in for the servers and the domain, every bit is welcome.</p>
-                {CRYPTO.length > 0 && (
-                    <details className="about__crypto">
-                        <summary>Crypto ({CRYPTO.map(c => c.coin).join(' · ')})</summary>
-                        <ul>{CRYPTO.map(c => <Address key={c.address} {...c} />)}</ul>
-                    </details>
-                )}
-            </section>
-
             <p className="about__links mono text-xs">
                 <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram ↗</a> ·{' '}
                 <a href={GITHUB_PROFILE} target="_blank" rel="noopener noreferrer">GitHub ↗</a> ·{' '}
                 <a href={LINKEDIN_PROFILE} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
             </p>
         </div>
-    )
-}
-
-function Address({ coin, network, address }) {
-    const [copied, setCopied] = useState(false)
-    const copy = () => {
-        navigator.clipboard?.writeText(address).then(() => {
-            setCopied(true)
-            setTimeout(() => setCopied(false), 1500)
-        }).catch(() => {})
-    }
-    return (
-        <li>
-            <span className="about__coin">{coin}{network && <small> · {network}</small>}</span>
-            <code>{address}</code>
-            <button type="button" className="btn btn--ghost" onClick={copy}>{copied ? 'Copied' : 'Copy'}</button>
-        </li>
     )
 }
 
