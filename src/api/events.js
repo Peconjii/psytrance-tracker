@@ -201,3 +201,26 @@ export function countTicketClick(id, name) {
         // an old browser without fetch: nothing to count
     }
 }
+
+// Festival Buddies of an event: { visibleCount, canSee, reason, buddies: [{ username, country, note, instagram, me }] }.
+// Never throws: on failure it answers "nothing to show".
+export async function fetchBuddies(eventId, signal) {
+    try {
+        const response = await api.get(`/api/events/${eventId}/buddies`, { signal })
+        return response.data
+    } catch (err) {
+        if (err?.name !== 'CanceledError') console.error('Could not load buddies:', err)
+        return null
+    }
+}
+
+// The logged-in user's Festival Buddies settings: { visible, country, note, instagram }
+export async function fetchBuddySettings() {
+    const response = await api.get('/api/me/buddy')
+    return response.data
+}
+
+export async function saveBuddySettings(settings) {
+    const response = await api.put('/api/me/buddy', settings)
+    return response.data
+}

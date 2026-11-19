@@ -38,6 +38,9 @@ function Privacy() {
                         <li>What you do on the site: the artists and labels you follow, events you save or are going to, your
                             reviews, the events you add, the pages you own and the requests you send.</li>
                         <li>The date you made the account and whether you confirmed your email.</li>
+                        <li>Only if you turn on Festival Buddies (off by default): your country, a short note and your Instagram
+                            name, if you fill them in. They are shown, with your username, only to other people who are going to
+                            the same event and turned Festival Buddies on too. Turning it off hides you right away.</li>
                         <li>With &ldquo;Continue with Google&rdquo;: Google tells us your email (confirmed by Google), your
                             name and an id for your Google account. We keep the email and that id, and use the name only to
                             suggest a username. We get nothing else from Google, and Google doesn&apos;t see what you do here.</li>

@@ -4,6 +4,7 @@ import { calendarUrl, countTicketClick, fetchEventDetails, fetchAftermovie, fetc
 import { fetchWeatherForEvents, forecastFor, weatherKey } from '../api/weather.js'
 import EventMap from '../components/EventMap.jsx'
 import ReviewSection from '../components/ReviewSection.jsx'
+import BuddiesSection from '../components/BuddiesSection.jsx'
 import FavoriteButton from '../components/FavoriteButton.jsx'
 import GoingButton from '../components/GoingButton.jsx'
 import ShareButton from '../components/ShareButton.jsx'
@@ -438,6 +439,8 @@ function EventDetails() {
                             <p className="muted text-sm m-0">The organizers haven't published a line-up or description yet.</p>
                         </Section>
                     )}
+
+                    <BuddiesSection eventId={id} goingKey={currentGoing?.going ? 'going' : 'not'} />
 
                     <ReviewSection eventId={id} />
                 </div>
