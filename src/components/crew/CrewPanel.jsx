@@ -53,7 +53,7 @@ function CrewPanel({ eventId, eventOver }) {
             )}
             {user && (naming ? (
                 <form className="flex flex-wrap gap-2" onSubmit={start}>
-                    <input className="field flex-1" autoFocus maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Ekipa iz Novog Sada" aria-label="Crew name" />
+                    <input className="field flex-1" autoFocus maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Belgrade crew · 2 spare seats" aria-label="Crew name" />
                     <button type="submit" className="btn btn--primary">Start crew</button>
                 </form>
             ) : (
